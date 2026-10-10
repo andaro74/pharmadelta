@@ -15,7 +15,7 @@ this is the same row with the open detail.
 | Seeded commit | `df860b7` on `m00-pr1`. `goldens/g-002.yaml` (trap, a superseded rule) carries as its `expected` the answer the baseline gives, not the Data Owner's. |
 | Expected gate output | PR 2's gate runs `src/baseline/run.py` over `goldens/` in CI, compares each observation with its golden and records the match per golden. On `df860b7`: RED, naming `g-002`. |
 | Measured | (filled at close; a CI-written result with its link, nothing else) |
-| PRs used / cap | 2 / 4 |
+| PRs used / cap | 3 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -190,21 +190,120 @@ same construction step PR 1 recorded, and decides nothing.
   with `verdict: RED`, `traps_matched: ["g-002"]` and
   `written_by_ci: true`. Download it and read it.
 - The six `matched` values in `result.json` equal PR 1's hand read above.
-- `src/gate/` reads a golden's `expected` only to compare it with an
-  observation; `src/baseline/` still does not read it. Grep `expected`
+- `src/gate/` reads a golden's `expected` for three uses: it
+  shape-checks it (an answer object for `ordinary` and `trap`, the
+  string `BLOCKED` for `guardrail` and `redteam`), compares it with the
+  observation, and copies it into `result.json` beside the observation.
+  None of the three reaches the baseline or the verdict: `src/baseline/`
+  does not read it, and the verdict is formed from each golden's `kind`
+  and `matched` only, never from an `expected` value. Grep `expected`
   under `src/`.
 - The scorer compares every key under `answer_fields`, not only the
   three the goldens carry: an observation with an extra or missing key
   does not match. Read `score_answer` in `src/gate/score.py`.
 - Nothing in this PR changes `goldens/g-002.yaml`. `git diff main --stat`.
-- `git ls-files --eol` shows `i/lf` for every file before and after
-  `.gitattributes`.
+- `git ls-files --eol` shows `i/lf` for every non-empty file before and
+  after `.gitattributes`. The empty `src/__init__.py` shows `i/none`.
 
 ### After this PR goes RED
 
 The plant is lifted by the one edit `milestones/M00/README.md` names
 under "The false state". Which PR carries it is Product's decision on
 reading the CI run; it is recorded here when made.
+
+## Repair (PR 3, 2026-10-10)
+
+PR 3 is the repair: what the cold review of PR 2 (#3) found, and nothing
+else. The plant stands; `goldens/g-002.yaml` is unchanged. The review
+found one defect and two inexact sentences.
+
+### Q3, defect: the artifact is written whether or not the job fails
+
+PR 2's open detail says the artifact is "uploaded whether or not the job
+failed", and `rulings/pr2.md` ruling 4 says "the artifact is written
+whether or not it does". Three inputs break it:
+
+- a. Scorer exit 2 writes no `result.json`. Input: change `kind: trap`
+  to `kind: traps` in any golden. The artifact then holds
+  `observations.json` only, with no verdict and no run URL.
+- b. A runner crash creates no output directory, and the upload step's
+  `if-no-files-found: error` fails, so no artifact is written. Input:
+  delete the `question` key from any golden.
+- c. An uncaught exception in the scorer exits 1, the RED code, with no
+  `result.json`.
+
+Fix in `src/gate/score.py`: on `Unscorable` and on any uncaught
+exception the scorer writes `result.json` with `verdict: UNSCORABLE`,
+the error type and text (and the traceback when it raised), `commit`,
+`dirty`, `written_by_ci` and `ci`, then exits 2. UNSCORABLE is never RED
+and never GREEN. The result carries no `traps_matched` and no per-golden
+table, so it cannot be read as either.
+
+Fix in `.github/workflows/gate.yml`: a step before the runner creates the
+artifact directory, so the upload always has a directory. The scorer
+step runs whenever the runner step ran, crashed or not, so a runner
+crash yields a `result.json` saying the observations file is missing.
+`if-no-files-found: error` stays, so when nothing ran (checkout or
+install failed) the empty directory still fails the upload loudly.
+
+What is now true, exactly: `result.json` is written whenever the scorer
+step starts, which is whenever the runner step ran. Before that point
+nothing is written and the upload fails. The two PR 2 sentences above
+stand as the record of what PR 2 claimed; they were not true at PR 2.
+
+Local construction checks (not evidence, P4), run on a scratch copy of
+`goldens/` passed with `--goldens` and not committed:
+
+| Input | Before PR 3 | After PR 3 |
+|---|---|---|
+| a. `kind: traps` in `g-003` | scorer exit 2, no `result.json` | `UNSCORABLE`, `Unscorable: g-003: unknown kind 'traps'`, exit 2 |
+| b. no `question` in `g-004` | runner exit 1, directory empty | runner exit 1; scorer `UNSCORABLE`, `FileNotFoundError` on the observations file, exit 2 |
+| c. no `expected` in `g-003` | scorer `KeyError`, exit 1 | `UNSCORABLE`, `KeyError: 'expected'`, exit 2 |
+
+For c the review named no input; a missing `expected` is one the runner
+does not read, so only the scorer raises. On the unchanged goldens the
+scorer still reads RED naming `g-002`, with the same six matches as
+PR 1's hand read, locally; the CI run on this PR measures that.
+
+### Q4, prose: three uses of `expected`
+
+The sentence under PR 2's "What a reader can falsify" said `src/gate/`
+reads a golden's `expected` "only to compare it with an observation". It
+also shape-checks it and copies it into `result.json`. The sentence is
+rewritten in place to name all three uses and to say none reaches the
+baseline or the verdict.
+
+### Q6, prose: the empty file
+
+The same section said `git ls-files --eol` shows `i/lf` for every file.
+The empty `src/__init__.py` shows `i/none`. The sentence now says "every
+non-empty file".
+
+### What this PR does not hold
+
+- No edit to `goldens/`, `data/`, `src/baseline/`, SPEC/00, CLAUDE.md
+  or the README. The plant stands.
+- No edit to `rulings/pr2.md`. A ruling is a record of what was ruled.
+- No "Measured" cell. That is PR 4's.
+- No lift. Which PR carries it is still Product's decision on reading
+  PR 2's CI run.
+- No test of the UNSCORABLE path beyond the three local checks above.
+
+### Expected CI result on this PR
+
+RED, naming `g-002`, written by CI. The plant is not lifted here, so RED
+is the correct reading. The `M00 gate` job is required on `main`
+(Unsure 12, set after PR 2 merged), so this run blocks the merge; see
+Unsure 17.
+
+## Unsure (PR 3)
+
+Each needs a seat's ruling. None changes the measurement.
+
+| # | Item | Seat |
+|---|---|---|
+| 16 | The review's fix for input b was the directory alone. An empty directory still fails the upload under `if-no-files-found: error`, so the directory alone writes no artifact when the runner crashes. PR 3 also runs the scorer step whenever the runner step ran (`if: !cancelled() && steps.baseline.outcome != 'skipped'`), so that case writes a `result.json`. Confirm the condition, or rule that the directory alone is enough and remove it. | Engineering |
+| 17 | The `M00 gate` job is required on `main` and goes RED while the plant stands. PR 3 cannot merge on its own run, and neither can PR 4 unless the lift is in it. Whether PR 3 is merged by an administrator over the check, or the lift moves into PR 3 or PR 4, is a repository-settings and ledger decision, not a file in this PR. | Security, Product |
 
 ## Unsure (PR 2)
 

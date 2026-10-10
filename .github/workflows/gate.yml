@@ -28,10 +28,20 @@ jobs:
       - name: Install (locked, Python 3.14 from .python-version)
         run: uv sync --locked
 
+      # The artifact directory exists before anything can crash, so the
+      # upload below always has a directory to read (M00 PR 3, Q3 b).
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m00-gate"
+
       - name: Run the baseline over goldens/ (observations, scores nothing)
+        id: baseline
         run: uv run python -m src.baseline.run --out "$RUNNER_TEMP/m00-gate/observations.json"
 
+      # Runs whenever the baseline step ran, crashed or not. With no
+      # observations the scorer writes result.json with verdict UNSCORABLE
+      # and exits 2, so the artifact still says what happened (Q3 b).
       - name: Score each observation against its golden (RED when a trap is matched)
+        if: ${{ !cancelled() && steps.baseline.outcome != 'skipped' }}
         run: >
           uv run python -m src.gate.score
           --observations "$RUNNER_TEMP/m00-gate/observations.json"

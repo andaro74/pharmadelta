@@ -16,9 +16,15 @@ any `trap` is matched, naming each matched trap; otherwise GREEN. An
 written as JSON; it is evidence only when CI wrote it (P4), and the
 result says whether it did.
 
+When the inputs cannot be scored, whether the scorer refuses them
+(`Unscorable`) or anything else raises, the result is still written, with
+`verdict: UNSCORABLE` and the error text, so the artifact always holds a
+result once the scorer has its arguments. UNSCORABLE is not a verdict on
+F0.1: it is never RED and never GREEN.
+
     uv run python -m src.gate.score --observations <obs.json> --out <result.json> [--summary <md>]
 
-Exit status: 0 GREEN, 1 RED, 2 the inputs could not be scored.
+Exit status: 0 GREEN, 1 RED, 2 UNSCORABLE.
 """
 
 from __future__ import annotations
@@ -28,6 +34,7 @@ import json
 import os
 import subprocess
 import sys
+import traceback
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -150,21 +157,105 @@ def score(goldens: list[dict[str, Any]], observations: list[dict[str, Any]], tab
 
 
 def summary_markdown(result: dict[str, Any]) -> str:
+    dirty = result.get("dirty")
     lines = [
         f"## M00 gate: {result['verdict']}",
         "",
         result["reason"] + ".",
         "",
-        f"Commit `{result['commit']}`" + (" (dirty tree)" if result["dirty"] else "") + f", written by CI: `{result['written_by_ci']}`.",
+        f"Commit `{result.get('commit') or 'unknown'}`"
+        + (" (dirty tree)" if dirty else "")
+        + f", written by CI: `{result['written_by_ci']}`.",
         "",
-        "| golden | kind | matched | why |",
-        "|---|---|---|---|",
     ]
+    if result["verdict"] == "UNSCORABLE":
+        err = result["error"]
+        lines += [
+            f"`{err['type']}: {err['message']}`",
+            "",
+            "UNSCORABLE is not a verdict on ledger row 0's F0.1. It is never RED and never GREEN.",
+        ]
+        return "\n".join(lines) + "\n"
+    lines += ["| golden | kind | matched | why |", "|---|---|---|---|"]
     for e in result["goldens"]:
         lines.append(f"| {e['id']} | {e['kind']} | {'yes' if e['matched'] else 'no'} | {e['why']} |")
     lines.append("")
     lines.append("The verdict judges ledger row 0's F0.1 only: RED when a `trap` is matched. Other rows are recorded, not judged.")
     return "\n".join(lines) + "\n"
+
+
+def provenance() -> dict[str, Any]:
+    """Which commit this result describes and whether CI wrote it (P4). Never raises."""
+    ci = ci_context()
+    try:
+        commit: str | None = git("rev-parse", "HEAD")
+        dirty: bool | None = bool(git("status", "--porcelain"))
+    except Exception:  # noqa: BLE001  the commit is still recorded from CI's environment when git cannot answer
+        commit, dirty = (ci or {}).get("sha"), None
+    return {
+        "what": "M00 gate: each baseline observation compared with its golden; the verdict is ledger row 0's F0.1",
+        "milestone": "M00",
+        "ledger_row": 0,
+        "falsifier": "F0.1 the baseline's answer to a trap golden equals that golden's expected: same table_row, same clause_id, every answer field equal",
+        "scored_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "commit": commit,
+        "dirty": dirty,
+        "written_by_ci": ci is not None,
+        "ci": ci,
+    }
+
+
+def write_result(args: argparse.Namespace, result: dict[str, Any]) -> None:
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    text = summary_markdown(result)
+    print(text)
+    if args.summary:
+        args.summary.parent.mkdir(parents=True, exist_ok=True)
+        with args.summary.open("a", encoding="utf-8") as fh:
+            fh.write(text)
+
+
+def run(args: argparse.Namespace) -> int:
+    observations = json.loads(args.observations.read_text(encoding="utf-8"))
+    goldens = [yaml.safe_load(p.read_text(encoding="utf-8")) for p in sorted(args.goldens.glob("g-*.yaml"))]
+    table = json.loads((args.data / "table.json").read_text(encoding="utf-8"))
+    clauses = json.loads((args.data / "clauses.json").read_text(encoding="utf-8"))
+
+    scored = score(goldens, observations["observations"], table, clauses)
+    result = {
+        **provenance(),
+        "observations_commit": observations.get("commit"),
+        "observations_method": observations.get("method"),
+        **scored,
+    }
+    if observations.get("commit") != result["commit"]:
+        result["warning"] = "the observations were written at a different commit than this result"
+    write_result(args, result)
+    return 1 if result["verdict"] == "RED" else 0
+
+
+def unscorable(args: argparse.Namespace, exc: BaseException) -> int:
+    """Write the result with `verdict: UNSCORABLE` and the error, then exit 2. Never RED, never GREEN."""
+    refused = isinstance(exc, Unscorable)
+    result = {
+        **provenance(),
+        "verdict": "UNSCORABLE",
+        "reason": "the inputs could not be scored, so F0.1 is not judged: " + ("the scorer refused them" if refused else "the scorer raised"),
+        "error": {
+            "type": type(exc).__name__,
+            "message": str(exc),
+            "traceback": None if refused else traceback.format_exc(),
+        },
+    }
+    print(f"UNSCORABLE: {type(exc).__name__}: {exc}", file=sys.stderr)
+    if not refused:
+        traceback.print_exc()
+    try:
+        write_result(args, result)
+    except Exception as write_exc:  # noqa: BLE001  the exit code stays 2 even when the result cannot be written
+        print(f"UNSCORABLE: could not write {args.out}: {write_exc!r}", file=sys.stderr)
+    return 2
 
 
 def main() -> int:
@@ -175,46 +266,10 @@ def main() -> int:
     parser.add_argument("--goldens", type=Path, default=ROOT / "goldens")
     parser.add_argument("--data", type=Path, default=ROOT / "data")
     args = parser.parse_args()
-
-    run = json.loads(args.observations.read_text(encoding="utf-8"))
-    goldens = [yaml.safe_load(p.read_text(encoding="utf-8")) for p in sorted(args.goldens.glob("g-*.yaml"))]
-    table = json.loads((args.data / "table.json").read_text(encoding="utf-8"))
-    clauses = json.loads((args.data / "clauses.json").read_text(encoding="utf-8"))
-
     try:
-        scored = score(goldens, run["observations"], table, clauses)
-    except Unscorable as exc:
-        print(f"UNSCORABLE: {exc}", file=sys.stderr)
-        return 2
-
-    commit = git("rev-parse", "HEAD")
-    ci = ci_context()
-    result = {
-        "what": "M00 gate: each baseline observation compared with its golden; the verdict is ledger row 0's F0.1",
-        "milestone": "M00",
-        "ledger_row": 0,
-        "falsifier": "F0.1 the baseline's answer to a trap golden equals that golden's expected: same table_row, same clause_id, every answer field equal",
-        "scored_at": datetime.now(UTC).isoformat(timespec="seconds"),
-        "commit": commit,
-        "dirty": bool(git("status", "--porcelain")),
-        "observations_commit": run.get("commit"),
-        "observations_method": run.get("method"),
-        "written_by_ci": ci is not None,
-        "ci": ci,
-        **scored,
-    }
-    if run.get("commit") != commit:
-        result["warning"] = "the observations were written at a different commit than this result"
-
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    text = summary_markdown(result)
-    print(text)
-    if args.summary:
-        args.summary.parent.mkdir(parents=True, exist_ok=True)
-        with args.summary.open("a", encoding="utf-8") as fh:
-            fh.write(text)
-    return 1 if result["verdict"] == "RED" else 0
+        return run(args)
+    except Exception as exc:  # noqa: BLE001  every failure to score is UNSCORABLE, written and exit 2; never the RED code
+        return unscorable(args, exc)
 
 
 if __name__ == "__main__":
