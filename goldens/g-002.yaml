@@ -1,6 +1,4 @@
 # Trap: the rule in the question is an earlier version, no longer in force.
-# PLANT (M00 PR 1): `expected` is the baseline's own answer, not the Data Owner's.
-# The Data Owner's answer and the lift are in milestones/M00/README.md.
 id: g-002
 kind: trap
 question: >-
@@ -10,8 +8,8 @@ expected:
   table_row: metoprolol-tartrate.8.1
   clause_id: 201.57(c)(9)(i)
   answer_fields:
-    impacted: true
-    owed: follow-rld
+    impacted: false
+    owed: none
     escalate: false
 seat: Data Owner
 added: M00

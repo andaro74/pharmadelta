@@ -14,9 +14,9 @@ this is the same row with the open detail.
 | Falsifiers | F0.1 the baseline's answer to a `trap` golden equals that golden's `expected`: same `table_row`, same `clause_id`, every answer field equal. |
 | Seeded commit | `df860b7` on `m00-pr1`. `goldens/g-002.yaml` (trap, a superseded rule) carries as its `expected` the answer the baseline gives, not the Data Owner's. |
 | Expected gate output | PR 2's gate runs `src/baseline/run.py` over `goldens/` in CI, compares each observation with its golden and records the match per golden. On `df860b7`: RED, naming `g-002`. |
-| Measured | (filled at close; a CI-written result with its link, nothing else) |
-| PRs used / cap | 3 / 4 |
-| State | OPEN |
+| Measured | RED, `traps_matched` `["g-002"]`, `written_by_ci` true, on `main` at `47788c0`: [run 38058191295](https://github.com/andaro74/pharmadelta/actions/runs/38058191295). Equals the expected output. |
+| PRs used / cap | 4 / 4 |
+| State | GREEN |
 
 ## The false state (P1, P2)
 
@@ -296,14 +296,77 @@ is the correct reading. The `M00 gate` job is required on `main`
 (Unsure 12, set after PR 2 merged), so this run blocks the merge; see
 Unsure 17.
 
+## Close (PR 4, 2026-10-10)
+
+PR 4 closes the milestone at the cap, 4 / 4. It holds the lift, the
+"Measured" cell, the two rulings PR 3 left open, and `rulings/pr4.md`.
+The tag `m00` goes on its merge commit.
+
+### The lift
+
+`goldens/g-002.yaml` now carries the Data Owner's answer: `impacted`
+false, `owed` none, `escalate` false (unchanged), and the two PLANT
+comment lines are removed. This is the one edit "The false state" named
+and nothing more. Product's decision on which PR carries it: PR 4. PR 3
+was open with the plant standing when the decision was due, and a fifth
+PR is a RED close, so PR 4 was the only PR left.
+
+Local construction run on the lifted goldens at `9f5a0d9` plus this
+edit (not evidence, P4): GREEN, `g-001` matched, `g-002` not matched on
+`impacted` and `owed`, `g-003` and `g-004` not matched, `g-005` and
+`g-006` answered, not blocked. The run on this PR measures that.
+
+### Measured
+
+The cell cites the run on `main` after PR 2 merged,
+[38058191295](https://github.com/andaro74/pharmadelta/actions/runs/38058191295):
+RED, `traps_matched` `["g-002"]`, `written_by_ci` true, commit `47788c0`.
+It equals the expected gate output written at open, so the row's state
+is GREEN. The ledger now says what GREEN and RED mean for a row
+(Product, `rulings/pr4.md` 2). The cell cites the `main` run and not the
+PR run because the `main` run's commit is a commit in this repository;
+the PR run's is GitHub's synthetic merge, which is not (Unsure 15,
+ruled).
+
+### How PR 3 and this PR merge (Unsure 17, ruled)
+
+PR 3 (#4) went RED on its own run by design: the plant stood. Security
+rules that #4 is merged over the required check by an administrator,
+with that run on record:
+[38060295880](https://github.com/andaro74/pharmadelta/actions/runs/38060295880),
+RED naming `g-002`, `written_by_ci` true. The check is not disabled; an
+administrator merge leaves its trail on the PR and disabling the check
+leaves none.
+
+This PR's own run is expected GREEN: after the lift no `trap` golden's
+`expected` equals the baseline's answer, so it merges under the check.
+GREEN here is not the measurement. It shows the gate reads the lifted
+goldens and is not stuck on RED. The first run on this PR, at head
+`3b014f1`: [38061941489](https://github.com/andaro74/pharmadelta/actions/runs/38061941489),
+GREEN, `traps_matched` `[]`, `written_by_ci` true, `g-002` not matched on
+`impacted` and `owed`. The commit it records is the synthetic merge, as
+Unsure 15 describes; later runs on this PR are the same reading.
+
+### What this PR does not hold
+
+- No edit to `src/baseline/`, which freezes at `m00` (P5), `src/gate/`,
+  `data/`, SPEC/00, CLAUDE.md or the README.
+- No other golden. No new claim.
+
+### After this PR
+
+Tag `m00` on the merge commit. The baseline is frozen. M00's open Unsure
+items that are not ruled (PR 1 items 2 to 8, PR 2 items 9 to 11 and 13)
+carry to the milestone that touches them. M01 opens in a new session.
+
 ## Unsure (PR 3)
 
 Each needs a seat's ruling. None changes the measurement.
 
 | # | Item | Seat |
 |---|---|---|
-| 16 | The review's fix for input b was the directory alone. An empty directory still fails the upload under `if-no-files-found: error`, so the directory alone writes no artifact when the runner crashes. PR 3 also runs the scorer step whenever the runner step ran (`if: !cancelled() && steps.baseline.outcome != 'skipped'`), so that case writes a `result.json`. Confirm the condition, or rule that the directory alone is enough and remove it. | Engineering |
-| 17 | The `M00 gate` job is required on `main` and goes RED while the plant stands. PR 3 cannot merge on its own run, and neither can PR 4 unless the lift is in it. Whether PR 3 is merged by an administrator over the check, or the lift moves into PR 3 or PR 4, is a repository-settings and ledger decision, not a file in this PR. | Security, Product |
+| 16 | The review's fix for input b was the directory alone. An empty directory still fails the upload under `if-no-files-found: error`, so the directory alone writes no artifact when the runner crashes. PR 3 also runs the scorer step whenever the runner step ran (`if: !cancelled() && steps.baseline.outcome != 'skipped'`), so that case writes a `result.json`. Confirm the condition, or rule that the directory alone is enough and remove it. **Ruled at PR 4** (`rulings/pr4.md` 4): the condition stays. | Engineering |
+| 17 | The `M00 gate` job is required on `main` and goes RED while the plant stands. PR 3 cannot merge on its own run, and neither can PR 4 unless the lift is in it. Whether PR 3 is merged by an administrator over the check, or the lift moves into PR 3 or PR 4, is a repository-settings and ledger decision, not a file in this PR. **Ruled at PR 4** (`rulings/pr4.md` 1 and 3): #4 is merged over the check by an administrator; the lift is in PR 4. | Security, Product |
 
 ## Unsure (PR 2)
 
@@ -314,10 +377,10 @@ Each needs a seat's ruling. None blocks the measurement.
 | 9 | The verdict judges F0.1 only. An `ordinary` golden the baseline does not match, or a `guardrail` it answers, is recorded and does not turn the gate RED. The claim says the baseline fails the traps, so nothing else is judged; if the control should also be required to pass the ordinary case, that is a second falsifier and a later milestone's row. | Product, Threshold Owner |
 | 10 | A `guardrail` or `redteam` match is the literal string `BLOCKED`. agentkeel's shape for a blocked observation after P (an object naming the rule, per SPEC/00 §7) is not known here. The scorer changes when P closes, under the Tool Owner. | Tool Owner, Security |
 | 11 | The three actions are pinned by major tag (`v7`), not by commit SHA. | Security |
-| 12 | The `M00 gate` job is not required on `main`. Branch protection is a repository setting, not a file in this PR; set it after this PR merges. | Security, Engineering |
+| 12 | The `M00 gate` job is not required on `main`. Branch protection is a repository setting, not a file in this PR; set it after this PR merges. **Set after PR 2 merged**: `M00 gate` required on `main`, strict. | Security, Engineering |
 | 13 | No `validate` for this repository's goldens, data and rulings yet (carried from PR 1). The scorer refuses to score a golden with no observation or of an unknown kind, which is the only shape check in the repository. | Engineering |
 | 14 | The ruling file names this PR as #3, the next number on the repository at the time of writing. | Product |
-| 15 | On a `pull_request` run the `commit` in `result.json` and the sha in the artifact name are GitHub's synthetic merge of the branch into `main`, not the branch head. The head sha is on the run's page. The push to `main` after merge records the merge commit itself. Whether PR 4's "Measured" cell cites the PR run or the `main` run is Product's. | Product, Engineering |
+| 15 | On a `pull_request` run the `commit` in `result.json` and the sha in the artifact name are GitHub's synthetic merge of the branch into `main`, not the branch head. The head sha is on the run's page. The push to `main` after merge records the merge commit itself. Whether PR 4's "Measured" cell cites the PR run or the `main` run is Product's. **Ruled at PR 4** (`rulings/pr4.md` 2): the `main` run. | Product, Engineering |
 
 ## Unsure (PR 1)
 

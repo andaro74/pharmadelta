@@ -9,14 +9,16 @@ milestone opens, not before.
 The adoption PR (#1, `milestones/adoption/rulings/adopt-spec00.md`) is
 not counted against any milestone's cap of four (U9).
 
-States: OPEN → GREEN | RED | UNMEASURED. A milestone that closes without
-a measurement is RED.
+States: OPEN → GREEN | RED | UNMEASURED. GREEN: the CI-written verdict
+in "Measured" equals the row's expected gate output, written at open.
+RED: it does not. A milestone that closes without a measurement is RED
+(M00 PR 4, Product).
 
 ## Rows
 
 | # | M | Claim | Falsifiers | Seeded commit | Expected gate output | Measured | PRs used / cap | State |
 |---|---|---|---|---|---|---|---|---|
-| 0 | M00 | Goldens, traps and a naive baseline that fails them | F0.1 the baseline's answer to a `trap` golden equals that golden's `expected`: same `table_row`, same `clause_id`, every answer field equal. | `df860b7` on `m00-pr1`: `goldens/g-002.yaml` (trap) carries the baseline's own answer as its `expected`. | PR 2's gate runs the baseline over `goldens/` in CI, compares each observation with its golden and records the match per golden. On `df860b7`: RED, naming `g-002`. | | 3 / 4 | OPEN |
+| 0 | M00 | Goldens, traps and a naive baseline that fails them | F0.1 the baseline's answer to a `trap` golden equals that golden's `expected`: same `table_row`, same `clause_id`, every answer field equal. | `df860b7` on `m00-pr1`: `goldens/g-002.yaml` (trap) carries the baseline's own answer as its `expected`. | PR 2's gate runs the baseline over `goldens/` in CI, compares each observation with its golden and records the match per golden. On `df860b7`: RED, naming `g-002`. | RED, `traps_matched` `["g-002"]`, `written_by_ci` true, on `main` at `47788c0`: [run 38058191295](https://github.com/andaro74/pharmadelta/actions/runs/38058191295), artifact `m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed`. Equals the expected output. | 4 / 4 | GREEN |
 | 1 | M01 | The agent is created from the re-made template, seats filled, deployed | | | | | 0 / 4 | OPEN |
 | 2 | M02 | Table and clauses are built from live FDA sources, versioned by effective date | | | | | 0 / 4 | OPEN |
 | 3 | P | Per-agent guardrail rules and one approved public caller | | | | | measured in `andaro74/agentkeel`, not here | OPEN |
