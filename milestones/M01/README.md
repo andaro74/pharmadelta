@@ -169,10 +169,22 @@ result; nothing here is the measurement.
   API: conclusion, App id, output text), the pull request's
   `mergeable_state` and merge state, agentkeel's `deploy.yml` runs that
   name `label-impact`, and the registry row for `label-impact`; and
-  writes a `result.json` with a verdict on F1.1 only: RED when the pull
-  request is mergeable or merged while a seat is unassigned, GREEN when
-  the check refused it naming the seat and nothing merged or deployed.
-  The verdict names the seat. `written_by_ci` and the run URL as M00's.
+  writes a `result.json` with one verdict, read as the ledger's expected
+  gate output reads it. RED while any seat in `manifest.yaml` at the
+  first pull request's head is not a login that administers the
+  repository, naming each such seat: the claim "seats filled" is false,
+  and on `eb9b201` that is `rule-owner`. GREEN only when every seat is
+  assigned, the pull request is merged, the platform's deploy run for
+  that merge succeeded and the registry holds `label-impact`. Beside the
+  verdict it records the control: the check's conclusion, App id and
+  output, the `mergeable_state`, the deploy runs and the registry read.
+  A pull request found with `mergeable_state` `clean`, or merged, while
+  a seat is unassigned is RED with F1.1 as the finding, named as such;
+  the plant is expected to produce the other RED, the check refusing it,
+  and that reading is the one the ledger cell names. `written_by_ci` and
+  the run URL as M00's. (Corrected before the merge of PR 1: the first
+  draft said GREEN when the check refused the pull request, which
+  disagreed with the ledger's cell.)
 - What token the reader needs, and whether it needs one (Unsure 3).
 - Whether the registry is read through AWS or through Grafana panel 1,
   and with what credential (Unsure 3).
