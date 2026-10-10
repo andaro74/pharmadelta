@@ -1,0 +1,2 @@
+# Every text file is stored and checked out with LF (M00 PR 2, Security ruling).
+* text=auto eol=lf

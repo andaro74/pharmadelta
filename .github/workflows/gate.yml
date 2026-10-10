@@ -1,0 +1,48 @@
+# The M00 gate (milestones/README.md row 0, F0.1).
+#
+# Runs the frozen baseline over goldens/, scores each observation against
+# its golden, and writes both as the artifact `m00-gate-<sha>`. The job
+# fails when the gate is RED. Only what this workflow writes is evidence
+# (SPEC/00 P4); a local run of the same commands is not.
+
+name: gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m00-gate:
+    name: M00 gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      - name: Run the baseline over goldens/ (observations, scores nothing)
+        run: uv run python -m src.baseline.run --out "$RUNNER_TEMP/m00-gate/observations.json"
+
+      - name: Score each observation against its golden (RED when a trap is matched)
+        run: >
+          uv run python -m src.gate.score
+          --observations "$RUNNER_TEMP/m00-gate/observations.json"
+          --out "$RUNNER_TEMP/m00-gate/result.json"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Write the result as a CI artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: m00-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/m00-gate/
+          if-no-files-found: error
+          retention-days: 90

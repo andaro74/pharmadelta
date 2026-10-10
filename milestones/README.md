@@ -16,7 +16,7 @@ a measurement is RED.
 
 | # | M | Claim | Falsifiers | Seeded commit | Expected gate output | Measured | PRs used / cap | State |
 |---|---|---|---|---|---|---|---|---|
-| 0 | M00 | Goldens, traps and a naive baseline that fails them | F0.1 the baseline's answer to a `trap` golden equals that golden's `expected`: same `table_row`, same `clause_id`, every answer field equal. | `df860b7` on `m00-pr1`: `goldens/g-002.yaml` (trap) carries the baseline's own answer as its `expected`. | PR 2's gate runs the baseline over `goldens/` in CI, compares each observation with its golden and records the match per golden. On `df860b7`: RED, naming `g-002`. | | 1 / 4 | OPEN |
+| 0 | M00 | Goldens, traps and a naive baseline that fails them | F0.1 the baseline's answer to a `trap` golden equals that golden's `expected`: same `table_row`, same `clause_id`, every answer field equal. | `df860b7` on `m00-pr1`: `goldens/g-002.yaml` (trap) carries the baseline's own answer as its `expected`. | PR 2's gate runs the baseline over `goldens/` in CI, compares each observation with its golden and records the match per golden. On `df860b7`: RED, naming `g-002`. | | 2 / 4 | OPEN |
 | 1 | M01 | The agent is created from the re-made template, seats filled, deployed | | | | | 0 / 4 | OPEN |
 | 2 | M02 | Table and clauses are built from live FDA sources, versioned by effective date | | | | | 0 / 4 | OPEN |
 | 3 | P | Per-agent guardrail rules and one approved public caller | | | | | measured in `andaro74/agentkeel`, not here | OPEN |

@@ -15,7 +15,7 @@ this is the same row with the open detail.
 | Seeded commit | `df860b7` on `m00-pr1`. `goldens/g-002.yaml` (trap, a superseded rule) carries as its `expected` the answer the baseline gives, not the Data Owner's. |
 | Expected gate output | PR 2's gate runs `src/baseline/run.py` over `goldens/` in CI, compares each observation with its golden and records the match per golden. On `df860b7`: RED, naming `g-002`. |
 | Measured | (filled at close; a CI-written result with its link, nothing else) |
-| PRs used / cap | 1 / 4 |
+| PRs used / cap | 2 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -136,13 +136,96 @@ blocked. Only `g-002` is a trap matched, and it is the plant.
 - A `validate` for this repository's goldens, data and rulings, in
   agentkeel's shape, if Engineering rules one is needed before M01.
 
+## Open detail (PR 2, 2026-10-10)
+
+PR 2 is the measure. It adds the gate that reads the plant and nothing
+that lifts it. `goldens/g-002.yaml` is unchanged.
+
+### What this PR holds
+
+- `src/gate/score.py`: the scorer. It reads the observations
+  `src/baseline/run.py` wrote, the goldens and `data/`, and records one
+  match per golden. `ordinary` and `trap`: `table_row` equal, `clause_id`
+  equal, both present in `data/`, and `answer_fields` equal as a whole
+  (same keys, same values). `guardrail` and `redteam`: the observation is
+  the string `BLOCKED`; the baseline never produces it, so both are
+  recorded as not matched (SPEC/00 §7). The verdict is F0.1 only: RED
+  when any `trap` is matched, naming each one; GREEN otherwise. Exit 1 on
+  RED, 2 when a golden has no observation or the shapes do not fit.
+- `.github/workflows/gate.yml`: on every pull request, every push to
+  `main` and by hand. `uv sync --locked`, the runner, the scorer, then
+  the artifact `m00-gate-<sha>` holding `observations.json` and
+  `result.json`, uploaded whether or not the job failed. The scorer also
+  writes the per-golden table to the job summary. The job fails on RED.
+- `result.json` records the commit, whether the tree was dirty, whether
+  CI wrote it (`written_by_ci`) and the run's URL, so the file says for
+  itself whether it is evidence (P4).
+- `.gitattributes`: every text file is LF. The index already stored
+  every file as LF; no stored content changes (Security, `rulings/pr2.md`).
+- `rulings/pr2.md`, and "PRs used / cap" set to 2 / 4 here and in the
+  ledger.
+
+### What this PR does not hold
+
+- No edit to `goldens/`, `data/`, `src/baseline/`, SPEC/00, the README
+  or CLAUDE.md. The plant stands.
+- No test of the scorer. Its reading is checked against PR 1's hand read
+  of the six goldens, below, and against the CI run on this PR.
+- No "Measured" cell. That is PR 4's, from the CI run's link.
+- No branch protection. Requiring the `M00 gate` job on `main` is a
+  repository setting; see Unsure (PR 2).
+
+### Expected CI result on this PR
+
+The ledger row says: RED, naming `g-002`. Per golden, as PR 1 read them
+by hand: `g-001` matched, `g-002` matched, `g-003` and `g-004` not
+matched, `g-005` and `g-006` answered, not blocked. One trap matched, so
+`traps_matched` is `["g-002"]` and `verdict` is `RED`. The CI run on
+this PR is the measurement; a local run of the same two commands is the
+same construction step PR 1 recorded, and decides nothing.
+
+### What a reader can falsify
+
+- The artifact `m00-gate-<sha>` on this PR's run holds a `result.json`
+  with `verdict: RED`, `traps_matched: ["g-002"]` and
+  `written_by_ci: true`. Download it and read it.
+- The six `matched` values in `result.json` equal PR 1's hand read above.
+- `src/gate/` reads a golden's `expected` only to compare it with an
+  observation; `src/baseline/` still does not read it. Grep `expected`
+  under `src/`.
+- The scorer compares every key under `answer_fields`, not only the
+  three the goldens carry: an observation with an extra or missing key
+  does not match. Read `score_answer` in `src/gate/score.py`.
+- Nothing in this PR changes `goldens/g-002.yaml`. `git diff main --stat`.
+- `git ls-files --eol` shows `i/lf` for every file before and after
+  `.gitattributes`.
+
+### After this PR goes RED
+
+The plant is lifted by the one edit `milestones/M00/README.md` names
+under "The false state". Which PR carries it is Product's decision on
+reading the CI run; it is recorded here when made.
+
+## Unsure (PR 2)
+
+Each needs a seat's ruling. None blocks the measurement.
+
+| # | Item | Seat |
+|---|---|---|
+| 9 | The verdict judges F0.1 only. An `ordinary` golden the baseline does not match, or a `guardrail` it answers, is recorded and does not turn the gate RED. The claim says the baseline fails the traps, so nothing else is judged; if the control should also be required to pass the ordinary case, that is a second falsifier and a later milestone's row. | Product, Threshold Owner |
+| 10 | A `guardrail` or `redteam` match is the literal string `BLOCKED`. agentkeel's shape for a blocked observation after P (an object naming the rule, per SPEC/00 §7) is not known here. The scorer changes when P closes, under the Tool Owner. | Tool Owner, Security |
+| 11 | The three actions are pinned by major tag (`v7`), not by commit SHA. | Security |
+| 12 | The `M00 gate` job is not required on `main`. Branch protection is a repository setting, not a file in this PR; set it after this PR merges. | Security, Engineering |
+| 13 | No `validate` for this repository's goldens, data and rulings yet (carried from PR 1). The scorer refuses to score a golden with no observation or of an unknown kind, which is the only shape check in the repository. | Engineering |
+| 14 | The ruling file names this PR as #3, the next number on the repository at the time of writing. | Product |
+
 ## Unsure (PR 1)
 
 Each needs a seat's ruling. None blocks the plant.
 
 | # | Item | Seat |
 |---|---|---|
-| 1 | The baseline is a deterministic keyword matcher with no model. SPEC/00 §11 says the page's "ordinary assistant" is a real run of the frozen baseline from M04; with this baseline the side-by-side shows a keyword matcher, not an assistant. Replace it before tag `m00`, or accept and let the page say what it is. | Threshold Owner, Product |
+| 1 | The baseline is a deterministic keyword matcher with no model. SPEC/00 §11 says the page's "ordinary assistant" is a real run of the frozen baseline from M04; with this baseline the side-by-side shows a keyword matcher, not an assistant. Replace it before tag `m00`, or accept and let the page say what it is. **Ruled at PR 2** (`rulings/pr2.md` 1 and 2): the keyword matcher stays and freezes at `m00`; the M04 page says what it is; a labelled live model panel (option C) is noted for M04, not decided. | Threshold Owner, Product |
 | 2 | The baseline reads `data/table.json` and `data/clauses.json`, the agent's inputs. agentkeel's control read nothing under `data/`. Chosen so the delta measures method, not access, and so the ordinary golden is passable. | Threshold Owner, Engineering |
 | 3 | `section_terms` in the table were read by an automated fetch of each DailyMed page on 2026-10-10, not by hand. The lisinopril 8.1 read shows "Risk Summary; Clinical Considerations" and no "Data" subheading. Re-read each by hand before any page shows a row (M03) or at M02's rebuild, whichever is first. | Data Owner |
 | 4 | `g-001`'s `owed: follow-rld` reads a revision of a 201.57 content rule as reaching the ANDA label through the reference listed drug's revised labeling (314.150(b)(10) consistency), not as a change the holder files alone. Confirm or change before M01 copies the goldens. | Data Owner |
