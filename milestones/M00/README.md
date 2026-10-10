@@ -341,8 +341,11 @@ leaves none.
 This PR's own run is expected GREEN: after the lift no `trap` golden's
 `expected` equals the baseline's answer, so it merges under the check.
 GREEN here is not the measurement. It shows the gate reads the lifted
-goldens and is not stuck on RED. The run on this PR: recorded below
-when it has run.
+goldens and is not stuck on RED. The first run on this PR, at head
+`3b014f1`: [38061941489](https://github.com/andaro74/pharmadelta/actions/runs/38061941489),
+GREEN, `traps_matched` `[]`, `written_by_ci` true, `g-002` not matched on
+`impacted` and `owed`. The commit it records is the synthetic merge, as
+Unsure 15 describes; later runs on this PR are the same reading.
 
 ### What this PR does not hold
 
