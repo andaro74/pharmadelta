@@ -307,6 +307,32 @@ refused"`, with the platform check's refusal beside it, `written_by_ci`
 true and the run URL. The CI run on this PR is the measurement; the
 construction run above decides nothing.
 
+### Observed (CI run, 2026-10-10)
+
+The first run on this PR,
+[38077129178](https://github.com/andaro74/pharmadelta/actions/runs/38077129178),
+wrote the artifact `m01-gate-223de2d13d518ce23327373cfff9775a49c24e0f`
+(the sha is the pull request's merge ref, as M00's artifacts were). It
+holds:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED` |
+| `finding` | `control refused` |
+| `seats_unassigned` | `["rule-owner"]` |
+| `seats_admin_unread` | the six `andaro74` seats: `GET collaborators/andaro74/permission` answered 403 with `GITHUB_TOKEN` |
+| `pull_request` | head `eb9b201`, `open`, `merged` false, `mergeable_state` `blocked`, GraphQL `mergeStateStatus` `BLOCKED`, `statusCheckRollup` `FAILURE` |
+| `control.check_runs` | one: id 114267967935, `platform-check`, App 5144253, `failure`, refused `["seats assigned, each a login that administers the repository"]` |
+| `control.required_checks` | ruleset 24846330: `platform-check` from integration 5144253 |
+| `deploys` | 9 runs since `2026-10-10T16:54:39Z`, all read, none naming `label-impact`, not truncated |
+| `registry` | unread, no credential |
+| `written_by_ci` | `true`; exit 1; the `M01 gate` job failed; `M00 gate` on the same PR passed |
+
+Equals the expected result above. Two reads differ from the
+construction run, by token: REST `mergeable_state` is `blocked` with
+`GITHUB_TOKEN` where it was `unstable` with none, and the permission
+endpoint answers 403 where it answered 401. Neither changes the verdict.
+
 ### What a reader can falsify
 
 - The artifact `m01-gate-<sha>` on this PR's run holds a `result.json`
@@ -333,10 +359,18 @@ construction run above decides nothing.
 ### After this PR goes RED
 
 The plant is lifted by the one edit named under "The false state":
-`rule-owner: andaro74` in label-impact's `manifest.yaml`. Which PR
-carries it, and what the reader then reads of the merge, the deploy and
-the registry, is Product's decision on reading the CI run; it is
-recorded here when made.
+`rule-owner: andaro74` in label-impact's `manifest.yaml`.
+
+**Ruled at PR 2, on reading run 38077129178 (Product).** The lift is
+carried by PR 4, as M00's was (`milestones/M00/rulings/pr4.md`). PR 3,
+if the cold review of #7 finds anything, repairs and does not lift; if
+it finds nothing, PR 3 is skipped. The Measured cell takes run
+38077129178: RED naming `rule-owner`, which equals the row's expected
+output. PR 4 records the lift commit, the platform check that passes
+it, the merge and agentkeel's `deploy-agent` job for the merged head,
+each with its link. PR 4 does not claim GREEN from this reader: with
+Unsure 10 and 12 ruled as they are, the reader reads PENDING after the
+lift, naming the unread seat permissions and the unread registry.
 
 ## Unsure (PR 2)
 
@@ -345,14 +379,14 @@ written; this PR touches none of them. Items 3 and 4 are addressed below.
 
 | # | Item | Seat |
 |---|---|---|
-| 10 | **The token.** This repository's `GITHUB_TOKEN` reads, on the two public repositories, the pull request, the commit's contents, the check runs, the rulesets and the Actions runs and jobs: all read with no token in the construction run, so an authenticated token reads them too, with a higher rate limit. It cannot read a seat's collaborator permission on `agentkeel-studio/label-impact`: that endpoint answers only a token with access to the repository (401 with none; the CI run says what `GITHUB_TOKEN` gets). So the reader records the six assigned seats' permission as unread, and GREEN is not reachable from this CI as it stands. Settles PR 1's Unsure 3 for the GitHub half. Proposed: a fine-grained PAT of the owner with Metadata read on the organisation's repositories, or a token minted by agentkeel's observer App, set as a repository secret named by Security and passed to the reader step as `GITHUB_TOKEN`; who sets it and under which seat's record. Not done in this PR. | Security, Engineering |
+| 10 | **The token.** This repository's `GITHUB_TOKEN` reads, on the two public repositories, the pull request, the commit's contents, the check runs, the rulesets and the Actions runs and jobs: all read with no token in the construction run, so an authenticated token reads them too, with a higher rate limit. It cannot read a seat's collaborator permission on `agentkeel-studio/label-impact`: that endpoint answers only a token with access to the repository (401 with none; the CI run says what `GITHUB_TOKEN` gets). So the reader records the six assigned seats' permission as unread, and GREEN is not reachable from this CI as it stands. Settles PR 1's Unsure 3 for the GitHub half. Proposed: a fine-grained PAT of the owner with Metadata read on the organisation's repositories, or a token minted by agentkeel's observer App, set as a repository secret named by Security and passed to the reader step as `GITHUB_TOKEN`; who sets it and under which seat's record. Not done in this PR. **Ruled at PR 2** (`rulings/pr2.md` 6): not needed to close M01; the seat read matters only for GREEN. Ruled again when a milestone needs GREEN from this reader, M07 at the latest; if earlier, the fine-grained PAT, as the smaller change. | Security, Engineering |
 | 11 | **Merge state by token.** REST `mergeable_state` read `unstable` with no token and `blocked` with the owner's; GraphQL `mergeStateStatus` read `BLOCKED` with the owner's and is unread with none. The reader records both and judges "mergeable" on `clean`/`CLEAN` only. Whether a caller without access could ever be shown `clean` while the ruleset blocks the merge is not known; if it could, F1.1's reading from this CI would need the token of item 10. | Engineering |
-| 12 | **The registry.** Recorded as unread. GREEN is impossible while it is. Read it through AWS (a read-only role this repository assumes by OIDC, in the agent account: an agentkeel change, flagged not designed here) or through Grafana panel 1 (a Grafana token as a secret here, the pattern of agentkeel's `evals.yml`), or leave it unread until M03 needs the deployed agent. Settles PR 1's Unsure 3 for the AWS half only by naming the options. | Security, Product |
-| 13 | **PENDING.** The reader has a fourth verdict for "not RED, not GREEN, readable": every seat assigned but the pull request not merged, or merged but not deployed, or the registry unread. The ledger knows RED, GREEN and UNSCORABLE. Proposed: PENDING is an exit 3, fails the job, and is never written to a Measured cell; the cell takes RED or GREEN only. | Product |
-| 14 | **Required check.** Whether `M01 gate` is made a required check on `main` after this PR merges, as `M00 gate` was (M00 Unsure 12). While the plant stands the job is RED on every run, so PR 3 and PR 4 cannot merge on their own run; M00 Unsure 17's pattern was an administrator merging over the check, on record, with the lift in PR 4. The same choice is owed here, after this run is read. | Security, Product |
+| 12 | **The registry.** Recorded as unread. GREEN is impossible while it is. Read it through AWS (a read-only role this repository assumes by OIDC, in the agent account: an agentkeel change, flagged not designed here) or through Grafana panel 1 (a Grafana token as a secret here, the pattern of agentkeel's `evals.yml`), or leave it unread until M03 needs the deployed agent. Settles PR 1's Unsure 3 for the AWS half only by naming the options. **Ruled at PR 2** (`rulings/pr2.md` 7): unread through M01. The read is designed at M03, once, as a read-only role in agentkeel assumed by OIDC, flagged there and not here. | Security, Product |
+| 13 | **PENDING.** The reader has a fourth verdict for "not RED, not GREEN, readable": every seat assigned but the pull request not merged, or merged but not deployed, or the registry unread. The ledger knows RED, GREEN and UNSCORABLE. Proposed: PENDING is an exit 3, fails the job, and is never written to a Measured cell; the cell takes RED or GREEN only. **Ruled at PR 2** (`rulings/pr2.md` 8): as proposed. | Product |
+| 14 | **Required check.** Whether `M01 gate` is made a required check on `main` after this PR merges, as `M00 gate` was (M00 Unsure 12). While the plant stands the job is RED on every run, so PR 3 and PR 4 cannot merge on their own run; M00 Unsure 17's pattern was an administrator merging over the check, on record, with the lift in PR 4. The same choice is owed here, after this run is read. **Ruled at PR 2** (`rulings/pr2.md` 9): `M01 gate` is not made required on `main`. After the lift the reader reads PENDING until items 10 and 12 are read, and a required check would block every later PR for that reason alone. No PR of M01 is merged over a check. | Security, Product |
 | 15 | **Deploy runs grow.** agentkeel's `deploy.yml` runs every ten minutes; the reader reads up to 100 runs since the repository was created, one jobs call each, and records `truncated` when more exist. Within a day the window closes over the plant's early runs; a deploy that scrolled out of it is unread and blocks GREEN until read another way (the registry row, item 12, names the deploying run). | Engineering |
-| 16 | **PR 1's Unsure 4.** The platform check's output on the pull request is now read by the reader: it refused the seats check only, and passed the goldens, so `g-004`'s `escalate` field and `314.80(c)(1)(i)` clause survived agentkeel's golden validation at `eb9b201`. Proposed: ruled, by that record. | Data Owner, Tool Owner |
-| 17 | The ruling file names this PR as #7, the next number on this repository. | Product |
+| 16 | **PR 1's Unsure 4.** The platform check's output on the pull request is now read by the reader: it refused the seats check only, and passed the goldens, so `g-004`'s `escalate` field and `314.80(c)(1)(i)` clause survived agentkeel's golden validation at `eb9b201`. Proposed: ruled, by that record. **Ruled at PR 2** (`rulings/pr2.md` 10): closed, by that record; PR 1's Unsure 4 is settled. | Data Owner, Tool Owner |
+| 17 | The ruling file names this PR as #7, the next number on this repository. Confirmed: #7. | Product |
 
 ## Unsure (PR 1)
 

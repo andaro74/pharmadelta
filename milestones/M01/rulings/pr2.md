@@ -75,13 +75,31 @@ Nothing in this PR lifts the plant, and nothing in label-impact changes.
    expected output names. PR 1's Unsure 4 is answered by the same
    record: the check refused the seats only and passed the goldens.
 
+Added on reading run 38077129178, before this PR left draft:
+
+6. **Security, Engineering (Unsure 10).** No token beyond `GITHUB_TOKEN`
+   is set for M01. The seat-permission read matters only for GREEN, which
+   M01 does not need to close: the Measured cell takes the RED run on
+   the plant. Ruled again when a milestone needs GREEN from this reader.
+7. **Security, Product (Unsure 12).** The registry stays unread through
+   M01. The read is designed at M03 as a read-only role in agentkeel
+   assumed by OIDC, flagged there.
+8. **Product (Unsure 13).** PENDING stands: exit 3, fails the job, never
+   written to a Measured cell. The cell takes RED or GREEN only.
+9. **Security, Product (Unsure 14).** `M01 gate` is not made a required
+   check on `main`. No PR of M01 is merged over a check.
+10. **Data Owner, Tool Owner (Unsure 16).** PR 1's Unsure 4 is closed by
+    the platform check's record at `eb9b201`: the goldens passed.
+11. **Product.** The lift is carried by PR 4. PR 3 repairs what the cold
+    review of #7 finds, or is skipped. Recorded in
+    `milestones/M01/README.md`, "After this PR goes RED".
+
 ## What a reader can falsify
 
 Listed in `milestones/M01/README.md`, "Open detail (PR 2)".
 
 ## What this ruling does not settle
 
-The items under "Unsure (PR 2)" in `milestones/M01/README.md`, and
-PR 1's Unsure 1, 2, 5, 8 and 9, each with its seat. The token (10), the
-registry (12), PENDING (13) and the required check (14) each need a
-ruling before any PR can read GREEN from this CI.
+Unsure 11 and 15 in `milestones/M01/README.md`, and PR 1's Unsure 1, 2,
+5, 8 and 9, each with its seat. GREEN from this reader needs Unsure 10
+and 12 read, which is not M01's.
