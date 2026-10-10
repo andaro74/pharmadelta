@@ -218,6 +218,7 @@ Each needs a seat's ruling. None blocks the measurement.
 | 12 | The `M00 gate` job is not required on `main`. Branch protection is a repository setting, not a file in this PR; set it after this PR merges. | Security, Engineering |
 | 13 | No `validate` for this repository's goldens, data and rulings yet (carried from PR 1). The scorer refuses to score a golden with no observation or of an unknown kind, which is the only shape check in the repository. | Engineering |
 | 14 | The ruling file names this PR as #3, the next number on the repository at the time of writing. | Product |
+| 15 | On a `pull_request` run the `commit` in `result.json` and the sha in the artifact name are GitHub's synthetic merge of the branch into `main`, not the branch head. The head sha is on the run's page. The push to `main` after merge records the merge commit itself. Whether PR 4's "Measured" cell cites the PR run or the `main` run is Product's. | Product, Engineering |
 
 ## Unsure (PR 1)
 
