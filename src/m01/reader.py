@@ -14,21 +14,36 @@ The verdict is ledger row 1's claim, "seats filled, deployed", read as
 `milestones/M01/README.md` "Carried to PR 2" defines it:
 
 - RED while any seat in `manifest.yaml` at the head is not a login that
-  administers the repository: null, empty, not a login, or read as a
-  permission other than `admin`. Each such seat is named. When the pull
-  request is also found with `mergeable_state` `clean`, or merged, the
-  finding is F1.1 and is named as such; otherwise the finding is that the
-  platform's check refused the head, which is the reading the ledger's
-  expected output names.
+  administers the repository: null, empty, not of a login's form, or read
+  as a permission other than `admin`. Each such seat is named. A seat
+  whose permission GitHub would not answer (404 as much as 403) is
+  unread, not unassigned. No `manifest.yaml` at the head (404) is a fact
+  about the commit: every seat unassigned, RED. The `finding` beside RED
+  says what else was found: `F1.1` when the pull request is merged or is
+  read as mergeable; `control refused` when a `platform-check` from
+  agentkeel's App refused the head naming the seats check; otherwise
+  `unassigned, no refusal read`. The ledger's expected output names the
+  second.
+  "Mergeable" is GitHub's `mergeable_state` `clean`, `unstable` or
+  `has_hooks` (REST), or `mergeStateStatus` `CLEAN`, `UNSTABLE` or
+  `HAS_HOOKS` (GraphQL): the states GitHub merges from. GraphQL decides
+  when it was read, else REST. Both are judged only when a token asked:
+  with no token REST showed `unstable` on a head the ruleset blocked
+  (construction run, M01 PR 2), so a no-token read is recorded as unread
+  for F1.1's purpose and cannot make the finding F1.1.
 - GREEN only when every seat is assigned and read as `admin`, the pull
   request is merged, a `deploy-agent` job of agentkeel's `deploy.yml`
-  naming `label-impact` and the merged head concluded `success`, and the
-  registry was read and holds `label-impact`. A seat whose permission
+  naming `label-impact` and the merge commit (`merge_commit_sha`, main's
+  head after the merge, which agentkeel deploys) concluded `success`, and
+  the registry was read and holds `label-impact`. A seat whose permission
   could not be read, or an unread registry, does not make GREEN possible.
 - PENDING when neither: no seat is read as unassigned, and GREEN's
   conditions are not all met. The result names what is missing.
-- UNSCORABLE when the pull request, the manifest or the check runs could
-  not be read, or anything raises. Never RED, never GREEN.
+- UNSCORABLE when the pull request, the repository, the manifest (any
+  answer but 200 or 404) or the check runs could not be read, or anything
+  raises inside `main`. Never RED, never GREEN. A failure before `main`
+  runs (an import error) exits 1 with no result file; the file, not the
+  exit code, is the verdict.
 
 Only a CI-written result is evidence (P4); the result says whether CI
 wrote it. Reads use `GITHUB_TOKEN` when set, else no token; which one is
@@ -225,6 +240,8 @@ def read_permission(login: str, owner: dict[str, Any]) -> dict[str, Any]:
 
 def judge_seats(seats: dict[str, Any], owner: dict[str, Any]) -> list[dict[str, Any]]:
     judged = []
+    # `admin_read` is True whenever nothing is unread: on a null, empty or malformed seat no read was needed, and on
+    # a seat read as not admin the read was made. It is False only on an assigned seat GitHub did not answer for.
     for slug in SEATS:
         value = seats.get(slug)
         if not isinstance(value, str) or not value.strip():
@@ -288,8 +305,10 @@ def read_required_checks() -> dict[str, Any]:
 def read_deploys(since: str | None) -> dict[str, Any]:
     """agentkeel's deploy.yml runs since the agent repository was created, and the jobs in each that name the agent.
 
-    deploy.yml's `sign-agent` and `deploy-agent` are matrix jobs; GitHub names each leg
-    `<job> (<name>, <repository>, <commit>)`, so a leg for this agent carries its name and the commit it deployed."""
+    deploy.yml's `sign-agent` and `deploy-agent` are matrix jobs with no `name` of their own, so GitHub names each
+    leg from the matrix row in its key order, `<job> (<repository>, <repository_id>, <commit>, <name>, <rollout>)`
+    (`deployable` in scripts/platform_check.py at m08). A leg for this agent carries `label-impact` and the
+    40-hex commit it deployed; both are found by content, not by position."""
     query = {"per_page": MAX_DEPLOY_RUNS, "exclude_pull_requests": "true"}
     if since:
         query["created"] = f">={since}"
@@ -330,28 +349,55 @@ def read_registry() -> dict[str, Any]:
 # --- the verdict -----------------------------------------------------------------------------
 
 
+MERGEABLE_REST = ("clean", "unstable", "has_hooks")  # the `mergeable_state` values GitHub merges from
+MERGEABLE_GRAPHQL = ("CLEAN", "UNSTABLE", "HAS_HOOKS")  # the same, as `mergeStateStatus` spells them
+
+
+def judge_mergeable(pull: dict[str, Any]) -> dict[str, Any]:
+    """F1.1's "mergeable", read from one source and said which. GraphQL decides when it was read, else REST.
+
+    Only a token's reading decides: with no token REST showed `unstable` on a head the ruleset blocked
+    (construction run, M01 PR 2, Unsure 11), so a no-token reading is unread for F1.1's purpose."""
+    graphql = pull["graphql"]
+    if token()[0] is None:
+        return {"read": False, "mergeable": None, "source": None, "value": pull["mergeable_state"],
+                "why": "no token asked; REST's mergeable_state without a token does not account for the ruleset"}  # fmt: skip
+    if graphql.get("read"):
+        value = graphql.get("merge_state_status")
+        return {"read": True, "mergeable": value in MERGEABLE_GRAPHQL, "source": "graphql", "value": value, "why": f"mergeStateStatus {value!r} with {token()[1]}"}
+    value = pull["mergeable_state"]
+    return {"read": True, "mergeable": value in MERGEABLE_REST, "source": "rest", "value": value,
+            "why": f"mergeable_state {value!r} with {token()[1]}; GraphQL unread: {graphql.get('why')}"}  # fmt: skip
+
+
 def judge(pull: dict[str, Any], seats: list[dict[str, Any]], checks: list[dict[str, Any]], deploys: dict[str, Any], registry: dict[str, Any]) -> dict[str, Any]:
     unassigned = [s["seat"] for s in seats if not s["assigned"]]
     admin_unread = [s["seat"] for s in seats if s["assigned"] and not s["admin_read"]]
     platform_checks = [c for c in checks if c["name"] == PLATFORM_CHECK and c["app_id"] == PLATFORM_APP_ID]
     refused_seats = any(c["refused"] and any("seats" in r for r in c["refused"]) for c in platform_checks)
-    # F1.1's "mergeable": REST's `clean`, or GraphQL's `CLEAN` when that was read; `merged` either way.
-    found_mergeable = pull["merged"] or pull["mergeable_state"] == "clean" or pull["graphql"].get("merge_state_status") == "CLEAN"
-    merge_head = pull["head_sha"] if pull["merged"] else None
+    mergeable = judge_mergeable(pull)
+    found_mergeable = pull["merged"] or bool(mergeable["mergeable"])
+    # agentkeel deploys main's head, which after the merge is the merge commit, not the branch head
+    # (`deployable` in scripts/platform_check.py at m08 reads branch["commit"]["sha"]).
+    merge_head = pull["merge_commit_sha"] if pull["merged"] else None
     deployed = [leg for leg in deploys.get("naming_agent") or [] if leg["job"] == "deploy-agent" and leg["conclusion"] == "success" and leg["commit"] == merge_head] if merge_head else []
     in_registry = bool(registry.get("read") and registry.get("row"))
+    merge_words = f"mergeable_state {pull['mergeable_state']!r}, mergeStateStatus {pull['graphql'].get('merge_state_status') or 'unread'}"
+    not_mergeable = f"not mergeable ({merge_words})" if mergeable["read"] else f"not read as mergeable ({mergeable['why']}; {merge_words})"
 
     if unassigned:
+        seats_words = f"seat(s) {', '.join(unassigned)} are not a login that administers the repository"
         if found_mergeable:
             finding = "F1.1"
-            reason = (f"F1.1 holds: the pull request is {'merged' if pull['merged'] else 'mergeable (mergeable_state clean)'} "
-                      f"while seat(s) {', '.join(unassigned)} are not a login that administers the repository")
-        else:
+            reason = f"F1.1 holds: the pull request is {'merged' if pull['merged'] else 'mergeable (' + mergeable['why'] + ')'} while {seats_words}"
+        elif refused_seats:
             finding = "control refused"
-            reason = (f"the claim 'seats filled' is false: seat(s) {', '.join(unassigned)} are not a login that administers the repository; "
-                      f"the pull request is not mergeable (mergeable_state {pull['mergeable_state']!r}, mergeStateStatus {pull['graphql'].get('merge_state_status')!r}) and "
-                      + ("the platform check refused the head naming the seats" if refused_seats else "no platform check from the App refused the head for the seats"))
-        return {"verdict": "RED", "finding": finding, "reason": reason, "seats_unassigned": unassigned, "seats_admin_unread": admin_unread, "green_blocked_by": None}
+            reason = f"the claim 'seats filled' is false: {seats_words}; the pull request is {not_mergeable} and the platform check refused the head naming the seats"
+        else:
+            finding = "unassigned, no refusal read"
+            reason = f"the claim 'seats filled' is false: {seats_words}; the pull request is {not_mergeable} and no platform check from the App refused the head for the seats"
+        return {"verdict": "RED", "finding": finding, "reason": reason, "seats_unassigned": unassigned, "seats_admin_unread": admin_unread,
+                "mergeable_judged": mergeable, "green_blocked_by": None}  # fmt: skip
 
     blocked = []
     if admin_unread:
@@ -359,15 +405,15 @@ def judge(pull: dict[str, Any], seats: list[dict[str, Any]], checks: list[dict[s
     if not pull["merged"]:
         blocked.append(f"the pull request is not merged (state {pull['state']!r}, mergeable_state {pull['mergeable_state']!r})")
     if not deployed:
-        blocked.append("no deploy-agent job of agentkeel's deploy.yml naming label-impact at the merged head concluded success"
+        blocked.append("no deploy-agent job of agentkeel's deploy.yml naming label-impact at the merge commit concluded success"
                        + ("" if deploys.get("read") else " (deploy runs unread)"))
     if not in_registry:
         blocked.append("the registry row for label-impact is unread" if not registry.get("read") else "the registry does not hold label-impact")
     if blocked:
         return {"verdict": "PENDING", "finding": None, "reason": "no seat is read as unassigned, and GREEN is not shown: " + "; ".join(blocked),
-                "seats_unassigned": [], "seats_admin_unread": admin_unread, "green_blocked_by": blocked}  # fmt: skip
+                "seats_unassigned": [], "seats_admin_unread": admin_unread, "mergeable_judged": mergeable, "green_blocked_by": blocked}  # fmt: skip
     return {"verdict": "GREEN", "finding": None, "reason": "every seat is a login read as admin, the pull request is merged, its deploy succeeded and the registry holds label-impact",
-            "seats_unassigned": [], "seats_admin_unread": [], "green_blocked_by": []}  # fmt: skip
+            "seats_unassigned": [], "seats_admin_unread": [], "mergeable_judged": mergeable, "green_blocked_by": []}  # fmt: skip
 
 
 def summary_markdown(result: dict[str, Any]) -> str:

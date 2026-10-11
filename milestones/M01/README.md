@@ -15,7 +15,7 @@ this is the same row with the open detail.
 | Seeded commit | `eb9b201` on `first-agent` in `agentkeel-studio/label-impact`, [pull request #1](https://github.com/agentkeel-studio/label-impact/pull/1): `manifest.yaml` with `name: label-impact`, six seats `andaro74` and `rule-owner: null`; goldens `g-001` to `g-004`; `data/` as at pharmadelta `m00`; the tool, its schema and the prompt rewritten for labels. |
 | Expected gate output | agentkeel's `platform-check` on that pull request fails, naming `rule-owner`. PR 2's reader in this repository reads that check, agentkeel's deploy runs and the registry for `label-impact`, in CI, and writes a `result.json` that is RED on F1.1 naming `rule-owner`. |
 | Measured | |
-| PRs used / cap | 2 / 4 |
+| PRs used / cap | 3 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -213,31 +213,56 @@ first pull request stays open. M01 is measured here (SPEC/00 §3).
   this repository holds no credential for it. It writes `result.json`
   with every reading beside one verdict:
   - **RED** while any seat at the head is not a login that administers
-    the repository: `null`, empty, not a login, or read as a permission
-    other than `admin`. Each is named in `seats_unassigned`. The
-    `finding` is `F1.1` when the pull request is also found with
-    `mergeable_state` `clean` (REST), `mergeStateStatus` `CLEAN`
-    (GraphQL) or merged; otherwise `control refused`, the reading the
-    ledger's expected output names.
+    the repository: `null`, empty, not of a login's form, or read as a
+    permission other than `admin`. Each is named in `seats_unassigned`.
+    A login the permission endpoint answers 404 for is unread, not
+    unassigned: the reader cannot tell "not a collaborator" from "this
+    token cannot see collaborators". No `manifest.yaml` at the head
+    (404) is every seat unassigned, RED, not UNSCORABLE. The `finding`
+    is `F1.1` when the pull request is also merged or read as mergeable;
+    `control refused` when a `platform-check` from App 5144253 refused
+    the head naming the seats check, the reading the ledger's expected
+    output names; otherwise `unassigned, no refusal read`. (Repair, PR 3:
+    at PR 2 the second finding was written on every RED where the pull
+    request was not mergeable, whether or not a check had refused it.)
+    "Read as mergeable" is `mergeStateStatus` `CLEAN`, `UNSTABLE` or
+    `HAS_HOOKS` when GraphQL was read, else `mergeable_state` `clean`,
+    `unstable` or `has_hooks`: the states GitHub merges from. Either is
+    judged only when a token asked; `mergeable_judged` records the
+    source. (Repair, PR 3: at PR 2 `clean`/`CLEAN` alone was judged
+    mergeable.)
   - **GREEN** only when every seat is assigned and read as `admin`, the
     pull request is merged, a `deploy-agent` job of agentkeel's
-    `deploy.yml` naming `label-impact` and the merged head concluded
-    `success`, and the registry was read and holds `label-impact`.
+    `deploy.yml` naming `label-impact` and the merge commit
+    (`merge_commit_sha`: main's head after the merge, which agentkeel
+    deploys) concluded `success`, and the registry was read and holds
+    `label-impact`. (Repair, PR 3: at PR 2 the leg was matched on the
+    branch head, which agentkeel never deploys after a merge.)
   - **PENDING** when neither: no seat is read as unassigned and GREEN is
     not shown. `green_blocked_by` names what is missing. A seat whose
     permission is unread, or an unread registry, lands here, never in
     GREEN.
-  - **UNSCORABLE** when the pull request, the manifest or the check runs
-    could not be read, or anything raises. Never RED, never GREEN. The
-    error is written in the result.
+  - **UNSCORABLE** when the pull request, the repository, the manifest
+    (any answer but 200 or 404) or the check runs could not be read, or
+    anything raises inside `main`. Never RED, never GREEN. The error is
+    written in the result. A failure before `main` runs, an import error,
+    exits 1 with no file; the file, not the exit code, is the verdict
+    (Unsure 19).
 
   Exit 0 GREEN, 1 RED, 2 UNSCORABLE, 3 PENDING. Anything else that is
   unread is written as unread with the status GitHub gave and which
-  token asked, never left out and never read as a pass.
+  token asked, never left out and never read as a pass. A seat's
+  `admin_read` is `true` whenever nothing is unread: a `null`, empty or
+  malformed seat needed no read and carries `admin: null`; a seat read
+  as a permission other than `admin` had its read made and carries
+  `admin: false`. It is `false` only on an assigned seat whose
+  permission GitHub did not answer.
 - `.github/workflows/m01.yml`: on every pull request, every push to
   `main` and by hand. `uv sync --locked`, the artifact directory, the
   reader, then the artifact `m01-gate-<sha>` holding `result.json`,
-  uploaded whenever the job reached the reader step. The reader writes
+  uploaded whenever the reader wrote one, which is whenever `main` ran;
+  an import error before `main` exits 1 with no file, and the upload
+  then fails on `if-no-files-found: error` (Unsure 19). The reader writes
   the per-reading table to the job summary. The job fails on anything
   but GREEN. The workflow reads two public repositories with
   `GITHUB_TOKEN` and no secret of this repository. `gate.yml` is
@@ -273,7 +298,7 @@ so its reads may differ; the CI run on this PR says how.
 
 | Reading | What the reader wrote |
 |---|---|
-| pull request | `#1` at `eb9b201`, state `open`, `merged` false, `mergeable` true, `mergeable_state` **`unstable`**; GraphQL unread (needs a token) |
+| pull request | `#1` at `eb9b201`, state `open`, `merged` false, `mergeable` true, `mergeable_state` **`unstable`**; GraphQL unread (needs a token; the reason string at PR 2 printed it as `None`, repaired at PR 3 to `unread`) |
 | seats | `rule-owner` is `None`: unassigned. The six `andaro74` seats: assigned, permission **unread**, `GET collaborators/andaro74/permission` answered 401 with no token |
 | check runs on the head | one: `platform-check`, App 5144253 (`agentkeel-platform`), conclusion `failure`, title `1 refused`, refused `["seats assigned, each a login that administers the repository"]` |
 | required checks | ruleset 24846330: `platform-check` from integration 5144253, read with no token |
@@ -290,7 +315,8 @@ CI run to settle:
   access to the rulesets a state that does not account for them. Neither
   word is `clean`, so the verdict is the same either way; the reader
   records both forms and which token asked, and judges "mergeable" on
-  `clean` or `CLEAN` only (Unsure 11).
+  `clean` or `CLEAN` only (Unsure 11). (Repair, PR 3: now `clean`,
+  `unstable` or `has_hooks`, and only when a token asked; Defect 3.)
 - The collaborator permission endpoint answers only a token with access
   to the repository. With none the six assigned seats are recorded as
   "permission unread", so the reader as built cannot go GREEN from this
@@ -326,7 +352,7 @@ holds:
 | `control.required_checks` | ruleset 24846330: `platform-check` from integration 5144253 |
 | `deploys` | 9 runs since `2026-10-10T16:54:39Z`, all read, none naming `label-impact`, not truncated |
 | `registry` | unread, no credential |
-| `written_by_ci` | `true`; exit 1; the `M01 gate` job failed; `M00 gate` on the same PR passed |
+| `written_by_ci` | `true`; exit 1; the `M01 gate` job failed; `M00 gate` on the same head passed: [run 38077129122](https://github.com/andaro74/pharmadelta/actions/runs/38077129122) |
 
 Equals the expected result above. Two reads differ from the
 construction run, by token: REST `mergeable_state` is `blocked` with
@@ -340,14 +366,19 @@ endpoint answers 403 where it answered 401. Neither changes the verdict.
   `written_by_ci: true`. Download it and read it.
 - The `control.check_runs` entry in it equals "Observed at open" above:
   id 114267967935, App 5144253, conclusion `failure`, title `1 refused`.
-- `src/m01/reader.py` reads nothing from disk: every reading comes from
-  GitHub's API at run time, and the only files it touches are the result
-  and the summary it writes. Grep `open(` under `src/m01/`: two
-  `urllib.request.urlopen` calls to the API and one `args.summary.open`
-  in append mode; `read_text` does not occur.
+- `src/m01/reader.py` reads no file of this repository's content: every
+  reading of label-impact and agentkeel comes from GitHub's API at run
+  time. It runs `git rev-parse HEAD` and `git status --porcelain` for the
+  result's `commit` and `dirty`, and writes the result and the summary.
+  Grep `open(` under `src/m01/`: two `urllib.request.urlopen` calls to
+  the API and one `args.summary.open` in append mode; `read_text` does
+  not occur; `subprocess.run` occurs once, in `git`. (Repair, PR 3: the
+  sentence said "reads nothing from disk".)
 - The verdict is formed from the seats, the merge state, the deploys and
-  the registry only; the check runs are recorded and named in the
-  reason, and do not decide RED. Read `judge` in `src/m01/reader.py`.
+  the registry only; the check runs do not decide RED. They decide the
+  `finding` beside it: `control refused` needs a `platform-check` from
+  the App that refused the seats check, read from the check runs
+  (Repair, PR 3, Defect 2). Read `judge` in `src/m01/reader.py`.
 - No path under `src/m01/` or in `m01.yml` names a secret: grep
   `secrets.` in `.github/workflows/m01.yml`, no match.
 - Nothing in this PR changes label-impact. The pull request's head is
@@ -367,10 +398,198 @@ if the cold review of #7 finds anything, repairs and does not lift; if
 it finds nothing, PR 3 is skipped. The Measured cell takes run
 38077129178: RED naming `rule-owner`, which equals the row's expected
 output. PR 4 records the lift commit, the platform check that passes
-it, the merge and agentkeel's `deploy-agent` job for the merged head,
-each with its link. PR 4 does not claim GREEN from this reader: with
+it, the merge and agentkeel's `deploy-agent` job for the merge commit
+(Repair, PR 3, Defect 1: "the merged head" before), each with its link. PR 4 does not claim GREEN from this reader: with
 Unsure 10 and 12 ruled as they are, the reader reads PENDING after the
 lift, naming the unread seat permissions and the unread registry.
+
+## Repair (PR 3, 2026-10-10)
+
+PR 3 is the repair: what the cold review of PR 2 (#7) found, and nothing
+else. The plant stands; `rule-owner` is `null` at `eb9b201` and
+label-impact's first pull request is open. The review found three
+defects in the reader and ten inexact sentences. Nothing here decides
+the row: PR 2's run 38077129178 was the measurement, and PR 4 fills the
+"Measured" cell from it.
+
+### Defect 1: the deploy leg was matched on the branch head
+
+GREEN asked for a `deploy-agent` job naming `label-impact` at the pull
+request's head sha. agentkeel deploys main's head: `deployable` in
+`scripts/platform_check.py` at `m08` reads `branch["commit"]["sha"]`,
+which after a merge is the merge commit, never the branch head. The
+reader read `merge_commit_sha` into the result and did not use it, so
+GREEN was unreachable on a merged pull request whatever the deploy did.
+
+Fix in `src/m01/reader.py`, `judge`: the leg's commit is matched on
+`merge_commit_sha`. Input that showed it: a merged pull request with a
+`deploy-agent` leg at the merge commit read PENDING before, GREEN after
+(construction check D1 below).
+
+### Defect 2: "control refused" was written with no refusal read
+
+The `finding` `control refused` was written on every RED where the pull
+request was not found mergeable, whether or not any check run had
+refused anything. A head with the null seat and no `platform-check` yet
+posted would have carried the finding the ledger's expected output
+names.
+
+Fix in `judge`: `control refused` needs a check run named
+`platform-check` from App 5144253 whose summary refused the seats
+check, as the reader already parsed it. Without one the finding is
+`unassigned, no refusal read`: the claim is false on the manifest alone
+and no control is on record. F1.1 keeps precedence over both. The third
+name is Product's to confirm (Unsure 18).
+
+### Defect 3: "mergeable" was `clean` only
+
+F1.1's "mergeable" was judged on `mergeable_state` `clean` or
+`mergeStateStatus` `CLEAN`. GitHub merges from `unstable` (a failing
+status that is not required) and `has_hooks` too, so a pull request in
+either state with the null seat would have read `control refused`
+instead of F1.1.
+
+Fix in `judge_mergeable`, new: the sets are `clean`, `unstable`,
+`has_hooks` and `CLEAN`, `UNSTABLE`, `HAS_HOOKS`. GraphQL decides when it
+was read, else REST, and `mergeable_judged` in the result names the
+source and the value. One consequence, handled in the same fix: the
+construction run at PR 2 with no token read REST `unstable` on this
+head while the ruleset blocked it, so the widened set would have read
+F1.1 from a no-token run. "Mergeable" is therefore judged only when a
+token asked; with none it is unread for F1.1's purpose, recorded as
+such, and the finding cannot be F1.1. Unsure 11 is updated in place.
+
+### Prose, repaired in place
+
+Each sentence is repaired where it stands, as M00's Q4 and Q6 were,
+except the first row, which is not edited, and the `admin_read` row,
+which is an addition. "Ten inexact sentences" counts the twelve rows
+less those two.
+
+| Where | Said | Now says |
+|---|---|---|
+| Ledger row 1 and this file, expected gate output | "RED on F1.1 naming `rule-owner`" | Not edited: written at open, and the Measured cell is read against it. It reads: RED on row 1, whose falsifier is F1.1; the `finding` field names the arm, `control refused` on the plant. Unsure 20. |
+| "What this PR holds", RED | "not a login" | "not of a login's form"; a login the permission endpoint answers 404 for is unread, not unassigned |
+| "What this PR holds", RED | `control refused` otherwise | `control refused` only on a refusal read; else `unassigned, no refusal read` (Defect 2) |
+| "What this PR holds", RED | `clean`/`CLEAN` | the three states GitHub merges from, token only (Defect 3) |
+| "What this PR holds", GREEN | "the merged head" | "the merge commit" (Defect 1) |
+| "What this PR holds", UNSCORABLE | "the manifest ... could not be read" | a 404 on `manifest.yaml` is every seat unassigned, RED; UNSCORABLE is any other answer but 200 |
+| "What this PR holds", exit codes | nothing on `admin_read` | added: `admin_read` is `true` whenever nothing is unread, on a seat that needed no read and on one read as not `admin` alike |
+| "What this PR holds", `m01.yml` | "uploaded whenever the job reached the reader step" | uploaded whenever `main` ran; an import error exits 1 with no file (Unsure 19) |
+| "Construction run", pull request | "GraphQL unread" | the reason string printed `mergeStateStatus None`; now `unread` |
+| "What a reader can falsify" | "reads nothing from disk" | reads no file of this repository's content; runs `git rev-parse` and `git status` for provenance |
+| "Observed (CI run)" | "`M00 gate` on the same PR passed" | with the link, run 38077129122 |
+| `reader.py`, `read_deploys` | leg name `(<name>, <repository>, <commit>)` | `(<repository>, <repository_id>, <commit>, <name>, <rollout>)`, the matrix row's key order; the reader finds the name and the sha by content, so the code was right and the sentence was not |
+
+### Construction checks (not evidence, P4)
+
+Run on this branch on 2026-10-10. The live plant: with the owner's
+token and with none, in the scratch directory, not committed. The
+synthetic cases: `judge` called on hand-made inputs the live plant
+cannot produce, with no API call.
+
+| Input | Before PR 3 | After PR 3 |
+|---|---|---|
+| live, owner's token | RED, `control refused`, `["rule-owner"]`; `mergeStateStatus BLOCKED` | the same; `mergeable_judged` source `graphql`, value `BLOCKED` |
+| live, no token | RED, `control refused`; reason printed `mergeStateStatus None` | RED, `control refused`; `mergeable_judged` unread, "no token asked"; reason prints `unread` |
+| D1: merged, `deploy-agent` leg at the merge commit, every seat admin, registry row | PENDING | GREEN |
+| D1: merged, leg at the branch head only | GREEN | PENDING |
+| D2: `rule-owner` null, `BLOCKED`, no check run on the head | RED, `control refused` | RED, `unassigned, no refusal read` |
+| D2: the same with the App's refusal | RED, `control refused` | RED, `control refused` |
+| D3: `rule-owner` null, `mergeStateStatus UNSTABLE` | RED, `control refused` | RED, `F1.1`, source `graphql` |
+| D3: `HAS_HOOKS` | RED, `control refused` | RED, `F1.1`, source `graphql` |
+| D3: GraphQL unread, REST `unstable`, token set | RED, `control refused` | RED, `F1.1`, source `rest` |
+
+### What this PR does not hold
+
+- No lift. `rule-owner` stays `null` at `eb9b201`; nothing is committed
+  to label-impact. The lift is PR 4's, ruled at PR 2.
+- No edit to `rulings/pr2.md`. A ruling is a record of what was ruled;
+  its ruling 1 ("the artifact is written whenever the reader step
+  started") stands as the record of what PR 2 claimed, and the
+  `m01.yml` row above says where it was inexact. Ruling 5 reads the
+  plant as "not mergeable", `BLOCKED`, which is true before and after
+  Defect 3.
+- No edit to `src/baseline/` (P5), `src/gate/`, `goldens/`, `data/`,
+  SPEC/00, CLAUDE.md, the README or `milestones/M00/`.
+- No "Measured" cell. That is PR 4's, from run 38077129178.
+- No token and no registry read (ruled at PR 2, Unsure 10 and 12).
+- No edit to `.github/workflows/m01.yml`: the review found nothing in
+  it. The `ruff` format and one `UP031` finding on `reader.py` predate
+  this PR and CI does not run `ruff`; not the review's and not repaired.
+- No test file. The synthetic checks above were run from the scratch
+  directory and are not committed (Unsure 21).
+
+### Expected CI result on this PR
+
+RED, `finding` `control refused`, `seats_unassigned` `["rule-owner"]`,
+`mergeable_judged` source `graphql` value `BLOCKED`, `written_by_ci`
+true. The plant is not lifted, so RED is the correct reading, and the
+`M01 gate` job fails. `M01 gate` is not required on `main` (Unsure 14,
+ruled), so this PR merges on `M00 gate` alone, with nothing merged over
+a check.
+
+### Observed (CI run, 2026-10-10)
+
+The first run on this PR,
+[38098770569](https://github.com/andaro74/pharmadelta/actions/runs/38098770569),
+on commit `835643e` (the artifact's sha is the pull request's merge
+ref, as PR 2's was), wrote the artifact
+`m01-gate-dab1b72c36e7718c01cbd11c4c18e6e9777c5195`. It holds:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED` |
+| `finding` | `control refused` |
+| `seats_unassigned` | `["rule-owner"]` |
+| `seats_admin_unread` | the six `andaro74` seats: `GET collaborators/andaro74/permission` answered 403 with `GITHUB_TOKEN` |
+| `mergeable_judged` | `read` true, `mergeable` false, source `graphql`, value `BLOCKED`, "mergeStateStatus 'BLOCKED' with GITHUB_TOKEN" |
+| `pull_request` | head `eb9b201`, `open`, `merged` false, `mergeable_state` `blocked`, GraphQL `mergeStateStatus` `BLOCKED` |
+| `control.check_runs` | one: id 114267967935, `platform-check`, App 5144253, `failure`, refused `["seats assigned, each a login that administers the repository"]` |
+| `deploys` | 37 runs since `2026-10-10T16:54:39Z`, all read, none naming `label-impact`, not truncated |
+| `registry` | unread, no credential |
+| `written_by_ci` | `true`; exit 1; the `M01 gate` job failed; `M00 gate` on the same head passed: [run 38098770600](https://github.com/andaro74/pharmadelta/actions/runs/38098770600) |
+
+Equals the expected result above. The reason string now reads
+`mergeStateStatus BLOCKED`, where PR 2's would have read `'BLOCKED'`
+and a no-token run's `None`. Every other reading equals PR 2's run
+38077129178 except the deploy count, which grew from 9 to 37 as
+agentkeel's schedule ran (Unsure 15: still within one page).
+
+### Cold review of #8 (before leaving draft)
+
+Read by a reviewer that had not seen the author's reasoning, on commit
+`9b160de`, against the diff, the README and the ruling. It traced every
+return of `judge`, the no-token case and the unread-GraphQL case, and
+read the artifact of run 38098770569 against the "Observed" table.
+
+Defects: none. Seven inexact sentences, six repaired in place in the
+commit after `9b160de` and one carried:
+
+| # | Where | Said | Now says |
+|---|---|---|---|
+| 1 | `reader.py`, the PENDING reason; this file, "After this PR goes RED" | "at the merged head" | "at the merge commit" (Defect 1's own words, missed in two places) |
+| 2 | "What this PR holds", `admin_read`; `judge_seats` comment; ruling 4 | `admin_read` is `true` when no read was needed | `true` whenever nothing is unread: a seat read as not `admin` had its read made and carries `admin: false` |
+| 3 | PR 2 "Construction run", the merge-state bullet | judges "mergeable" on `clean` or `CLEAN` only | marked "(Repair, PR 3 ...)", as the definitions were |
+| 4 | PR 2 "What a reader can falsify" | the verdict is formed from four readings "only"; the check runs "do not decide RED" | the check runs decide the `finding`, not RED |
+| 5 | "Prose, repaired in place", its heading and the count | "Each sentence is rewritten"; "ten" | one row is not edited and one is an addition; ten is twelve less two. Ruling 5 now says "in full" |
+| 6 | "What this PR does not hold" | ruling 5 of PR 2 was inexact | it was not: `BLOCKED` is "not mergeable" before and after Defect 3 |
+| 7 | `.github/workflows/m01.yml`, the comment above the reader step | "writes result.json whenever it starts" | not edited; outside this PR's ruling. Unsure 22 |
+
+The run on the repaired commit is the last word on this PR; its
+readings are expected to equal the two runs above.
+
+## Unsure (PR 3)
+
+Each needs a seat's ruling. None changes the measurement.
+
+| # | Item | Seat |
+|---|---|---|
+| 18 | The third finding's name, `unassigned, no refusal read`, is Engineering's choice at PR 3. It means: a seat is unassigned, the pull request is not read as mergeable, and no `platform-check` from the App is on record refusing the seats check. Confirm the name or give another; the two the ledger knows, `F1.1` and `control refused`, are unchanged. | Product |
+| 19 | An import error in the reader (a missing dependency, a syntax error) exits 1, the RED code, before `main` runs, and writes no `result.json`; the upload then fails on `if-no-files-found: error`, so no artifact exists. The file is the verdict and the exit code is not, so no RED can be read from it; but the job's red mark looks like RED. Proposed: leave it; a missing artifact is "no result", and the ledger reads artifacts only. Or: a wrapper step that writes UNSCORABLE when the reader exits with no file. | Engineering |
+| 20 | The ledger's expected gate output says "RED on F1.1 naming `rule-owner`" and the result's `finding` is `control refused`. The cell was written at open and is not edited here. Reading: "RED on F1.1" is RED on the row whose falsifier is F1.1, and `finding` names which arm; the plant's arm is the refusal. Confirm that reading, or rule that PR 4's Measured cell must say so in its own words. | Product |
+| 21 | The synthetic checks of `judge` are not committed. Committing them would be a test of the reader, which PR 2 said it does not hold; the next milestone that changes `judge` should decide whether `judge` gets a test file under `src/m01/`. | Engineering |
+| 22 | The comment in `.github/workflows/m01.yml` above the reader step, "The reader writes result.json whenever it starts", is the sentence this PR repairs in the README (Unsure 19) and is left standing in the workflow: this PR's ruling does not cover `m01.yml`, and the review of #7 found nothing in it. Found by the cold review of #8. One comment line, for PR 4 or the next PR that touches the workflow. | Engineering |
 
 ## Unsure (PR 2)
 
@@ -380,7 +599,7 @@ written; this PR touches none of them. Items 3 and 4 are addressed below.
 | # | Item | Seat |
 |---|---|---|
 | 10 | **The token.** This repository's `GITHUB_TOKEN` reads, on the two public repositories, the pull request, the commit's contents, the check runs, the rulesets and the Actions runs and jobs: all read with no token in the construction run, so an authenticated token reads them too, with a higher rate limit. It cannot read a seat's collaborator permission on `agentkeel-studio/label-impact`: that endpoint answers only a token with access to the repository (401 with none; the CI run says what `GITHUB_TOKEN` gets). So the reader records the six assigned seats' permission as unread, and GREEN is not reachable from this CI as it stands. Settles PR 1's Unsure 3 for the GitHub half. Proposed: a fine-grained PAT of the owner with Metadata read on the organisation's repositories, or a token minted by agentkeel's observer App, set as a repository secret named by Security and passed to the reader step as `GITHUB_TOKEN`; who sets it and under which seat's record. Not done in this PR. **Ruled at PR 2** (`rulings/pr2.md` 6): not needed to close M01; the seat read matters only for GREEN. Ruled again when a milestone needs GREEN from this reader, M07 at the latest; if earlier, the fine-grained PAT, as the smaller change. | Security, Engineering |
-| 11 | **Merge state by token.** REST `mergeable_state` read `unstable` with no token and `blocked` with the owner's; GraphQL `mergeStateStatus` read `BLOCKED` with the owner's and is unread with none. The reader records both and judges "mergeable" on `clean`/`CLEAN` only. Whether a caller without access could ever be shown `clean` while the ruleset blocks the merge is not known; if it could, F1.1's reading from this CI would need the token of item 10. | Engineering |
+| 11 | **Merge state by token.** REST `mergeable_state` read `unstable` with no token and `blocked` with the owner's; GraphQL `mergeStateStatus` read `BLOCKED` with the owner's and is unread with none. The reader records both and judges "mergeable" on `clean`/`CLEAN` only. Whether a caller without access could ever be shown `clean` while the ruleset blocks the merge is not known; if it could, F1.1's reading from this CI would need the token of item 10. **Repaired at PR 3:** `unstable` and `has_hooks` are now mergeable (Defect 3), so the no-token reading above would read F1.1 on a head the ruleset blocks. The reader therefore judges F1.1's "mergeable" only when a token asked, GraphQL deciding when read, else REST, and records the source in `mergeable_judged`; with no token it is unread for F1.1. Why REST without a token shows `unstable` is still not known. | Engineering |
 | 12 | **The registry.** Recorded as unread. GREEN is impossible while it is. Read it through AWS (a read-only role this repository assumes by OIDC, in the agent account: an agentkeel change, flagged not designed here) or through Grafana panel 1 (a Grafana token as a secret here, the pattern of agentkeel's `evals.yml`), or leave it unread until M03 needs the deployed agent. Settles PR 1's Unsure 3 for the AWS half only by naming the options. **Ruled at PR 2** (`rulings/pr2.md` 7): unread through M01. The read is designed at M03, once, as a read-only role in agentkeel assumed by OIDC, flagged there and not here. | Security, Product |
 | 13 | **PENDING.** The reader has a fourth verdict for "not RED, not GREEN, readable": every seat assigned but the pull request not merged, or merged but not deployed, or the registry unread. The ledger knows RED, GREEN and UNSCORABLE. Proposed: PENDING is an exit 3, fails the job, and is never written to a Measured cell; the cell takes RED or GREEN only. **Ruled at PR 2** (`rulings/pr2.md` 8): as proposed. | Product |
 | 14 | **Required check.** Whether `M01 gate` is made a required check on `main` after this PR merges, as `M00 gate` was (M00 Unsure 12). While the plant stands the job is RED on every run, so PR 3 and PR 4 cannot merge on their own run; M00 Unsure 17's pattern was an administrator merging over the check, on record, with the lift in PR 4. The same choice is owed here, after this run is read. **Ruled at PR 2** (`rulings/pr2.md` 9): `M01 gate` is not made required on `main`. After the lift the reader reads PENDING until items 10 and 12 are read, and a required check would block every later PR for that reason alone. No PR of M01 is merged over a check. | Security, Product |
