@@ -602,7 +602,7 @@ measurement (P4); the measurement is the cell below.
 
 | Step | Record |
 |---|---|
-| Platform check on `e26f882` | not yet read; filled before this PR leaves draft |
+| Platform check on `e26f882` | check run [114388822381](https://github.com/agentkeel-studio/label-impact/runs/114388822381), `platform-check`, App 5144253, conclusion `success`, title `passed`, summary `Every check passed.`, completed `2026-10-11T04:31:04Z`. Posted by agentkeel's platform-check run [38111762521](https://github.com/andaro74/agentkeel/actions/runs/38111762521), dispatched by hand by the owner at `04:29:54Z` (the same workflow the schedule runs, from agentkeel's `main`; the scheduled run before it, at `04:22:51Z`, preceded the push). The seats check that refused `eb9b201` passes `e26f882`. `mergeStateStatus` read `CLEAN` after it posted. |
 | Merge of label-impact #1 | not yet read; filled before this PR leaves draft |
 | agentkeel `deploy-agent` for the merge commit | not yet read; filled before this PR leaves draft |
 
