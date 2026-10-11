@@ -95,8 +95,7 @@
     "source_note": "[79 FR 33089, June 10, 2014]",
     "ecfr_url": "https://www.ecfr.gov/current/title-21/section-314.98#p-314.98(a)",
     "ecfr_as_of": "2026-10-07",
-    "effective_date": "2026-10-07",
-    "PLANT": "M02 PR 1: effective_date is the eCFR snapshot date (ecfr_as_of), not a version the versioner lists for 314.98. The source's latest amendment date is 2016-12-23. Lifted by one edit after PR 2 goes RED.",
+    "effective_date": "2016-12-23",
     "text_copied_on": "2026-10-10",
     "existence_checked_by_hand_on": "2026-10-09",
     "note": "Sends the ANDA holder to 314.80 for adverse drug experience reporting."
