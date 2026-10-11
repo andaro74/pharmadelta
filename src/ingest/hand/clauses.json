@@ -1,0 +1,74 @@
+{
+  "201.57(c)(9)(i)": {
+    "citation": "21 CFR 201.57(c)(9)(i)",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.",
+    "lead_in": false,
+    "append_subparagraphs": false
+  },
+  "314.70(c)(6)(iii)(A)": {
+    "citation": "21 CFR 314.70(c)(6)(iii)(A)",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-314.70#p-314.70(c)(6)(iii)(A)",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "Changes being effected (CBE-0). The subject is 'the applicant' (314.3), which includes an ANDA applicant; 314.97(a) sends the ANDA holder here. Limited by the lead-in to newly acquired information.",
+    "lead_in": true,
+    "append_subparagraphs": false
+  },
+  "314.94(a)(8)(iv)": {
+    "citation": "21 CFR 314.94(a)(8)(iv)",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-314.94#p-314.94(a)(8)(iv)",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "Sameness with the reference listed drug at submission, with the listed exceptions.",
+    "lead_in": false,
+    "append_subparagraphs": false
+  },
+  "314.150(b)(10)": {
+    "citation": "21 CFR 314.150(b)(10)",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-314.150#p-314.150(b)(10)",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "Sameness with the reference listed drug after approval; a discretionary ('may') withdrawal ground, with a hearing. (i) and (ii) are appended to (10).",
+    "lead_in": true,
+    "append_subparagraphs": true
+  },
+  "314.97(a)": {
+    "citation": "21 CFR 314.97(a)",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-314.97#p-314.97(a)",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "An ANDA holder has 314.70's routes for changes to an approved ANDA.",
+    "lead_in": false,
+    "append_subparagraphs": false
+  },
+  "314.80(c)(1)(i)": {
+    "citation": "21 CFR 314.80(c)(1)(i)",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-314.80#p-314.80(c)(1)(i)",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "Both conditions, serious and unexpected, are needed. Defined in 314.80(a).",
+    "lead_in": false,
+    "append_subparagraphs": false
+  },
+  "314.80(a)-serious": {
+    "citation": "21 CFR 314.80(a), 'Serious adverse drug experience'",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-314.80#p-314.80(a)",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "Definition, 314.80(a). The clause id carries a suffix because 314.80(a) holds several definitions.",
+    "lead_in": false,
+    "append_subparagraphs": false
+  },
+  "314.80(a)-unexpected": {
+    "citation": "21 CFR 314.80(a), 'Unexpected adverse drug experience'",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-314.80#p-314.80(a)",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "Definition, 314.80(a). 'Unexpected' means not in the current labeling, including greater severity or specificity than a listed event; not 'unanticipated'.",
+    "lead_in": false,
+    "append_subparagraphs": false
+  },
+  "314.98(a)": {
+    "citation": "21 CFR 314.98(a)",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-314.98#p-314.98(a)",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "Sends the ANDA holder to 314.80 for adverse drug experience reporting.",
+    "lead_in": false,
+    "append_subparagraphs": false
+  }
+}

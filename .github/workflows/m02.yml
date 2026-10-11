@@ -1,0 +1,61 @@
+# The M02 gate (milestones/README.md row 2, F2.1).
+#
+# Builds the clauses from the eCFR versioner and the rows from DailyMed, in
+# CI, each at the version data/ commits for it (a clause's effective_date, a
+# row's label_read_on), compares the build with data/, and writes the result
+# and the built files as the artifact `m02-gate-<sha>`. The job fails when
+# the verdict is not GREEN. Only what this workflow writes is evidence
+# (SPEC/00 P4); a local run of the same command is not.
+#
+# What it reads, and with what: two public hosts, www.ecfr.gov and
+# dailymed.nlm.nih.gov, over https, with no token and no secret of this
+# repository (src/ingest/fetch.py holds the allowlist). It writes nothing
+# into data/: the built files go in the artifact, beside the result, so a
+# reader can diff them. gate.yml (M00) and m01.yml (M01) are unchanged.
+
+name: m02
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m02-gate:
+    name: M02 gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      # The artifact directory exists before anything can crash, so the
+      # upload below always has a directory to read (M00 PR 3, Q3 b).
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m02-gate"
+
+      # The gate writes result.json whenever its `main` runs: UNSCORABLE with
+      # the error when a source cannot be read at an entry's version, never
+      # RED or GREEN. A failure before `main` (an import error) exits 1 with
+      # no file, and the upload below then fails on if-no-files-found.
+      - name: Build the clauses and the table from the live sources; compare with data/; judge row 2
+        run: >
+          uv run python -m src.ingest.gate
+          --out-dir "$RUNNER_TEMP/m02-gate"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Write the result, the built files and the sources read as a CI artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: m02-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/m02-gate/
+          if-no-files-found: error
+          retention-days: 90
