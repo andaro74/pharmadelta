@@ -672,10 +672,21 @@ platform check posted on it. It holds:
 | `registry` | unread, no credential |
 | `written_by_ci` | `true` |
 
-Equals the expected result above. Later runs on this PR read the same
-verdict with fewer items in `green_blocked_by` as the check, the merge
-and the deploy land; each is linked in the table under "The lift".
-PENDING is not written to the cell.
+Equals the expected result above.
+
+The run after the merge and the deploy were recorded,
+[38112590129](https://github.com/andaro74/pharmadelta/actions/runs/38112590129)
+on commit `8d7c1c4`, artifact `m01-gate-ef9e8adef3698c7abf33b55adb67d5540182e091`:
+`PENDING`, `written_by_ci` true, `green_blocked_by` two items, the seven
+unread permissions and the unread registry. It read the pull request
+`closed`, `merged` true at `2026-10-11T04:34:46Z`, `merge_commit_sha`
+`5e370ca`; and in `deploys.naming_agent` two legs of run 38112132210 at
+`5e370ca`, `sign-agent` and `deploy-agent`, both `success`, among 47
+runs read. The reader matched the `deploy-agent` leg on the merge
+commit, the input Defect 1 (PR 3) was repaired for, here on the live
+plant. What stands between this reading and GREEN is exactly Unsure 10
+and 12, ruled not M01's. Later runs on this PR read the same. PENDING is
+not written to the cell.
 
 ### Rulings carried from PR 3 and PR 1
 
