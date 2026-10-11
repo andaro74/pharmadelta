@@ -14,6 +14,7 @@ authorises:
   - milestones/M02/README.md
   - milestones/M02/rulings/pr3.md
   # Engineering, Security: the two cold-review findings are recorded, not repaired; no file changes
+  # Data Owner: the hand confirmations of Unsure 1 and 8, done in a browser; recorded in the README, no data/ change
 evidence:
   - SPEC/00-overview.md
   - docs/adr/ADR-0001-spec00-adopted.md
@@ -27,6 +28,10 @@ evidence:
   - https://www.ecfr.gov/api/versioner/v1/full/2016-12-23/title-21.xml?part=314&section=314.98
   - https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/f39ee08d-73db-71b9-e053-2995a90a877c.xml
   - https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/24837d82-0f3f-4482-9af0-31e5f675c30f.xml
+  - https://www.ecfr.gov/current/title-21/section-314.98
+  - https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=f8d16c85-50e2-4d99-afae-6fb902734e42
+  - https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=f39ee08d-73db-71b9-e053-2995a90a877c
+  - https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=24837d82-0f3f-4482-9af0-31e5f675c30f
 pr: https://github.com/andaro74/pharmadelta/pull/12
 ---
 
@@ -85,12 +90,10 @@ measurement.
    as read. No repair PR in this milestone. Both are repaired in the next
    PR that edits `gate.py`, and the Security property is restated there.
 6. **Data Owner (Unsure 25; PR 1's 1 and 8).** The hand confirmations
-   are asked of the Data Owner at this PR, to be done in a browser: the
-   eight effective dates against each section's "Timeline" on ecfr.gov,
-   and `section_terms` re-read on the three DailyMed pages. Nothing in
-   this PR does them by machine or calls them done. If the Data Owner
-   gives dates before this PR merges, they are recorded under Unsure 25
-   in the README; otherwise both stay owed before M03 shows a clause.
+   were done by the Data Owner in a browser on 2026-10-11, at this PR,
+   twenty steps of one URL each, read back by the Data Owner and recorded
+   in `milestones/M02/README.md` under Unsure 25. Unsure 1: the "Timeline" of 201.57, 314.70, 314.80, 314.97, 314.98 and 314.150 on ecfr.gov reads "No changes found for this content after 1/03/2017" (the eCFR's point-in-time record begins that day, so it shows no 2016 date and no later change); 314.94's shows 1/11/2017 as its latest. The versioner's `versions/title-21.json?section=<section>`, opened in the browser, reads `amendment_date` 2016-11-29 for 201.57 and 2016-12-23 for 314.70, 314.80, 314.97, 314.98 (one entry; none dated 2026-10-07) and 314.150. All nine committed `effective_date`s confirmed. Unsure 8: six rows' `section_terms` read on the DailyMed pages as the seed holds them (lisinopril bw and 8.1, metformin bw, 5.1 and 6, metoprolol tartrate 5). `metoprolol-tartrate.8.1` differs on one heading: the page prints "Clinical consideration" where the seed holds "Clinical Considerations", the build's reading (construction item 4). That cell is the Data Owner's to correct, in `data/table.json` and the hand file together, in the PR that settles Unsure 15; it is not edited here. `section_terms_read_on` in `data/` stays 2026-10-10, the machine read; the hand date is this row's. Nothing in
+   this PR did either by machine.
 7. **Product (Unsure 26).** This PR is #12, the next number on this
    repository.
 
