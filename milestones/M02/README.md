@@ -646,7 +646,32 @@ the measurement, not the Measured cell.
 
 ### Observed (CI run, 2026-10-11)
 
-Written after the first run on this PR.
+The first run on this PR,
+[38156488922](https://github.com/andaro74/pharmadelta/actions/runs/38156488922),
+wrote the artifact `m02-gate-2b1da30ba21dcab522543cdc22762df4ee2fc5ea`
+(the sha is the pull request's merge ref, as every PR run's has been). It
+holds `result.json`, `clauses.json`, `table.json` and `sources/` with 21
+responses and `index.json`. `result.json`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `GREEN`; `reason` "F2.1 does not hold" |
+| `clauses_mismatched` | `[]` |
+| `rows_mismatched` | `[]` |
+| `unreadable` | `[]` |
+| `counts` | clauses 9 of 9 matched; rows 7 of 7 matched |
+| `314.98(a)` | `effective_date` `2016-12-23`, `version_listed` true; `text` and `source_note` read at `full/2016-12-23/title-21.xml?part=314&section=314.98` and equal to `data/` |
+| the two cells | `metformin.6` `section_title` source `ADVERSE REACTIONS`, `metoprolol-tartrate.5` source `WARNINGS AND PRECAUTIONS`, both equal to `data/` |
+| rows read | lisinopril SPL version 5, `effectiveTime` 20220630; metformin 6, 20251204; metoprolol tartrate 10, 20240822; current versions and published dates as the `main` run read them; none published after `label_read_on` |
+| `ecfr` | `up_to_date_as_of` `2026-10-07`; `meta.date` `2026-10-08`, `import_in_progress` true (Unsure 18) |
+| `written_by_ci` | `true`; `commit` `2b1da30`, `dirty` false; `ci.run_url` the run above; exit 0; the `M02 gate` job passed, the first pass of this gate. `M00 gate` on the same head passed: [run 38156488930](https://github.com/andaro74/pharmadelta/actions/runs/38156488930). `M01 gate`, [run 38156488890](https://github.com/andaro74/pharmadelta/actions/runs/38156488890), is not required and reads as it does on `main` |
+
+Equals the expected result above and the construction run on every
+compared field. The built `clauses.json` differs from `data/` on
+`text_copied_on` only (`2026-10-11` against `2026-10-10`; recorded, not
+compared, Unsure 10); the built `table.json` equals `data/` on every
+field. This run is a reading after the measurement. The cell above is
+the `main` run on the plant, and is not changed by it.
 
 ### Rulings carried
 
