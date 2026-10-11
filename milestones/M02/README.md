@@ -105,6 +105,27 @@ again, in CI.
 same text, not a version. 314.94 has two versions; the later,
 2017-01-11, is written.
 
+### The DailyMed read (construction, not evidence, P4)
+
+Read on 2026-10-11, after PR 1 was opened, to settle Unsure 3. Three
+calls to `/dailymed/services/v2/spls/<setid>/history.json`, four to
+`/spls/<setid>.xml?version=<n>` and one to `lookup.cfm?setid=<setid>&version=5`.
+The responses are in the session's scratch directory and are not
+committed; PR 2 reads them again, in CI.
+
+| Label | Versions listed | Current version, published | `effectiveTime` of the current XML |
+|---|---|---|---|
+| lisinopril | 5 | 5, 2022-11-18 | not read |
+| metformin | 5 (versions 1, 2, 3, 5, 6) | 6, 2025-12-05 | not read |
+| metoprolol tartrate | 10 | 10, 2024-11-06 | `20240822`, which is the row's `label_revised` `2024-08` |
+
+The XML endpoint ignored `version`: asked for 1, 5, 8 and 9 of
+metoprolol it answered `versionNumber` 10 every time. The web lookup
+with `version=5` answered the version 5 page ("Revised: 6/2019"), as
+HTML. Every current version was published before `label_read_on`
+(2026-10-09), so today the current version is the version in force on
+the read date for all three labels.
+
 ### What this PR does not hold
 
 - No reader of the source. Nothing in this repository calls ecfr.gov
@@ -158,14 +179,20 @@ same text, not a version. 314.94 has two versions; the later,
   not in the section's version list cannot be fetched at that date, and
   is named.
 - **The build, rows.** For each `dailymed_set_id` in `data/table.json`:
-  read DailyMed's SPL for the set id at the version in force on the
-  row's `label_read_on` (the history endpoint, then the versioned SPL),
-  and derive the DailyMed-sourced fields: `ingredient`, `dosage_form`,
-  `strengths`, `anda`, `label_revised`, `format`, `section`,
-  `section_title`, `section_terms`. The Data Owner's fields (`holder`,
+  read DailyMed's history for the set id. If no version was published
+  after the row's `label_read_on`, the current SPL XML is the version in
+  force on the read date; fetch it and derive the DailyMed-sourced
+  fields: `ingredient`, `dosage_form`, `strengths`, `anda`,
+  `label_revised`, `format`, `section`, `section_title`,
+  `section_terms`. If a version was published after `label_read_on`,
+  the source at the row's version cannot be read by machine (the XML
+  API serves the current version only; Unsure 3, ruled): the row is
+  named with the page URL and the result is UNSCORABLE, never RED. The
+  SPL version number and `effectiveTime` are written in the artifact
+  beside the row, not into the row. The Data Owner's fields (`holder`,
   `holder_fictional`, `rld_nda`, `label_read_on`,
   `section_terms_read_on`, `requirement`) are carried from a hand file
-  the build reads, not derived (Unsure 4).
+  the build reads, not derived (Unsure 4, ruled).
 - **The gate.** In CI, on every pull request and push to `main`: build
   both, compare each clause and row with `data/`, and write
   `result.json` with one verdict. RED when any clause's
@@ -174,8 +201,9 @@ same text, not a version. 314.94 has two versions; the later,
   row's DailyMed-sourced field differs from the SPL at its version;
   `clauses_mismatched` and `rows_mismatched` name each, with the
   source's value beside the committed one. GREEN only when every clause
-  and row equals the build. UNSCORABLE when a source could not be read,
-  never RED and never GREEN (M00 PR 3's shape). `written_by_ci` and the
+  and row equals the build. UNSCORABLE when a source could not be read
+  at the entry's version, never RED and never GREEN (M00 PR 3's shape;
+  a label revised after its `label_read_on` lands here, Unsure 3). `written_by_ci` and the
   run URL as M00's. The built files are written into the artifact
   beside the result, so a reader can diff them; they are not written
   into `data/` by the gate.
@@ -188,7 +216,9 @@ same text, not a version. 314.94 has two versions; the later,
   and must reproduce it"), and the seven rows must reproduce from the
   SPL. If they do not, the result names more than the plant and the
   Measured cell will not equal this output; that is a true RED on the
-  seed, not a reason to edit the expected output (Unsure 3).
+  seed, not a reason to edit the expected output. A label revised after
+  its read date is not that case: it reads UNSCORABLE (Unsure 3,
+  ruled), and the measurement is then owed another run.
 
 ### Rulings carried from M01
 
@@ -205,8 +235,8 @@ Each needs a seat's ruling. None blocks the plant.
 |---|---|---|
 | 1 | The eight effective dates were read from the versioner by an automated call on 2026-10-11, not by hand in a browser. P7 covers citations; an amendment date is the source's own field, read from the source. The Data Owner's hand confirmation (the eCFR page's "Timeline" for each section) is owed before a page shows a clause (M03). PR 2's gate re-reads the dates from the source in CI, which is the measurement. | Data Owner |
 | 2 | `effective_date` is the section's latest amendment date, because the versioner versions sections, not paragraphs. The paragraph `201.57(c)(9)(i)` was last amended by 79 FR 72101 (Dec. 4, 2014) per its `source_note`, and its section's latest version is 2016-11-29. Confirm the section's date as the clause's version, or rule that a clause also carries its paragraph's own last-amended date from the `source_note` (a Federal Register citation, so P7 applies to it). | Data Owner, Tool Owner |
-| 3 | The table's version. A row carries `dailymed_set_id` and `label_read_on` (SPEC/00 §9), not an SPL version number. PR 2 proposes reading the SPL version in force on `label_read_on` from DailyMed's history endpoint. If DailyMed does not serve prior versions, a label revised after 2026-10-09 makes the gate RED on that row, the Measured cell then differs from the expected output, and row 2 closes RED. Whether a row should also carry `spl_version` and `spl_effective_time` as fields is a Data Owner and Tool Owner ruling; proposed: yes, written by the build at PR 2, under the same ruling as item 4. | Data Owner, Tool Owner, Engineering |
-| 4 | Which row fields the build derives from the source and which it carries from a hand file. Proposed: derived, the nine DailyMed fields listed under "Carried to PR 2"; carried, the six Data Owner fields. The gate compares the derived nine only. | Data Owner |
+| 3 | The table's version. A row carries `dailymed_set_id` and `label_read_on` (SPEC/00 §9), not an SPL version number. DailyMed's history endpoint lists every version, but its XML API ignores the `version` parameter and serves the current version only; prior versions exist as HTML pages, which the build does not parse (read 2026-10-11, "The DailyMed read" above). Today the current version of each label predates `label_read_on`, so the risk is a revision between now and PR 2's run. **Ruled at PR 1** (`rulings/pr1.md` 7): accepted. No new row field in M02; the version stays set id plus read date, as §9 defines it. PR 2's build reads the history first; when a version was published after `label_read_on`, the source at the row's version cannot be read by machine and the result is UNSCORABLE naming the row and the page, never RED. The SPL version number and `effectiveTime` are recorded in the artifact beside each row, not in the row. | Data Owner, Tool Owner, Engineering |
+| 4 | Which row fields the build derives from the source and which it carries from a hand file. Proposed: derived, the nine DailyMed fields listed under "Carried to PR 2"; carried, the six Data Owner fields. The gate compares the derived nine only. **Ruled at PR 1** (`rulings/pr1.md` 8): as proposed. | Data Owner |
 | 5 | The Federal Register half of regdelta's ingestion (the poller) is not needed by the claim; M02 ports the eCFR reader and adds a DailyMed reader. Where the Federal Register feed lands (the "a rule changed" trigger for the public API) is a later row's. | Product |
 | 6 | label-impact's `data/` is a copy as at `m00` and now differs from this repository's by the added field. When the agent takes the rebuilt data is not M02's: the deployed agent is called at M03, and a second agent is created at M07. | Product, Data Owner |
 | 7 | The ruling file names this PR as #10, the next number on this repository. | Product |

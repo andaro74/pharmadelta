@@ -3,6 +3,8 @@ ruling: m02-pr1
 seat:
   - Product
   - Data Owner
+  - Tool Owner
+  - Engineering
 authorises:
   # Data Owner: the field added to each clause, and the plant
   - data/clauses.json
@@ -17,6 +19,7 @@ evidence:
   - milestones/M01/README.md
   - milestones/M02/README.md
   - https://www.ecfr.gov/api/versioner/v1/versions/title-21.json?section=314.98
+  - https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/24837d82-0f3f-4482-9af0-31e5f675c30f/history.json
 pr: https://github.com/andaro74/pharmadelta/pull/10
 ---
 
@@ -61,6 +64,19 @@ in this PR reads it: no ingestion code, no workflow, no test.
 6. **Product.** The versioner read of 2026-10-11 is recorded in the
    README as construction. It is a read of the source while building
    the plant, not this repository's measurement (P4); PR 2's CI run is.
+7. **Data Owner, Tool Owner, Engineering; Unsure 3.** A row's version
+   stays its set id and read date (SPEC/00 §9); no field is added to a
+   row in M02. DailyMed's XML API serves the current version only
+   (read 2026-10-11, README "The DailyMed read"). PR 2's build reads
+   the history first; a version published after the row's
+   `label_read_on` means the source at that version cannot be read by
+   machine, and the result is UNSCORABLE naming the row and its page,
+   never RED. The SPL version number and `effectiveTime` go in the
+   artifact beside the row. Ruled on the session's recommendation,
+   2026-10-11, after the three read-only checks it names.
+8. **Data Owner; Unsure 4.** The build derives nine fields from
+   DailyMed and carries six from a hand file; the gate compares the
+   nine. As proposed in the README.
 
 ## What a reader can falsify
 
@@ -68,7 +84,9 @@ Listed in `milestones/M02/README.md`, "What a reader can falsify".
 
 ## What this ruling does not settle
 
-The items under Unsure in `milestones/M02/README.md`, each with its
-seat. None blocks the plant. Item 3 (the table's version at DailyMed)
-is the one that can turn the row RED at PR 2 for a reason other than
-the plant, and it is said there rather than hidden.
+The items under Unsure in `milestones/M02/README.md` not marked ruled,
+each with its seat. None blocks the plant. Items 3 and 4 are ruled
+above; what remains open is the hand confirmation of the dates and the
+section terms (1, 8), the meaning of a clause's date (2), the Federal
+Register feed (5), when label-impact takes the rebuilt data (6), the
+PR number (7), the metformin finding (9) and the provenance fields (10).
