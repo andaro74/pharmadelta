@@ -102,6 +102,20 @@ Nothing in this PR lifts the plant, and nothing under `data/` changes.
    lift; if it finds nothing, PR 3 is skipped. The Measured cell takes
    the `main` run after #11 merges; whether it equals the expected
    output is Unsure 11 and 12's, and the cell says what it reads.
+9. **Data Owner, Tool Owner; Unsure 11.** `section_terms` is a reading,
+   not a structure. It is carried from the hand file and recorded, not
+   compared; the gate compares eight DailyMed fields. Ruling 3's
+   departure from ruling 8 stands. The hand re-read (Unsure 8) stays
+   owed. Ruled on the session's recommendation, 2026-10-11.
+10. **Data Owner, Product; Unsure 12.** The seed is wrong on two
+    `section_title` cells; the SPL prints the headings in capitals and
+    `fields.md` says "as printed". The cells are corrected in
+    `data/table.json` in the PR that lifts the plant (PR 4). The gate
+    is not changed. The Measured cell cites the `main` run after #11
+    merges as it reads, naming the plant and the two rows; that is not
+    the expected output written at open, and under the ledger's rule
+    row 2 reads RED, with the finding beside it. Product writes the
+    state at PR 4. Ruled on the session's recommendation, 2026-10-11.
 
 ## What a reader can falsify
 
