@@ -17,7 +17,7 @@ this is the same row with the open detail.
 | Seeded commit | `4379556` on `m02-pr1`: `data/clauses.json` carries `effective_date` on each of the nine clauses, the versioner's latest amendment date for the clause's section, read 2026-10-11; `314.98(a)` carries `2026-10-07`, the snapshot date (`ecfr_as_of`), which is not a version the versioner lists for 314.98. `data/table.json` is unchanged from `m00`. |
 | Expected gate output | PR 2's gate builds the clauses from the eCFR versioner and the rows from DailyMed, in CI, compares each with `data/`, and writes a `result.json` that is RED when any clause or row differs from the source at its version, naming each. On `4379556`: RED, `clauses_mismatched` `["314.98(a)"]`, `rows_mismatched` `[]`. The Measured cell cites the `main` run after PR 2 merges (M01 Unsure 23, ruled here). |
 | Measured | |
-| PRs used / cap | 1 / 4 |
+| PRs used / cap | 2 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -226,6 +226,316 @@ the read date for all three labels.
 |---|---|
 | M01's 23 | Product (`rulings/pr1.md` 4): a Measured cell cites the run on `main` after PR 2 merges, because its commit is a commit in this repository (M00 Unsure 15). When the run read at the time was the PR run, it is named beside the `main` run. Row 2's expected gate output says so. One rule from here on. |
 | M01's 1 | Product (`rulings/pr1.md` 5): SPEC/00 §3's "re-made at `m08`" is owed a one-line edit. It rides in a PR of its own, outside any milestone's cap, together with the two one-line §10 edits M00's Unsure 5 owes; proposed ruling file `milestones/adoption/rulings/spec00-errata.md`. This session does not open it (one milestone per session), so after this PR it is still owed, with its PR named. It is not folded into M02's cap. |
+
+## Open detail (PR 2, 2026-10-11)
+
+PR 2 is the measure. It adds the build and the gate that read the plant
+and nothing that lifts it. `314.98(a)` carries `effective_date`
+`2026-10-07` at the head this PR measures. M02 is measured here.
+
+### What this PR holds
+
+- `src/ingest/`, the build. Python 3.14, standard library only;
+  `pyproject.toml` and `uv.lock` are unchanged.
+  - `fetch.py`: a port of regdelta's `src/shared/fetch.py`. Two hosts
+    are allowed, `www.ecfr.gov` and `dailymed.nlm.nih.gov`, https only,
+    the allowlist re-checked on every redirect hop, the body capped at
+    8 MiB. Added for the eCFR: every request accepts gzip, because the
+    `/full/` endpoint answers 406 without it (construction, below), and
+    the body is inflated here. A 5xx, a 429 or a network error is tried
+    three times; any other status is final. Each URL is read once per
+    run, and every body read is written into the artifact under
+    `sources/` with an index of file to URL.
+  - `ecfr.py`: the eCFR half of regdelta's `src/ingestion/processor.py`,
+    scoped to 21 CFR 201 and 314 (`cfr_section` refuses any other part).
+    Ported: `valid_version_dates` (the versioner's `content_versions[]`
+    to ISO dates, skip-and-report), `latest_version_date` (kept for
+    reference; the build never resolves "latest" or today, it reads at
+    the clause's committed `effective_date`), and the DIV8 reading of
+    `parse_ecfr_xml` (HEAD, the flat P elements, the CITA note as
+    `source_note`). New: the paragraph locator. eCFR's P elements are
+    flat and each starts with its own lettering, so the section's
+    hierarchy is rebuilt by walking them with six levels, (a) (1) (i)
+    (A) (*1*) (*i*), a marker after an italic heading continuing the
+    lettering ("(a) *Changes to an approved NDA.* (1)(i) ..."), and an
+    unlettered P belonging to the paragraph above it (the definitions in
+    314.80(a)). A marker that can be placed two ways, or none, stops the
+    read of that section; the clause is then unread, not RED.
+  - `dailymed.py`: the history of a set id (`history.json`, every
+    version with its published date), the current SPL XML, and the
+    derivation of eight fields from it (the table below).
+  - `gate.py`: builds both files from `data/`'s ids and the hand files,
+    compares each entry with `data/`, writes `result.json`, the built
+    `clauses.json` and `table.json` in `data/`'s shape, and `sources/`.
+  - `hand/clauses.json`, `hand/table.json`: the Data Owner's fields the
+    build carries rather than derives, copied from `data/` at `0382d21`
+    (Unsure 4, ruled: `holder`, `holder_fictional`, `rld_nda`,
+    `label_read_on`, `section_terms_read_on`, `requirement`; for a
+    clause `citation`, `ecfr_url`, `existence_checked_by_hand_on`,
+    `note`), the row's `dailymed_set_id` and `section` (its version and
+    its selector, SPEC/00 §9), `section_terms` (Unsure 11), and two
+    reading flags per clause that say what the Data Owner's clause is:
+    `lead_in` (the parent paragraph is carried: 314.70(c)(6)(iii) for
+    (A), 314.150(b) for (10)) and `append_subparagraphs` (314.150(b)(10)
+    carries its (i) and (ii); 201.57(c)(9)(i) does not carry its (A) to
+    (D), as `fields.md` and the clause's `note` say).
+- `.github/workflows/m02.yml`: on every pull request, every push to
+  `main` and by hand. `uv sync --locked`, the artifact directory, the
+  gate, then the artifact `m02-gate-<sha>` holding `result.json`, the
+  built files and `sources/`, uploaded whenever the gate wrote a result,
+  which is whenever `main` ran; an import error before `main` exits 1
+  with no file and the upload fails on `if-no-files-found: error`. The
+  gate writes its tables to the job summary. The job fails on anything
+  but GREEN. The workflow reads two public hosts with no token and no
+  secret of this repository. `gate.yml` and `m01.yml` are unchanged.
+- `result.json` records the commit, whether the tree was dirty, whether
+  CI wrote it (`written_by_ci`), the run's URL, which fields were
+  compared and which were recorded only, so the file says for itself
+  whether it is evidence (P4).
+- `rulings/pr2.md`, and "PRs used / cap" set to 2 / 4 here and in the
+  ledger.
+
+### What the build reads, per entry
+
+A clause, at its committed `effective_date`:
+
+| Step | Source | What is taken |
+|---|---|---|
+| 1 | `titles.json` | title 21's `up_to_date_as_of`, written as `ecfr_as_of`; recorded, not compared (Unsure 10) |
+| 2 | `versions/title-21.json?section=<section>` | `content_versions[].date`, the dates the versioner lists for the clause's section. A committed `effective_date` not among them is named in `clauses_mismatched` with the listed dates beside it, and nothing is fetched at it: it is not a version of the section |
+| 3 | `full/<effective_date>/title-21.xml?part=<part>&section=<section>` | the section at that version: the paragraph at the clause id's lettering as `text` (with its sub-paragraphs appended where the hand file says so), the parent paragraph as `lead_in` where the hand file says so, the CITA note as `source_note`. A definition id (`314.80(a)-serious`) takes the unlettered paragraph under (a) whose text begins with the suffix |
+
+Compared: `text`, `lead_in`, `source_note`, `effective_date`. Recorded:
+`ecfr_as_of`, `text_copied_on` (the run date, UTC), the Data Owner's
+fields, and `PLANT`, which the build does not write.
+
+A row, at its committed `label_read_on`:
+
+| Step | Source | What is taken |
+|---|---|---|
+| 1 | `spls/<setid>/history.json` | every version and its published date. A version published after `label_read_on` means the SPL at the row's version cannot be read by machine (the XML endpoint serves the current version only, ruling 7): the row is named with its page URL and the result is UNSCORABLE |
+| 2 | `spls/<setid>.xml` | the current SPL. Its `setId` must be the row's and its `versionNumber` the history's current, else the row is unread. `spl_version` and `effectiveTime` are written beside the row in the result, not into the row |
+
+The eight derived fields and their rules (`fields.md` names the field;
+the rule is PR 2's reading of its "Source" column, Unsure 13 and 14):
+
+| Field | Rule |
+|---|---|
+| `ingredient` | the active ingredient's substance name on the SPL's products, lowercased. Not `genericMedicine/name`: metformin's reads "Metformin Hydrochloride Tablet" and metoprolol's "METOPROLOL" (construction, below) |
+| `dosage_form` | the products' `formCode` display name, lowercased |
+| `strengths` | each product's active quantity, `<value> <unit>`, unique, ascending, `; `-joined |
+| `anda` | the products' approval id |
+| `label_revised` | the latest `effectiveTime` over the label's sections, outside the product data elements section, as `YYYY-MM`. Two of the three SPLs carry no "Revised:" text; on all three the month DailyMed prints in the Highlights equals this (construction, below) |
+| `format` | `201.56(d)` when the SPL carries Highlights (any `<highlight>` element); else `201.56(e)` |
+| `section` | the row's section code, when the SPL has it: `bw` is a section coded LOINC 34066-1, `N` or `N.N` a section whose title begins with that number |
+| `section_title` | that section's title without its number. A boxed warning whose title is the generic "BOXED WARNING" takes its first non-empty paragraph |
+
+The products must agree on ingredient, dosage form and approval id;
+where they do not, the field is null with the disagreement beside it.
+The comparison is string equality, with no case folding (Unsure 12).
+
+`section_terms` is not derived and not compared (Unsure 11). The
+result records beside each row what the section carries as headings by
+structure: its subsection titles and its short styled paragraphs.
+
+### The verdict
+
+- **RED** when any clause's `effective_date` is not a version the
+  versioner lists for its section, or its `text`, `lead_in` or
+  `source_note` is not what the section carries at that version (a
+  paragraph missing at the clause's lettering is this case: the
+  committed text is not the paragraph at that version); or any row's
+  derived field differs from the SPL at its version. `clauses_mismatched`
+  and `rows_mismatched` name each; every compared field carries the
+  committed value and the source's beside it.
+- **GREEN** only when every compared field of every clause and row
+  equals the build.
+- **UNSCORABLE** when a source could not be read at an entry's version:
+  a network or HTTP failure after the retries, a label with a version
+  published after its read date, an SPL served at another version or
+  set id, a section whose lettering the reader could not rebuild, the
+  titles endpoint unread, or anything raised inside `main`. Never RED,
+  never GREEN (M00 PR 3's shape). The entries read before the unread
+  one keep their comparison in the result; the verdict is still
+  UNSCORABLE. The error is written in the result.
+
+Exit 0 GREEN, 1 RED, 2 UNSCORABLE.
+
+### What this PR does not hold
+
+- No lift. `314.98(a)` carries `2026-10-07` at the head the gate reads.
+- No edit to `data/`, `goldens/`, `src/baseline/` (P5), `src/gate/`,
+  `src/m01/`, SPEC/00, CLAUDE.md, the README, `milestones/M00/` or
+  `milestones/M01/`. No new dependency.
+- No write into `data/`. The built files go in the artifact. Who takes
+  a rebuild into `data/` is not this PR's (Unsure 19).
+- No hand confirmation of the dates (Unsure 1) or the section terms
+  (Unsure 8). Both are still owed.
+- No comparison of `section_terms` (Unsure 11) and no case folding of
+  `section_title` (Unsure 12).
+- No test of the build. Its reading is checked against the construction
+  run below and against the CI run on this PR.
+- No "Measured" cell. That is PR 4's, from the `main` run after this
+  PR merges (ruling 4).
+- No branch protection. Whether `M02 gate` is required on `main` is a
+  repository setting (Unsure 16).
+
+### Construction run (not evidence, P4)
+
+Run once on 2026-10-11 on the branch before the first push, from the
+working tree, so `written_by_ci` is false and the tree was dirty. It
+read 20 responses: `titles.json`, seven version lists, seven section
+XMLs (the three 314.80 clauses share one), three histories and three
+SPLs. Nothing was fetched at the plant's date. The responses are in the
+session's scratch directory, not the repository.
+
+| Reading | What the gate wrote |
+|---|---|
+| eCFR title 21 | `up_to_date_as_of` `2026-10-07`, `latest_amended_on` `2026-10-06`; `meta.date` `2026-10-08`, `import_in_progress` true (Unsure 18) |
+| versions | each section lists the dates PR 1 recorded; 314.98 lists `2016-12-23` only |
+| the eight clauses | `text`, `lead_in` where carried, `source_note`: all equal to `data/`, byte for byte, with the sub-paragraphs (i) and (ii) appended to 314.150(b)(10) and the parent paragraphs read for 314.70(c)(6)(iii)(A) and 314.150(b)(10) |
+| `314.98(a)` | `version_listed` false; `effective_date` committed `2026-10-07`, the source lists `['2016-12-23']`; `text` and `source_note` not read, no version at that date. Named in `clauses_mismatched` |
+| DailyMed histories | lisinopril: 5 versions, current 5 published 2022-11-18. metformin: 5 versions listed (1, 2, 3, 5, 6), current 6 published 2025-12-05. metoprolol tartrate: 10 versions, current 10 published 2024-11-06. None published after `label_read_on` 2026-10-09 |
+| SPLs served | lisinopril version 5, `effectiveTime` 20220630; metformin 6, 20251204; metoprolol tartrate 10, 20240822 |
+| the seven rows | `ingredient`, `dosage_form`, `strengths`, `anda`, `label_revised`, `format`, `section`: all equal on all seven. `section_title`: equal on five; `metformin.6` committed `Adverse Reactions`, source `ADVERSE REACTIONS`; `metoprolol-tartrate.5` committed `Warnings and Precautions`, source `WARNINGS AND PRECAUTIONS` |
+| verdict | RED, `clauses_mismatched` `["314.98(a)"]`, `rows_mismatched` `["metformin.6", "metoprolol-tartrate.5"]`, `unreadable` `[]`, exit 1 |
+
+Six things the sources showed while this was built, each recorded for
+the seat that owns it:
+
+1. The eCFR `/full/<date>/` endpoint answers the plant's date. Asked
+   for 314.98 at 2026-10-07 it answered 200 with the section's current
+   text; asked at 2015-01-01, before the section's version, it answered
+   404. So the source does not refuse a snapshot date, and the version
+   check is the list check, as ruled: the build does not fetch at a date
+   the versioner does not list (Unsure 17).
+2. The same endpoint answers 406 ("requires response compression")
+   unless the request accepts gzip. regdelta's Lambda runtime sent that
+   header; the port sends it explicitly.
+3. Two rows' `section_title` is title-cased in the seed where the SPL
+   prints capitals. `fields.md` defines the field as "the section
+   heading as printed"; the gate compares what the SPL prints (Unsure 12).
+4. `section_terms` cannot be reproduced by machine. For a boxed warning,
+   5.1 or 6 the seed holds a paraphrase ("fetal toxicity; discontinue
+   when pregnancy is detected; drugs that act directly on the
+   renin-angiotensin system"); for 8.1 the seed holds "Clinical
+   Considerations" where the metoprolol SPL's underlined paragraph reads
+   "Clinical consideration". The field is a reading, which is what M00
+   Unsure 3 and this milestone's Unsure 8 already say (Unsure 11).
+5. The SPL XML of lisinopril and metformin carries no "Revised:" text;
+   metoprolol's does, "Revised: 08/2024". The DailyMed page prints
+   6/2022, 7/2023 and 8/2024. The latest section `effectiveTime` outside
+   the product data elements section is 20220630, 20230727 and 20240822:
+   the same months. The document `effectiveTime` is not (metformin's is
+   20251204). FDA's SPL stylesheet, which would say the rule, refused
+   the automated read (an abuse-detection page), so the rule is observed
+   on three labels, not read from the stylesheet (Unsure 13).
+6. `genericMedicine/name` is not the established name on two of three
+   SPLs (item above); the active substance name on the products is, on
+   all three (Unsure 14).
+
+### Expected CI result on this PR
+
+The ledger row says: RED, `clauses_mismatched` `["314.98(a)"]`,
+`rows_mismatched` `[]`. The construction run says the gate as built
+also names two rows on `section_title`, so the CI run on this PR is
+expected to write `verdict: RED`, `clauses_mismatched` `["314.98(a)"]`
+and `rows_mismatched` `["metformin.6", "metoprolol-tartrate.5"]`,
+`written_by_ci` true and the run URL. The plant is named as the row
+expects. The two rows are a RED on the seed, the case PR 1's "The
+expected RED" foresaw: not a reason to edit the expected output, and
+not a reason to fold case in the gate (Unsure 12). The CI run is the
+measurement; the construction run decides nothing.
+
+### Observed (CI run, 2026-10-11)
+
+The first run on this PR,
+[38153322315](https://github.com/andaro74/pharmadelta/actions/runs/38153322315),
+wrote the artifact `m02-gate-c6ef2418b43d295e3a7755652faebc75ec665fd8`
+(the sha is the pull request's merge ref, as M00's and M01's were). It
+holds `result.json`, `clauses.json`, `table.json` and `sources/` with
+20 responses and `index.json`. `result.json`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED` |
+| `clauses_mismatched` | `["314.98(a)"]`: `effective_date` committed `2026-10-07`, the versioner lists `["2016-12-23"]`; `text` and `source_note` not read, no version at that date |
+| `rows_mismatched` | `["metformin.6", "metoprolol-tartrate.5"]`, each on `section_title` only: committed `Adverse Reactions` and `Warnings and Precautions`, source `ADVERSE REACTIONS` and `WARNINGS AND PRECAUTIONS` |
+| `unreadable` | `[]` |
+| `counts` | clauses 8 of 9 matched; rows 5 of 7 matched |
+| the eight clauses | `text`, `lead_in`, `source_note`, `effective_date` all equal |
+| rows read | lisinopril SPL version 5, `effectiveTime` 20220630, current published 2022-11-18; metformin 6, 20251204, 2025-12-05; metoprolol tartrate 10, 20240822, 2024-11-06; none published after `label_read_on` |
+| `ecfr` | `up_to_date_as_of` `2026-10-07`; `meta.date` `2026-10-08`, `import_in_progress` true |
+| `written_by_ci` | `true`; `commit` `c6ef241`, `dirty` false; exit 1; the `M02 gate` job failed. `M00 gate` on the same head passed: [run 38153322301](https://github.com/andaro74/pharmadelta/actions/runs/38153322301). `M01 gate` is not required and reads as it did on `main` |
+
+Equals the expected result above, and equals the construction run on
+every compared field. The plant is named as ledger row 2 expects; the
+two rows are named beside it.
+
+### What a reader can falsify
+
+- The artifact `m02-gate-<sha>` on this PR's run holds `result.json`
+  with `verdict: RED`, `clauses_mismatched: ["314.98(a)"]` and
+  `written_by_ci: true`; `clauses.json` and `table.json`, the build;
+  and `sources/` with every response read and `index.json`. Download
+  it and read it.
+- In the built `clauses.json`, the eight clauses equal `data/`'s except
+  `text_copied_on`; `314.98(a)` has `text`, `source_note` and
+  `effective_date` null and no `PLANT` key.
+- In the built `table.json`, every row equals `data/`'s except the two
+  `section_title` cells named above. `section_terms` is carried, not
+  derived: compare `src/ingest/hand/table.json` with `data/table.json`
+  on the Data Owner's fields; they are equal.
+- The build reads two hosts: grep `https://` under `src/ingest/`, every
+  URL built for a fetch is on `www.ecfr.gov` or `dailymed.nlm.nih.gov`;
+  the one other match, `github.com`, is the User-Agent string in
+  `fetch.py` and is never fetched; `check_url` there refuses any other
+  hostname. Grep `secrets.` in `.github/workflows/m02.yml`: no match.
+- The build never resolves "current" or today as a version: grep
+  `latest_version_date` under `src/ingest/`, it is defined and not
+  called; grep `/current/`, no match outside `ecfr_url` carried from the
+  hand file.
+- `git diff main --stat` on this PR touches `src/ingest/`,
+  `.github/workflows/m02.yml`, `milestones/README.md`,
+  `milestones/M02/README.md` and `milestones/M02/rulings/pr2.md` only.
+
+### After this PR goes RED
+
+The plant is lifted by the one edit named under "The false state":
+`314.98(a)`'s `effective_date` to `2016-12-23` and the `PLANT` key
+removed. Which PR carries the lift is ruled on reading this PR's CI
+run, as M01's was at PR 2 (`milestones/M01/README.md`, "After this PR
+goes RED"). The two `section_title` cells are the Data Owner's (Unsure
+12); whether they are corrected in `data/table.json` with the lift, and
+what the Measured cell then says, is ruled there.
+
+**Ruled at PR 2, on reading run 38153322315 (Product).** The lift is
+carried by PR 4, as M00's and M01's were. PR 3, if the cold review of
+#11 finds anything, repairs and does not lift; if it finds nothing, PR 3
+is skipped. The Measured cell takes the `main` run after #11 merges
+(ruling 4), which reads as run 38153322315 did unless a source moves.
+Whether that run equals the row's expected output is decided by Unsure
+11 and 12, not here: as the gate stands, it names two rows the expected
+output does not, and the cell says so.
+
+## Unsure (PR 2)
+
+Numbering continues from PR 1's. Each needs a seat's ruling. None blocks
+the measurement; 11 and 12 decide what the Measured cell can equal.
+
+| # | Item | Seat |
+|---|---|---|
+| 11 | `section_terms` is not derived by the build and not compared by the gate. Ruling 8 said the gate compares nine DailyMed fields; the build found the ninth is a reading, not a structure the SPL carries (construction, item 4), so a machine cannot reproduce it and a comparison would name every row for a reason that is not the build's. The gate compares eight and records beside each row the headings the section carries by structure. Confirm, or rule that `section_terms` is compared as a hand-derived field, in which case the gate names all seven rows and row 2 is RED on the seed. The hand re-read (Unsure 8) is owed either way. **Ruled at PR 2** (`rulings/pr2.md` 9): as built. `section_terms` is a Data Owner reading, carried and recorded, not compared. The hand re-read stays owed. | Data Owner, Tool Owner |
+| 12 | `section_title` is compared as the SPL prints it, without case folding. Two seed rows are title-cased where the SPL prints capitals (construction, item 3), so the CI run names them and the Measured cell will not equal the expected output, which names the plant only. The gate is not changed to pass the seed. Rule which of the two is wrong: the seed, corrected in `data/table.json` by the Data Owner in the PR that lifts the plant, with the consequence for the Measured cell stated there; or the comparison, if "as printed" means the words and not the case, in which case PR 3 repairs the gate to fold case and says so. **Ruled at PR 2** (`rulings/pr2.md` 10): the seed is wrong. The two cells are corrected to what the SPL prints, in `data/table.json`, in the PR that lifts the plant (PR 4). The gate is not changed. The Measured cell at PR 4 cites the `main` run after #11 merges as it reads, naming the plant and the two rows; that does not equal the expected output written at open, and the ledger's rule then reads row 2 RED. The state is Product's to write at PR 4, with the finding beside it. | Data Owner, Product |
+| 13 | `label_revised` is the latest section `effectiveTime` outside the product data elements section, a rule observed on three labels against the month DailyMed prints (construction, item 5). FDA's stylesheet, which would state the rule, refused the automated read. Confirm by hand against the three pages, or read the stylesheet in a browser and record the rule it holds. | Data Owner |
+| 14 | `ingredient` is the active ingredient's substance name on the SPL's products, lowercased, not `genericMedicine/name` (construction, item 6). `fields.md` says "the established name as the label title gives it"; the title reads "METFORMIN HYDROCHLORIDE tablets" and the substance name "METFORMIN HYDROCHLORIDE". Confirm the substance name as the field's source. | Data Owner |
+| 15 | The hand files live at `src/ingest/hand/` and duplicate the Data Owner's fields of `data/`. An edit to those fields in `data/` must be made in the hand file too, or the gate's carried fields and the committed ones part. Whether the hand files move beside `data/`, or the build reads the carried fields from `data/` itself (which would make them trivially equal and is why they are not read from there now), is a ruling. | Data Owner, Engineering |
+| 16 | Whether `M02 gate` is made a required check on `main`, as M00's Unsure 12 and M01's Unsure 14 asked for theirs. Not changed here. | Security, Product |
+| 17 | The eCFR `/full/<date>/` endpoint answers a date the versioner does not list with the text in force on that date (construction, item 1). The build does not fetch at such a date, so the plant's `text` is "not read", not "differs". A reader might expect the text compared anyway. The reading here follows regdelta's rule that a snapshot date is not an effective date. | Tool Owner |
+| 18 | `titles.json` answered `up_to_date_as_of` `2026-10-07` with `meta.date` `2026-10-08` and `import_in_progress` true. `ecfr_as_of` is written from `up_to_date_as_of` and the meta is recorded beside it. Whether a run during an import should be unread is not ruled. | Engineering |
+| 19 | The built files are written into the artifact, never into `data/`. Who takes a rebuild into `data/`, and when (the lift PR, a later milestone), is not this PR's. | Product, Data Owner |
+| 20 | Unsure 2 (the section's date as the clause's version) is not touched: the build checks the committed date against the section's version list and reads the section at that date. | Data Owner, Tool Owner |
+| 21 | The ruling file names this PR as #11, the next number on this repository. | Product |
 
 ## Unsure (PR 1)
 
