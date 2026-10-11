@@ -648,9 +648,33 @@ not required on `main` (Unsure 14, ruled), so this PR merges on
 written to a Measured cell (Unsure 13, ruled); the cell above is the
 RED run on the plant.
 
-### Observed (CI run)
+### Observed (CI run, 2026-10-11)
 
-Not yet read; filled before this PR leaves draft.
+The first run on this PR,
+[38111668079](https://github.com/andaro74/pharmadelta/actions/runs/38111668079),
+on commit `1c2c3ff` (the artifact's sha is the pull request's merge ref,
+as PR 2's and PR 3's were), wrote the artifact
+`m01-gate-652af5e09364d628cbcc46281901767bc176b3f4`. It read label-impact
+at `04:28Z`, four minutes after the lift was pushed and before the
+platform check posted on it. It holds:
+
+| Field | Value |
+|---|---|
+| `verdict` | `PENDING`; `finding` null; exit 3; the `M01 gate` job failed |
+| `seats_unassigned` | `[]`: all seven seats `andaro74` at head `e26f882` |
+| `seats_admin_unread` | all seven: `GET collaborators/andaro74/permission` answered 403 with `GITHUB_TOKEN` |
+| `green_blocked_by` | the seven unread permissions; the pull request not merged (`open`, `mergeable_state` `blocked`); no `deploy-agent` job at the merge commit; the registry unread |
+| `mergeable_judged` | `read` true, `mergeable` false, source `graphql`, value `BLOCKED` |
+| `pull_request` | head `e26f882`, `open`, `merged` false, `mergeable_state` `blocked`, `mergeStateStatus` `BLOCKED`, `statusCheckRollup` null |
+| `control.check_runs` | `[]`: none on `e26f882` when read |
+| `deploys` | 45 runs since `2026-10-10T16:54:39Z`, all read, none naming `label-impact`, not truncated |
+| `registry` | unread, no credential |
+| `written_by_ci` | `true` |
+
+Equals the expected result above. Later runs on this PR read the same
+verdict with fewer items in `green_blocked_by` as the check, the merge
+and the deploy land; each is linked in the table under "The lift".
+PENDING is not written to the cell.
 
 ### Rulings carried from PR 3 and PR 1
 
