@@ -521,6 +521,33 @@ true. The plant is not lifted, so RED is the correct reading, and the
 ruled), so this PR merges on `M00 gate` alone, with nothing merged over
 a check.
 
+### Observed (CI run, 2026-10-10)
+
+The first run on this PR,
+[38098770569](https://github.com/andaro74/pharmadelta/actions/runs/38098770569),
+on commit `835643e` (the artifact's sha is the pull request's merge
+ref, as PR 2's was), wrote the artifact
+`m01-gate-dab1b72c36e7718c01cbd11c4c18e6e9777c5195`. It holds:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED` |
+| `finding` | `control refused` |
+| `seats_unassigned` | `["rule-owner"]` |
+| `seats_admin_unread` | the six `andaro74` seats: `GET collaborators/andaro74/permission` answered 403 with `GITHUB_TOKEN` |
+| `mergeable_judged` | `read` true, `mergeable` false, source `graphql`, value `BLOCKED`, "mergeStateStatus 'BLOCKED' with GITHUB_TOKEN" |
+| `pull_request` | head `eb9b201`, `open`, `merged` false, `mergeable_state` `blocked`, GraphQL `mergeStateStatus` `BLOCKED` |
+| `control.check_runs` | one: id 114267967935, `platform-check`, App 5144253, `failure`, refused `["seats assigned, each a login that administers the repository"]` |
+| `deploys` | 37 runs since `2026-10-10T16:54:39Z`, all read, none naming `label-impact`, not truncated |
+| `registry` | unread, no credential |
+| `written_by_ci` | `true`; exit 1; the `M01 gate` job failed; `M00 gate` on the same head passed: [run 38098770600](https://github.com/andaro74/pharmadelta/actions/runs/38098770600) |
+
+Equals the expected result above. The reason string now reads
+`mergeStateStatus BLOCKED`, where PR 2's would have read `'BLOCKED'`
+and a no-token run's `None`. Every other reading equals PR 2's run
+38077129178 except the deploy count, which grew from 9 to 37 as
+agentkeel's schedule ran (Unsure 15: still within one page).
+
 ## Unsure (PR 3)
 
 Each needs a seat's ruling. None changes the measurement.
