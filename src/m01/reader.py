@@ -240,8 +240,8 @@ def read_permission(login: str, owner: dict[str, Any]) -> dict[str, Any]:
 
 def judge_seats(seats: dict[str, Any], owner: dict[str, Any]) -> list[dict[str, Any]]:
     judged = []
-    # `admin_read` is True on an unassigned seat: the judgement needed no permission read, so nothing is unread.
-    # It is False only on an assigned seat whose permission GitHub did not answer.
+    # `admin_read` is True whenever nothing is unread: on a null, empty or malformed seat no read was needed, and on
+    # a seat read as not admin the read was made. It is False only on an assigned seat GitHub did not answer for.
     for slug in SEATS:
         value = seats.get(slug)
         if not isinstance(value, str) or not value.strip():
@@ -405,7 +405,7 @@ def judge(pull: dict[str, Any], seats: list[dict[str, Any]], checks: list[dict[s
     if not pull["merged"]:
         blocked.append(f"the pull request is not merged (state {pull['state']!r}, mergeable_state {pull['mergeable_state']!r})")
     if not deployed:
-        blocked.append("no deploy-agent job of agentkeel's deploy.yml naming label-impact at the merged head concluded success"
+        blocked.append("no deploy-agent job of agentkeel's deploy.yml naming label-impact at the merge commit concluded success"
                        + ("" if deploys.get("read") else " (deploy runs unread)"))
     if not in_registry:
         blocked.append("the registry row for label-impact is unread" if not registry.get("read") else "the registry does not hold label-impact")

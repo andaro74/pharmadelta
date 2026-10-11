@@ -61,13 +61,19 @@ fills the "Measured" cell from it and carries the lift (`rulings/pr2.md`
    RED; a failure before `main` exits 1 with no file and the file is
    the verdict. `read_deploys` names the matrix leg
    `(<repository>, <repository_id>, <commit>, <name>, <rollout>)`.
-   `judge_seats` says `admin_read` is `true` on an unassigned seat. The
-   RED reason prints `unread` where `mergeStateStatus` was not read.
+   `judge_seats` says `admin_read` is `true` whenever nothing is unread,
+   on a seat that needed no read and on one read as not `admin` alike.
+   The RED reason prints `unread` where `mergeStateStatus` was not
+   read; the PENDING reason says "the merge commit".
 5. **Product (prose).** `milestones/M01/README.md` is repaired in
-   place, sentence by sentence, as listed under "Repair (PR 3)", "Prose,
-   repaired in place": the RED, GREEN and UNSCORABLE definitions; the
-   `m01.yml` sentence on when the artifact is uploaded; "reads nothing
-   from disk"; the `M00 gate` link, run 38077129122; and Unsure 11.
+   place, sentence by sentence, as listed in full under "Repair (PR 3)",
+   "Prose, repaired in place"; among them the RED, GREEN and UNSCORABLE
+   definitions, the `m01.yml` sentence on when the artifact is
+   uploaded, "reads nothing from disk", the `M00 gate` link, run
+   38077129122, and Unsure 11. Six more sentences the cold review of #8
+   found inexact were repaired before this PR left draft; they are
+   listed under "Cold review of #8" in the same section, and the
+   seventh is Unsure 22.
 6. **Product (the ledger cell).** Row 1's expected gate output, "RED on
    F1.1 naming `rule-owner`", is not edited. It was written at open and
    the Measured cell is read against it. It reads: RED on the row whose

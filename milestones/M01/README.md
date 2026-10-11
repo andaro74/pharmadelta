@@ -252,10 +252,11 @@ first pull request stays open. M01 is measured here (SPEC/00 §3).
   Exit 0 GREEN, 1 RED, 2 UNSCORABLE, 3 PENDING. Anything else that is
   unread is written as unread with the status GitHub gave and which
   token asked, never left out and never read as a pass. A seat's
-  `admin_read` is `true` when the judgement needed no permission read,
-  so an unassigned seat carries `admin_read: true` and `admin: null`;
-  it is `false` only on an assigned seat whose permission GitHub did
-  not answer.
+  `admin_read` is `true` whenever nothing is unread: a `null`, empty or
+  malformed seat needed no read and carries `admin: null`; a seat read
+  as a permission other than `admin` had its read made and carries
+  `admin: false`. It is `false` only on an assigned seat whose
+  permission GitHub did not answer.
 - `.github/workflows/m01.yml`: on every pull request, every push to
   `main` and by hand. `uv sync --locked`, the artifact directory, the
   reader, then the artifact `m01-gate-<sha>` holding `result.json`,
@@ -314,7 +315,8 @@ CI run to settle:
   access to the rulesets a state that does not account for them. Neither
   word is `clean`, so the verdict is the same either way; the reader
   records both forms and which token asked, and judges "mergeable" on
-  `clean` or `CLEAN` only (Unsure 11).
+  `clean` or `CLEAN` only (Unsure 11). (Repair, PR 3: now `clean`,
+  `unstable` or `has_hooks`, and only when a token asked; Defect 3.)
 - The collaborator permission endpoint answers only a token with access
   to the repository. With none the six assigned seats are recorded as
   "permission unread", so the reader as built cannot go GREEN from this
@@ -373,8 +375,10 @@ endpoint answers 403 where it answered 401. Neither changes the verdict.
   not occur; `subprocess.run` occurs once, in `git`. (Repair, PR 3: the
   sentence said "reads nothing from disk".)
 - The verdict is formed from the seats, the merge state, the deploys and
-  the registry only; the check runs are recorded and named in the
-  reason, and do not decide RED. Read `judge` in `src/m01/reader.py`.
+  the registry only; the check runs do not decide RED. They decide the
+  `finding` beside it: `control refused` needs a `platform-check` from
+  the App that refused the seats check, read from the check runs
+  (Repair, PR 3, Defect 2). Read `judge` in `src/m01/reader.py`.
 - No path under `src/m01/` or in `m01.yml` names a secret: grep
   `secrets.` in `.github/workflows/m01.yml`, no match.
 - Nothing in this PR changes label-impact. The pull request's head is
@@ -394,8 +398,8 @@ if the cold review of #7 finds anything, repairs and does not lift; if
 it finds nothing, PR 3 is skipped. The Measured cell takes run
 38077129178: RED naming `rule-owner`, which equals the row's expected
 output. PR 4 records the lift commit, the platform check that passes
-it, the merge and agentkeel's `deploy-agent` job for the merged head,
-each with its link. PR 4 does not claim GREEN from this reader: with
+it, the merge and agentkeel's `deploy-agent` job for the merge commit
+(Repair, PR 3, Defect 1: "the merged head" before), each with its link. PR 4 does not claim GREEN from this reader: with
 Unsure 10 and 12 ruled as they are, the reader reads PENDING after the
 lift, naming the unread seat permissions and the unread registry.
 
@@ -457,7 +461,10 @@ such, and the finding cannot be F1.1. Unsure 11 is updated in place.
 
 ### Prose, repaired in place
 
-Each sentence is rewritten where it stands, as M00's Q4 and Q6 were.
+Each sentence is repaired where it stands, as M00's Q4 and Q6 were,
+except the first row, which is not edited, and the `admin_read` row,
+which is an addition. "Ten inexact sentences" counts the twelve rows
+less those two.
 
 | Where | Said | Now says |
 |---|---|---|
@@ -467,7 +474,7 @@ Each sentence is rewritten where it stands, as M00's Q4 and Q6 were.
 | "What this PR holds", RED | `clean`/`CLEAN` | the three states GitHub merges from, token only (Defect 3) |
 | "What this PR holds", GREEN | "the merged head" | "the merge commit" (Defect 1) |
 | "What this PR holds", UNSCORABLE | "the manifest ... could not be read" | a 404 on `manifest.yaml` is every seat unassigned, RED; UNSCORABLE is any other answer but 200 |
-| "What this PR holds", exit codes | nothing on `admin_read` | an unassigned seat carries `admin_read: true`, `admin: null`: nothing was unread |
+| "What this PR holds", exit codes | nothing on `admin_read` | added: `admin_read` is `true` whenever nothing is unread, on a seat that needed no read and on one read as not `admin` alike |
 | "What this PR holds", `m01.yml` | "uploaded whenever the job reached the reader step" | uploaded whenever `main` ran; an import error exits 1 with no file (Unsure 19) |
 | "Construction run", pull request | "GraphQL unread" | the reason string printed `mergeStateStatus None`; now `unread` |
 | "What a reader can falsify" | "reads nothing from disk" | reads no file of this repository's content; runs `git rev-parse` and `git status` for provenance |
@@ -499,9 +506,10 @@ cannot produce, with no API call.
   to label-impact. The lift is PR 4's, ruled at PR 2.
 - No edit to `rulings/pr2.md`. A ruling is a record of what was ruled;
   its ruling 1 ("the artifact is written whenever the reader step
-  started") and ruling 5 ("the pull request is not mergeable") stand
-  as the record of what PR 2 claimed, and this section says where they
-  were inexact.
+  started") stands as the record of what PR 2 claimed, and the
+  `m01.yml` row above says where it was inexact. Ruling 5 reads the
+  plant as "not mergeable", `BLOCKED`, which is true before and after
+  Defect 3.
 - No edit to `src/baseline/` (P5), `src/gate/`, `goldens/`, `data/`,
   SPEC/00, CLAUDE.md, the README or `milestones/M00/`.
 - No "Measured" cell. That is PR 4's, from run 38077129178.
@@ -548,6 +556,29 @@ and a no-token run's `None`. Every other reading equals PR 2's run
 38077129178 except the deploy count, which grew from 9 to 37 as
 agentkeel's schedule ran (Unsure 15: still within one page).
 
+### Cold review of #8 (before leaving draft)
+
+Read by a reviewer that had not seen the author's reasoning, on commit
+`9b160de`, against the diff, the README and the ruling. It traced every
+return of `judge`, the no-token case and the unread-GraphQL case, and
+read the artifact of run 38098770569 against the "Observed" table.
+
+Defects: none. Seven inexact sentences, six repaired in place in the
+commit after `9b160de` and one carried:
+
+| # | Where | Said | Now says |
+|---|---|---|---|
+| 1 | `reader.py`, the PENDING reason; this file, "After this PR goes RED" | "at the merged head" | "at the merge commit" (Defect 1's own words, missed in two places) |
+| 2 | "What this PR holds", `admin_read`; `judge_seats` comment; ruling 4 | `admin_read` is `true` when no read was needed | `true` whenever nothing is unread: a seat read as not `admin` had its read made and carries `admin: false` |
+| 3 | PR 2 "Construction run", the merge-state bullet | judges "mergeable" on `clean` or `CLEAN` only | marked "(Repair, PR 3 ...)", as the definitions were |
+| 4 | PR 2 "What a reader can falsify" | the verdict is formed from four readings "only"; the check runs "do not decide RED" | the check runs decide the `finding`, not RED |
+| 5 | "Prose, repaired in place", its heading and the count | "Each sentence is rewritten"; "ten" | one row is not edited and one is an addition; ten is twelve less two. Ruling 5 now says "in full" |
+| 6 | "What this PR does not hold" | ruling 5 of PR 2 was inexact | it was not: `BLOCKED` is "not mergeable" before and after Defect 3 |
+| 7 | `.github/workflows/m01.yml`, the comment above the reader step | "writes result.json whenever it starts" | not edited; outside this PR's ruling. Unsure 22 |
+
+The run on the repaired commit is the last word on this PR; its
+readings are expected to equal the two runs above.
+
 ## Unsure (PR 3)
 
 Each needs a seat's ruling. None changes the measurement.
@@ -558,6 +589,7 @@ Each needs a seat's ruling. None changes the measurement.
 | 19 | An import error in the reader (a missing dependency, a syntax error) exits 1, the RED code, before `main` runs, and writes no `result.json`; the upload then fails on `if-no-files-found: error`, so no artifact exists. The file is the verdict and the exit code is not, so no RED can be read from it; but the job's red mark looks like RED. Proposed: leave it; a missing artifact is "no result", and the ledger reads artifacts only. Or: a wrapper step that writes UNSCORABLE when the reader exits with no file. | Engineering |
 | 20 | The ledger's expected gate output says "RED on F1.1 naming `rule-owner`" and the result's `finding` is `control refused`. The cell was written at open and is not edited here. Reading: "RED on F1.1" is RED on the row whose falsifier is F1.1, and `finding` names which arm; the plant's arm is the refusal. Confirm that reading, or rule that PR 4's Measured cell must say so in its own words. | Product |
 | 21 | The synthetic checks of `judge` are not committed. Committing them would be a test of the reader, which PR 2 said it does not hold; the next milestone that changes `judge` should decide whether `judge` gets a test file under `src/m01/`. | Engineering |
+| 22 | The comment in `.github/workflows/m01.yml` above the reader step, "The reader writes result.json whenever it starts", is the sentence this PR repairs in the README (Unsure 19) and is left standing in the workflow: this PR's ruling does not cover `m01.yml`, and the review of #7 found nothing in it. Found by the cold review of #8. One comment line, for PR 4 or the next PR that touches the workflow. | Engineering |
 
 ## Unsure (PR 2)
 
