@@ -1,0 +1,62 @@
+# The M01 reader (milestones/README.md row 1, F1.1).
+#
+# Reads label-impact's first pull request at its head, agentkeel's deploy
+# runs and the registry, judges ledger row 1 as milestones/M01/README.md
+# "Carried to PR 2" defines it, and writes the result as the artifact
+# `m01-gate-<sha>`. The job fails when the verdict is not GREEN. Only what
+# this workflow writes is evidence (SPEC/00 P4); a local run of the same
+# command is not.
+#
+# What it reads, and with what: GitHub's REST API for two public
+# repositories, agentkeel-studio/label-impact and andaro74/agentkeel, with
+# this repository's GITHUB_TOKEN. That token has no access to the
+# organisation, so a seat's permission is recorded as unread; the registry
+# is in AWS and is recorded as unread. Both are under Unsure in the README.
+# No secret of this repository is read. The M00 gate (gate.yml) is unchanged.
+
+name: m01
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m01-gate:
+    name: M01 gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      # The artifact directory exists before anything can crash, so the
+      # upload below always has a directory to read (M00 PR 3, Q3 b).
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m01-gate"
+
+      # The reader writes result.json whenever it starts: UNSCORABLE with the
+      # error when a reading it needs cannot be made, never RED or GREEN.
+      - name: Read label-impact's first pull request, agentkeel's deploys and the registry; judge row 1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >
+          uv run python -m src.m01.reader
+          --out "$RUNNER_TEMP/m01-gate/result.json"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Write the result as a CI artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: m01-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/m01-gate/
+          if-no-files-found: error
+          retention-days: 90
