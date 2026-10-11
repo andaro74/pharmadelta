@@ -14,9 +14,9 @@ this is the same row with the open detail.
 | Falsifiers | F1.1 label-impact's first pull request is mergeable, or is merged and deployed, while one of its seven seats is not a login that administers the repository. |
 | Seeded commit | `eb9b201` on `first-agent` in `agentkeel-studio/label-impact`, [pull request #1](https://github.com/agentkeel-studio/label-impact/pull/1): `manifest.yaml` with `name: label-impact`, six seats `andaro74` and `rule-owner: null`; goldens `g-001` to `g-004`; `data/` as at pharmadelta `m00`; the tool, its schema and the prompt rewritten for labels. |
 | Expected gate output | agentkeel's `platform-check` on that pull request fails, naming `rule-owner`. PR 2's reader in this repository reads that check, agentkeel's deploy runs and the registry for `label-impact`, in CI, and writes a `result.json` that is RED on F1.1 naming `rule-owner`. |
-| Measured | |
-| PRs used / cap | 3 / 4 |
-| State | OPEN |
+| Measured | RED on row 1 (falsifier F1.1), `finding` `control refused`, `seats_unassigned` `["rule-owner"]`, `written_by_ci` true, on PR 2 (#7) at merge ref `223de2d`: [run 38077129178](https://github.com/andaro74/pharmadelta/actions/runs/38077129178), artifact `m01-gate-223de2d13d518ce23327373cfff9775a49c24e0f`. The same reading on `main` at `8cdd851` after #7 merged: [run 38097865560](https://github.com/andaro74/pharmadelta/actions/runs/38097865560). Equals the expected output. |
+| PRs used / cap | 4 / 4 |
+| State | GREEN |
 
 ## The false state (P1, P2)
 
@@ -579,17 +579,124 @@ commit after `9b160de` and one carried:
 The run on the repaired commit is the last word on this PR; its
 readings are expected to equal the two runs above.
 
+## Close (PR 4, 2026-10-11)
+
+PR 4 closes the milestone at the cap, 4 / 4. It holds the lift in
+label-impact, the "Measured" cell, the rulings PR 3 left open (Unsure 18
+to 22) and PR 1's Unsure 2, one comment line in `m01.yml` (Unsure 22),
+and `rulings/pr4.md`. The tag `m01` goes on its merge commit. Nothing
+here decides the row: PR 2's run 38077129178 was the measurement.
+
+### The lift
+
+The one edit "The false state" named: `rule-owner: andaro74` in
+label-impact's `manifest.yaml`, on `first-agent`, commit
+[`e26f882`](https://github.com/agentkeel-studio/label-impact/commit/e26f8826715cec69e6a364c556b26926f13894bd)
+(`e26f8826715cec69e6a364c556b26926f13894bd`), pushed `2026-10-11T04:24:47Z`.
+The PLANT comment goes with it. Every seat is now `andaro74`. Product
+ruled at PR 2 that PR 4 carries it (`rulings/pr2.md` 11).
+
+What followed, each read from GitHub after it happened. This is
+agentkeel's record and label-impact's, not this repository's
+measurement (P4); the measurement is the cell below.
+
+| Step | Record |
+|---|---|
+| Platform check on `e26f882` | not yet read; filled before this PR leaves draft |
+| Merge of label-impact #1 | not yet read; filled before this PR leaves draft |
+| agentkeel `deploy-agent` for the merge commit | not yet read; filled before this PR leaves draft |
+
+### Measured
+
+The cell cites PR 2's run on #7,
+[38077129178](https://github.com/andaro74/pharmadelta/actions/runs/38077129178),
+as Product ruled on reading it (`rulings/pr2.md` 11; "After this PR goes
+RED" above): RED, `finding` `control refused`, `seats_unassigned`
+`["rule-owner"]`, `written_by_ci` true, artifact
+`m01-gate-223de2d13d518ce23327373cfff9775a49c24e0f`. Beside it the cell
+names the run on `main` at `8cdd851` after #7 merged,
+[38097865560](https://github.com/andaro74/pharmadelta/actions/runs/38097865560),
+whose `result.json` carries the same verdict, finding, seats and control
+record (check run 114267967935, App 5144253, `failure`); only the deploy
+count differs, 9 and 37. M00's cell cited the `main` run because its
+commit is a commit in this repository (M00 Unsure 15); here the ruled run
+is the PR run, and the `main` run is named so a reader has both. Unsure
+23.
+
+The expected gate output, written at open, says "RED on F1.1 naming
+`rule-owner`". The result's `finding` is `control refused`, not `F1.1`.
+Product confirms the reading PR 3 proposed (Unsure 20): "RED on F1.1" is
+RED on the row whose falsifier is F1.1, and the `finding` field names
+which arm fired. The plant's arm is the refusal: the check refused the
+head and the pull request was `BLOCKED`, so F1.1's own condition, a
+mergeable or merged pull request with a seat unassigned, did not hold,
+and a result that said `F1.1` on this plant would have been wrong. The
+cell says so in its own words. Row 1 is GREEN: the measured verdict
+equals the expected output.
+
+### Expected CI result on this PR
+
+The reader reads label-impact's first pull request live. After the lift
+no seat is unassigned, so RED is not reachable. GREEN needs the six
+seat permissions read as `admin` and the registry read, and this
+repository holds no token for either (Unsure 10 and 12, ruled at PR 2).
+So the reader reads **PENDING**, exit 3, `green_blocked_by` naming the
+unread permissions, the unread registry and, until they happen, the
+merge and the deploy. The `M01 gate` job fails on PENDING. `M01 gate` is
+not required on `main` (Unsure 14, ruled), so this PR merges on
+`M00 gate` alone, with nothing merged over a check. PENDING is never
+written to a Measured cell (Unsure 13, ruled); the cell above is the
+RED run on the plant.
+
+### Observed (CI run)
+
+Not yet read; filled before this PR leaves draft.
+
+### Rulings carried from PR 3 and PR 1
+
+| # | Ruled |
+|---|---|
+| 18 | Product: the name `unassigned, no refusal read` stands. |
+| 19 | Engineering: left as it is. A missing artifact is "no result"; the ledger reads artifacts only, and no RED can be read from a red job mark. The comment in `m01.yml` now says so (22). |
+| 20 | Product: the reading is confirmed, above under "Measured", and the cell says it in its own words. |
+| 21 | Engineering: no test file in M01. The next milestone that changes `judge` decides. |
+| 22 | Engineering: the comment above the reader step in `.github/workflows/m01.yml` now reads "whenever its `main` runs", with the import-error case and its Unsure numbers. Two lines added, one changed. Nothing else in the workflow. |
+| PR 1's 2 | Product: the cap of four is this repository's. label-impact's pull request #1 carried the seeded commit and the lift and is counted in this file, not in the ledger's cell. |
+
+### What this PR does not hold
+
+- No edit to `src/m01/reader.py`, `src/baseline/` (P5), `src/gate/`,
+  `goldens/`, `data/`, SPEC/00, CLAUDE.md, the README or
+  `milestones/M00/`.
+- No edit to `rulings/pr1.md`, `pr2.md` or `pr3.md`.
+- No token and no registry read (Unsure 10 and 12, ruled at PR 2).
+- No GREEN from this reader, and no claim of one.
+- No new claim. M02 opens in a new session.
+
+### After this PR
+
+Tag `m01` on the merge commit. M01's Unsure items not ruled (PR 1's 1,
+5, 8 and 9; PR 2's 11 and 15; this PR's 23) carry to the milestone that
+touches them. Unsure 1 owes a one-line edit to SPEC/00 §3 under
+Product; it is not made here.
+
+## Unsure (PR 4)
+
+| # | Item | Seat |
+|---|---|---|
+| 23 | Which run a Measured cell cites. M00's cell cites the `main` run after PR 2 merged, because its commit is a commit in this repository (M00 Unsure 15). M01's cites the PR run on #7, as Product ruled on reading it, and names the `main` run beside it. The two readings are equal. One rule for M02 onward: propose the `main` run, with the PR run named beside it when it was the one read at the time. | Product |
+
 ## Unsure (PR 3)
 
 Each needs a seat's ruling. None changes the measurement.
 
 | # | Item | Seat |
 |---|---|---|
-| 18 | The third finding's name, `unassigned, no refusal read`, is Engineering's choice at PR 3. It means: a seat is unassigned, the pull request is not read as mergeable, and no `platform-check` from the App is on record refusing the seats check. Confirm the name or give another; the two the ledger knows, `F1.1` and `control refused`, are unchanged. | Product |
-| 19 | An import error in the reader (a missing dependency, a syntax error) exits 1, the RED code, before `main` runs, and writes no `result.json`; the upload then fails on `if-no-files-found: error`, so no artifact exists. The file is the verdict and the exit code is not, so no RED can be read from it; but the job's red mark looks like RED. Proposed: leave it; a missing artifact is "no result", and the ledger reads artifacts only. Or: a wrapper step that writes UNSCORABLE when the reader exits with no file. | Engineering |
-| 20 | The ledger's expected gate output says "RED on F1.1 naming `rule-owner`" and the result's `finding` is `control refused`. The cell was written at open and is not edited here. Reading: "RED on F1.1" is RED on the row whose falsifier is F1.1, and `finding` names which arm; the plant's arm is the refusal. Confirm that reading, or rule that PR 4's Measured cell must say so in its own words. | Product |
-| 21 | The synthetic checks of `judge` are not committed. Committing them would be a test of the reader, which PR 2 said it does not hold; the next milestone that changes `judge` should decide whether `judge` gets a test file under `src/m01/`. | Engineering |
-| 22 | The comment in `.github/workflows/m01.yml` above the reader step, "The reader writes result.json whenever it starts", is the sentence this PR repairs in the README (Unsure 19) and is left standing in the workflow: this PR's ruling does not cover `m01.yml`, and the review of #7 found nothing in it. Found by the cold review of #8. One comment line, for PR 4 or the next PR that touches the workflow. | Engineering |
+| 18 | The third finding's name, `unassigned, no refusal read`, is Engineering's choice at PR 3. It means: a seat is unassigned, the pull request is not read as mergeable, and no `platform-check` from the App is on record refusing the seats check. Confirm the name or give another; the two the ledger knows, `F1.1` and `control refused`, are unchanged. **Ruled at PR 4** (`rulings/pr4.md` 4): the name stands. | Product |
+| 19 | An import error in the reader (a missing dependency, a syntax error) exits 1, the RED code, before `main` runs, and writes no `result.json`; the upload then fails on `if-no-files-found: error`, so no artifact exists. The file is the verdict and the exit code is not, so no RED can be read from it; but the job's red mark looks like RED. Proposed: leave it; a missing artifact is "no result", and the ledger reads artifacts only. Or: a wrapper step that writes UNSCORABLE when the reader exits with no file. **Ruled at PR 4** (`rulings/pr4.md` 5): left as it is; a missing artifact is no result. | Engineering |
+| 20 | The ledger's expected gate output says "RED on F1.1 naming `rule-owner`" and the result's `finding` is `control refused`. The cell was written at open and is not edited here. Reading: "RED on F1.1" is RED on the row whose falsifier is F1.1, and `finding` names which arm; the plant's arm is the refusal. Confirm that reading, or rule that PR 4's Measured cell must say so in its own words. **Ruled at PR 4** (`rulings/pr4.md` 3): the reading is confirmed and the cell says it in its own words. | Product |
+| 21 | The synthetic checks of `judge` are not committed. Committing them would be a test of the reader, which PR 2 said it does not hold; the next milestone that changes `judge` should decide whether `judge` gets a test file under `src/m01/`. **Ruled at PR 4** (`rulings/pr4.md` 5): no test file in M01. | Engineering |
+| 22 | The comment in `.github/workflows/m01.yml` above the reader step, "The reader writes result.json whenever it starts", is the sentence this PR repairs in the README (Unsure 19) and is left standing in the workflow: this PR's ruling does not cover `m01.yml`, and the review of #7 found nothing in it. Found by the cold review of #8. One comment line, for PR 4 or the next PR that touches the workflow. **Ruled at PR 4** (`rulings/pr4.md` 6): the comment is repaired in this PR. | Engineering |
 
 ## Unsure (PR 2)
 
@@ -614,7 +721,7 @@ Each needs a seat's ruling. None blocks the plant.
 | # | Item | Seat |
 |---|---|---|
 | 1 | The template was not re-made at `m08`. Its head `66ca2e4` was made from agentkeel `36c97dd`, which is `m07~1`, 78 commits before `m08`. Between the two, nothing under `agents/refagent/`, `scripts/make_template.py`, `infra/ruleset/` or `src/validate/` changed; `docs/developer/template-README.md` changed by two lines, and `platform_version` would read `m08` instead of `36c97ddaee93`. Product chose to create from the template as it stands (2026-10-10, option 1 of two). SPEC/00 §3's sentence "from a template re-made at `m08`" is then not literally met; a one-line edit to §3 is owed under Product. | Product |
-| 2 | How label-impact's own pull requests count against the cap: this repository's four, or label-impact's own. Proposed: the cap of four is this repository's; label-impact's pull requests are the seeded commit and the lift and are counted in this file, not in the ledger's cell. | Product |
+| 2 | How label-impact's own pull requests count against the cap: this repository's four, or label-impact's own. Proposed: the cap of four is this repository's; label-impact's pull requests are the seeded commit and the lift and are counted in this file, not in the ledger's cell. **Ruled at PR 4** (`rulings/pr4.md` 7): as proposed. | Product |
 | 3 | Whether PR 2's reader reads GitHub's checks API and agentkeel's deploy runs with the user's token in this repository's CI, and what secret that needs. The checks on a public repository's pull request and the runs of a public repository's workflow are readable without a token, within GitHub's rate limit for unauthenticated calls; `GITHUB_TOKEN` of this repository reads them too. The registry is a DynamoDB table in the agent account, read with an AWS credential this repository does not hold. | Security, Engineering |
 | 4 | Whether the `m00` goldens' `escalate` field and `g-004`'s `314.80(c)(1)(i)` clause survive agentkeel's golden validation unchanged. Read against `src/validate/agent_goldens.py` at `m08`: the validator asks the seven top-level fields, `kind` in {ordinary, trap}, `expected` with exactly `table_row`, `clause_id` and a non-empty `answer_fields`, and that the row and clause exist in the agent's own `data/`. It does not read the answer fields' names or values. `314.80(c)(1)(i)` is a key of `data/clauses.json`. The platform check's output on the pull request is the record. | Data Owner, Tool Owner |
 | 5 | Whether U3's trap (`g-004`) is measured on the deployed agent at M01 as ADR-0001 says, given the guardrail is the platform's. The deploy asks the agent its goldens after a merge and records the answer; at M06 a failing golden blocks nothing (quickstart §5). Nothing merges in this PR, so nothing is asked at PR 1. | Data Owner |
