@@ -42,8 +42,10 @@ jobs:
       - name: Create the artifact directory
         run: mkdir -p "$RUNNER_TEMP/m01-gate"
 
-      # The reader writes result.json whenever it starts: UNSCORABLE with the
-      # error when a reading it needs cannot be made, never RED or GREEN.
+      # The reader writes result.json whenever its `main` runs: UNSCORABLE with
+      # the error when a reading it needs cannot be made, never RED or GREEN.
+      # A failure before `main` (an import error) exits 1 with no file, and the
+      # upload below then fails on if-no-files-found (M01 Unsure 19, 22).
       - name: Read label-impact's first pull request, agentkeel's deploys and the registry; judge row 1
         env:
           GITHUB_TOKEN: ${{ github.token }}
