@@ -30,6 +30,7 @@ evidence:
   - https://www.ecfr.gov/api/versioner/v1/full/2016-12-23/title-21.xml?part=314&section=314.98
   - https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/f39ee08d-73db-71b9-e053-2995a90a877c/history.json
   - https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/f39ee08d-73db-71b9-e053-2995a90a877c.xml
+  - https://github.com/andaro74/pharmadelta/actions/runs/38153322315
 pr: https://github.com/andaro74/pharmadelta/pull/11
 ---
 
@@ -93,6 +94,14 @@ Nothing in this PR lifts the plant, and nothing under `data/` changes.
    README as construction. It decides nothing (P4).
 7. **Product.** "PRs used / cap" is 2 / 4. Which PR carries the lift is
    ruled on reading this PR's CI run, as M01's was.
+8. **Product, on reading run 38153322315.** The run wrote RED,
+   `clauses_mismatched` `["314.98(a)"]`, `rows_mismatched`
+   `["metformin.6", "metoprolol-tartrate.5"]`, `written_by_ci` true;
+   the plant is named as the row expects. The lift is carried by PR 4.
+   PR 3, if the cold review of #11 finds anything, repairs and does not
+   lift; if it finds nothing, PR 3 is skipped. The Measured cell takes
+   the `main` run after #11 merges; whether it equals the expected
+   output is Unsure 11 and 12's, and the cell says what it reads.
 
 ## What a reader can falsify
 

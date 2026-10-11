@@ -447,6 +447,31 @@ expected RED" foresaw: not a reason to edit the expected output, and
 not a reason to fold case in the gate (Unsure 12). The CI run is the
 measurement; the construction run decides nothing.
 
+### Observed (CI run, 2026-10-11)
+
+The first run on this PR,
+[38153322315](https://github.com/andaro74/pharmadelta/actions/runs/38153322315),
+wrote the artifact `m02-gate-c6ef2418b43d295e3a7755652faebc75ec665fd8`
+(the sha is the pull request's merge ref, as M00's and M01's were). It
+holds `result.json`, `clauses.json`, `table.json` and `sources/` with
+20 responses and `index.json`. `result.json`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED` |
+| `clauses_mismatched` | `["314.98(a)"]`: `effective_date` committed `2026-10-07`, the versioner lists `["2016-12-23"]`; `text` and `source_note` not read, no version at that date |
+| `rows_mismatched` | `["metformin.6", "metoprolol-tartrate.5"]`, each on `section_title` only: committed `Adverse Reactions` and `Warnings and Precautions`, source `ADVERSE REACTIONS` and `WARNINGS AND PRECAUTIONS` |
+| `unreadable` | `[]` |
+| `counts` | clauses 8 of 9 matched; rows 5 of 7 matched |
+| the eight clauses | `text`, `lead_in`, `source_note`, `effective_date` all equal |
+| rows read | lisinopril SPL version 5, `effectiveTime` 20220630, current published 2022-11-18; metformin 6, 20251204, 2025-12-05; metoprolol tartrate 10, 20240822, 2024-11-06; none published after `label_read_on` |
+| `ecfr` | `up_to_date_as_of` `2026-10-07`; `meta.date` `2026-10-08`, `import_in_progress` true |
+| `written_by_ci` | `true`; `commit` `c6ef241`, `dirty` false; exit 1; the `M02 gate` job failed. `M00 gate` on the same head passed: [run 38153322301](https://github.com/andaro74/pharmadelta/actions/runs/38153322301). `M01 gate` is not required and reads as it did on `main` |
+
+Equals the expected result above, and equals the construction run on
+every compared field. The plant is named as ledger row 2 expects; the
+two rows are named beside it.
+
 ### What a reader can falsify
 
 - The artifact `m02-gate-<sha>` on this PR's run holds `result.json`
@@ -483,6 +508,15 @@ run, as M01's was at PR 2 (`milestones/M01/README.md`, "After this PR
 goes RED"). The two `section_title` cells are the Data Owner's (Unsure
 12); whether they are corrected in `data/table.json` with the lift, and
 what the Measured cell then says, is ruled there.
+
+**Ruled at PR 2, on reading run 38153322315 (Product).** The lift is
+carried by PR 4, as M00's and M01's were. PR 3, if the cold review of
+#11 finds anything, repairs and does not lift; if it finds nothing, PR 3
+is skipped. The Measured cell takes the `main` run after #11 merges
+(ruling 4), which reads as run 38153322315 did unless a source moves.
+Whether that run equals the row's expected output is decided by Unsure
+11 and 12, not here: as the gate stands, it names two rows the expected
+output does not, and the cell says so.
 
 ## Unsure (PR 2)
 
