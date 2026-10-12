@@ -57,8 +57,10 @@ evidence behind each answer.
 | `andaro74/agentkeel` | the platform: checks, signing, deploy, guardrail, registry, audit | everything a tenant cannot change |
 
 The agent repository's creation time starts agentkeel's
-time-to-governed-agent clock (agentkeel SPEC/06). So it is created at M01,
-from a template re-made at `m08`. The template in use today was made from
+time-to-governed-agent clock (agentkeel SPEC/06). So it was created at
+M01, on 2026-10-10, from the template at `66ca2e4`, made from agentkeel
+`36c97dd` (`m07~1`), not re-made at `m08` (Product, M01 PR 1 ruling 2;
+errata PR). The template in use today was made from
 an older commit (`window-check` records `39031e7`, `platform_version: m06`).
 
 ## 4. Principles
@@ -204,14 +206,18 @@ close before M03. All nine rows are 21 to 23 days.
 ## 10. Citations checked
 
 Checked on 2026-10-09 against Cornell LII's text of the CFR. ecfr.gov
-refused the automated read, so the eCFR check the brief asks for is still
-open (§12, U6). All five citations in the mockups exist and are about
+refused the automated read then; its versioner API answers when the
+request accepts gzip (M02 PR 2), and the M02 gate reads it in CI
+([run 38166729564](https://github.com/andaro74/pharmadelta/actions/runs/38166729564)
+on `main` at `ab72b9d`). The hand check U6 asks for was done 2026-10-09
+and closed at M00 PR 1 (`milestones/M00/citations-checked.md`), not by
+that run. All five citations in the mockups exist and are about
 what the mockups use them for.
 
 | Citation | What it is | Note |
 |---|---|---|
 | 21 CFR 201.57(c)(9)(i) | Use in specific populations, 8.1 Pregnancy | applies to labels in the 201.56(d) format |
-| 21 CFR 314.70(c)(6)(iii)(A) | Changes being effected: add or strengthen a contraindication, warning, precaution or adverse reaction | written for the holder of an approved NDA; how far it reaches an ANDA holder is the point of scenario 3 and needs its own check |
+| 21 CFR 314.70(c)(6)(iii)(A) | Changes being effected: add or strengthen a contraindication, warning, precaution or adverse reaction | written for "the applicant", which 314.3 defines to include an ANDA applicant; 314.97(a) sends the ANDA holder to 314.70. Corrected at M00 from "the holder of an approved NDA" (`milestones/M00/citations-checked.md` row 2). How far it reaches an ANDA holder is the point of scenario 3 (U7, checked at M00) |
 | 21 CFR 314.94(a)(8)(iv) | ANDA labeling: side-by-side comparison; proposed labeling the same as the reference listed drug's, with listed exceptions | |
 | 21 CFR 314.80(c)(1)(i) | Postmarketing 15-day "Alert reports" | serious and unexpected, within 15 calendar days |
 | 21 CFR 314.98 | Postmarketing reports for an approved ANDA | (a) sends the ANDA holder to 314.80 |
