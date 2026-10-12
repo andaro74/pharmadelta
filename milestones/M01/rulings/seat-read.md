@@ -80,7 +80,11 @@ designs the registry read (Unsure 12).
   present) writes each of the six `andaro74` seats as `permission`
   `admin` with `why` naming `M01_READ_TOKEN`, and a PENDING reason that
   names the registry only. Exit 3; the job fails, as it is not
-  required (Unsure 14).
+  required (Unsure 14). Observed on the PR run at `21e19d8`, run
+  [38192905362](https://github.com/andaro74/pharmadelta/actions/runs/38192905362):
+  all seven seats "admin yes; GitHub answered 'admin' with
+  M01_READ_TOKEN"; PENDING, "the registry row for label-impact is
+  unread" and nothing else; M00 and M02 gates pass.
 - The M01 gate on `main` after merge reads the same.
 - The M00 and M02 gates are unchanged and pass.
 
