@@ -22,6 +22,7 @@ evidence:
   - src/ingest/gate.py
   - src/ingest/dailymed.py
   - https://github.com/andaro74/pharmadelta/actions/runs/38154731153
+  - https://github.com/andaro74/pharmadelta/actions/runs/38189632015
   - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f8d16c85-50e2-4d99-afae-6fb902734e42
   - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f39ee08d-73db-71b9-e053-2995a90a877c
   - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=24837d82-0f3f-4482-9af0-31e5f675c30f
@@ -145,6 +146,18 @@ is still open. M03 does not open here. The ledger is not touched.
 - The M02 gate on this PR writes `verdict: GREEN`, 9 of 9 clauses and
   7 of 7 rows, and its `metoprolol-tartrate.8.1` entry's
   `section_terms.committed` reads the new value with `compared` false.
+  Observed on the PR run at `595dd68`,
+  [38189632015](https://github.com/andaro74/pharmadelta/actions/runs/38189632015),
+  artifact `m02-gate-e20e9be161435e48436ed31bb79b6c71133635fc`:
+  `verdict` `GREEN`, `written_by_ci` true, `clauses_mismatched` `[]`,
+  `rows_mismatched` `[]`; the entry's `committed` reads "Risk Summary;
+  Clinical consideration; Data" and its `headings_read` lists "Risk
+  Summary", "Clinical consideration", "Disease-associated maternal
+  and/or embryo/fetal risk", "Fetal/Neonatal adverse reactions",
+  "Data", "Human Data", "Animal Data", the same list the page fetch
+  read (ruling 1). The M01 gate on the same PR exits 3 (registry
+  unread, no AWS credential), as on #13; it is not required and not
+  this PR's.
 - `spl-common.xsl` at the URL above holds the template and the select
   quoted in ruling 3.
 - The three DailyMed pages print the "Revised:" lines and the active
