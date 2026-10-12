@@ -9,10 +9,14 @@
 #
 # What it reads, and with what: GitHub's REST API for two public
 # repositories, agentkeel-studio/label-impact and andaro74/agentkeel, with
-# this repository's GITHUB_TOKEN. That token has no access to the
-# organisation, so a seat's permission is recorded as unread; the registry
-# is in AWS and is recorded as unread. Both are under Unsure in the README.
-# No secret of this repository is read. The M00 gate (gate.yml) is unchanged.
+# the secret M01_READ_TOKEN when it is set, else this repository's
+# GITHUB_TOKEN. M01_READ_TOKEN is a fine-grained personal access token of
+# the owner, Metadata read on agentkeel-studio/label-impact only, set
+# 2026-10-12 so that a seat's collaborator permission can be read (M01
+# Unsure 10; milestones/M01/rulings/seat-read.md). GITHUB_TOKEN cannot
+# read it, and a pull request from a fork gets no secret, so that run
+# records the permission as unread, as before. The registry is in AWS and
+# is recorded as unread (Unsure 12). The M00 gate (gate.yml) is unchanged.
 
 name: m01
 
@@ -49,6 +53,7 @@ jobs:
       - name: Read label-impact's first pull request, agentkeel's deploys and the registry; judge row 1
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          M01_READ_TOKEN: ${{ secrets.M01_READ_TOKEN }}
         run: >
           uv run python -m src.m01.reader
           --out "$RUNNER_TEMP/m01-gate/result.json"
