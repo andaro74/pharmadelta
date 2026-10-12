@@ -105,6 +105,8 @@ def git(*args: str) -> str:
 
 
 def token() -> tuple[str | None, str]:
+    if value := os.environ.get("M01_READ_TOKEN"):
+        return value, "M01_READ_TOKEN"
     if value := os.environ.get("GITHUB_TOKEN"):
         return value, "GITHUB_TOKEN"
     return None, "no token"
