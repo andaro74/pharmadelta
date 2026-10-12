@@ -20,9 +20,12 @@
 
 name: m01
 
+# Runs on pull requests and by hand, not on push to main. Row 1 was
+# measured on main at 8cdd851 (run 38097865560) and the ledger cites it.
+# Every push run since read PENDING on the registry (Unsure 12), so the
+# push trigger was removed 2026-10-12 (milestones/M01/rulings/main-run.md).
+# `gh workflow run m01.yml --ref main` reads main on demand.
 on:
-  push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
 
