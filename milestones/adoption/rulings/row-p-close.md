@@ -101,5 +101,15 @@ so row P needed both tags. Both exist.
 - **The registry read** the M01 reader lacks (M01 Unsure 12): designed
   at M03 as a read-only role in agentkeel assumed by OIDC. M01's gate
   on `main` runs only by hand until then (`rulings/main-run.md`).
+- **The M01 reader's deploy window has closed** (M01 Unsure 15, ruled
+  at PR 2 as a known limit). The M01 gate on this PR, run 39191730478,
+  reads PENDING on two reasons: "no deploy-agent job of agentkeel's
+  deploy.yml naming label-impact at the merge commit concluded success"
+  and the registry row unread. The reader reads the latest 100 deploy
+  runs; agentkeel deploys every ten minutes, and label-impact's deploy
+  of 2026-10-11 has scrolled out. Unsure 15 says a deploy that scrolled
+  out is unread until read another way, the registry row. Not a defect
+  of this PR, which touches no reader; it is the second thing the M03
+  registry read restores. Engineering.
 - The two build edits owed with M02 Unsure 23
   (`milestones/adoption/rulings/data-owner-cleanup.md`).
