@@ -1,0 +1,56 @@
+{
+  "what": "The public API of pharmadelta: the answers it serves, one per question, each with the row of the label table and the clause of 21 CFR it cites, and the record of the call to the deployed agent that produced it (milestones/M03/README.md). The row and the clause are copies of data/table.json and data/clauses.json at the commit named in `data_commit`. A number in this file is the row's or the clause's own data, never a measured result.",
+  "agent": "label-impact, agentkeel-studio/label-impact, the deployed agent (SPEC/00 §3, §6)",
+  "company": "Ardentia Generics is fictional; its portfolio and every 'our label' statement are invented (SPEC/00 §2, §9)",
+  "data_commit": "b9f84e3",
+  "answers": [
+    {
+      "id": "g-001",
+      "question": "FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?",
+      "answer": {
+        "table_row": "lisinopril.8.1",
+        "clause_id": "201.57(c)(9)(i)",
+        "answer_fields": {
+          "impacted": true,
+          "owed": "follow-rld",
+          "escalate": false
+        }
+      },
+      "row": {
+        "table_row": "lisinopril.8.1",
+        "holder": "Ardentia Generics",
+        "holder_fictional": true,
+        "ingredient": "lisinopril",
+        "dosage_form": "tablet",
+        "strengths": "2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg",
+        "anda": "ANDA075743",
+        "rld_nda": "NDA019777",
+        "dailymed_set_id": "f8d16c85-50e2-4d99-afae-6fb902734e42",
+        "label_revised": "2022-06",
+        "label_read_on": "2026-10-09",
+        "format": "201.56(d)",
+        "section": "8.1",
+        "section_title": "Pregnancy",
+        "section_terms": "Risk Summary; Clinical Considerations",
+        "section_terms_read_on": "2026-10-10",
+        "requirement": "201.57(c)(9)(i)"
+      },
+      "clause": {
+        "id": "201.57(c)(9)(i)",
+        "citation": "21 CFR 201.57(c)(9)(i)",
+        "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
+        "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
+        "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
+        "ecfr_as_of": "2026-10-07",
+        "effective_date": "2016-11-29",
+        "text_copied_on": "2026-10-10",
+        "existence_checked_by_hand_on": "2026-10-09",
+        "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
+      },
+      "agent": null,
+      "call": null,
+      "scripted": true,
+      "PLANT": "M03 PR 1 (milestones/M03/README.md, 'The false state'): this answer was written by hand. No call to the deployed agent produced it: `agent` and `call` are null. Lifted in the PR the milestone names, when the entry carries the record of the call that produced it."
+    }
+  ]
+}
