@@ -36,12 +36,24 @@ rows `ingredient`, `dosage_form`, `strengths`, `anda`, `label_revised`,
 `ecfr_as_of` and `text_copied_on` (provenance, Unsure 10); `section_terms`
 (a reading, not a structure, Unsure 11); every Data Owner field.
 
+The Data Owner's row fields (`ROW_CARRIED`) are carried from the hand
+file, never read from `data/` (M02 Unsure 15, ruled). Beside each row the
+result records whether `data/` and the hand file agree on them, field by
+field, and `rows_carried_diverging` names each divergence. A divergence
+does not change the verdict: it is a Data Owner error (both files are
+edited in one PR, `milestones/adoption/rulings/data-owner-cleanup.md` 2),
+not a mismatch with the source, and it is named, not judged.
+
     uv run python -m src.ingest.gate --out-dir <dir> [--summary <md>]
 
 Writes `<dir>/result.json`, `<dir>/clauses.json` and `<dir>/table.json`
 (the built files, same shape as `data/`), and `<dir>/sources/` (every
 response read, with an index). Exit 0 GREEN, 1 RED, 2 UNSCORABLE. The
 result is evidence only when CI wrote it (P4), and it says whether it did.
+
+`sources/` is written on every exit of `main`, the top-level UNSCORABLE
+included: whatever was read before the failure is in the artifact, so a
+run can be re-read without the source (M02 PR 2 ruling 2, M02 Unsure 23).
 """
 
 from __future__ import annotations
@@ -125,7 +137,11 @@ def provenance() -> dict[str, Any]:
         "fields_compared": {"clauses": list(CLAUSE_FIELDS), "rows": list(ROW_FIELDS)},
         "fields_recorded_not_compared": {
             "clauses": ["ecfr_as_of", "text_copied_on", "citation", "ecfr_url", "existence_checked_by_hand_on", "note"],
-            "rows": ["section_terms", *ROW_CARRIED, "dailymed_set_id", "table_row"],
+            "rows": [*ROW_CARRIED, "dailymed_set_id", "table_row"],
+        },
+        "fields_carried_checked": {
+            "rows": list(ROW_CARRIED),
+            "why": "data/ against src/ingest/hand/; a divergence is named in rows_carried_diverging and does not change the verdict",
         },
     }
 
@@ -244,6 +260,14 @@ def build_row(committed: dict, hand: dict, today: str) -> tuple[dict, dict]:
         "headings_read": derived["read"]["headings_read"],
         "why": "a reading, not a structure the SPL carries; the hand confirmation is owed (Unsure 8, 11)",
     }
+    carried = {name: {"equal": committed.get(name) == hand.get(name), "committed": committed.get(name), "hand": hand.get(name)} for name in ROW_CARRIED}
+    entry["carried"] = {
+        "judged": False,
+        "equal": all(v["equal"] for v in carried.values()),
+        "diverging": [name for name, v in carried.items() if not v["equal"]],
+        "fields": carried,
+        "why": "data/ against src/ingest/hand/; a divergence is a Data Owner error, not a source mismatch, and does not change the verdict (data-owner-cleanup.md 2)",
+    }
     entry["matched"] = not entry["reasons"]
     entry["why"] = "all equal" if entry["matched"] else "; ".join(entry["reasons"])
     return {k: built.get(k) for k in ROW_ORDER}, entry
@@ -267,11 +291,13 @@ def judge(clauses: list[dict], rows: list[dict], unreadable: list[dict]) -> dict
     else:
         verdict = "GREEN"
         reason = "F2.1 does not hold: every compared field of every clause and row equals the build from the source at its version"
+    carried_diverging = [f"{e['table_row']}.{name}" for e in rows for name in e.get("carried", {}).get("diverging", [])]
     return {
         "verdict": verdict,
         "reason": reason,
         "clauses_mismatched": clauses_mismatched,
         "rows_mismatched": rows_mismatched,
+        "rows_carried_diverging": carried_diverging,
         "unreadable": unreadable,
         "counts": {
             "clauses": {"total": len(clauses), "matched": sum(e["matched"] for e in clauses)},
@@ -299,10 +325,11 @@ def summary_markdown(result: dict) -> str:
             lines.append(f"| {e['id']} | {e['effective_date']} | {'yes' if e.get('version_listed') else 'no'} | {eq('text')} | {eq('lead_in')} | {eq('source_note')} | {e['why']} |")
         lines.append("")
     if result.get("rows"):
-        lines += ["| row | SPL version | effectiveTime | fields unequal | why |", "|---|---|---|---|---|"]
+        lines += ["| row | SPL version | effectiveTime | fields unequal | carried diverging (not judged) | why |", "|---|---|---|---|---|---|"]
         for e in result["rows"]:
             unequal = [n for n, v in e.get("fields", {}).items() if not v["equal"]]
-            lines.append(f"| {e['table_row']} | {e.get('spl_version')} | {e.get('effectiveTime')} | {', '.join(unequal) or 'none'} | {e['why']} |")
+            diverging = e.get("carried", {}).get("diverging", [])
+            lines.append(f"| {e['table_row']} | {e.get('spl_version')} | {e.get('effectiveTime')} | {', '.join(unequal) or 'none'} | {', '.join(diverging) or 'none'} | {e['why']} |")
         lines.append("")
     if result.get("unreadable"):
         lines += ["Unread at its version:", ""] + [f"- {u['what']}" for u in result["unreadable"]] + [""]
@@ -404,6 +431,13 @@ def unscorable(args: argparse.Namespace, exc: BaseException) -> int:
     print(f"UNSCORABLE: {type(exc).__name__}: {exc}", file=sys.stderr)
     if not refused:
         traceback.print_exc()
+    # Every response read before the failure goes into the artifact too (M02 PR 2 ruling 2; Unsure 23).
+    try:
+        result["sources"] = write_sources(args.out_dir)
+    except Exception as src_exc:  # noqa: BLE001  the result is still written when the sources cannot be
+        result["sources"] = None
+        result["sources_error"] = f"{type(src_exc).__name__}: {src_exc}"
+        print(f"UNSCORABLE: could not write sources/ under {args.out_dir}: {src_exc!r}", file=sys.stderr)
     try:
         write_result(args, result)
     except Exception as write_exc:  # noqa: BLE001  the exit code stays 2 even when the result cannot be written
