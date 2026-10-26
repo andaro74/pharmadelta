@@ -182,6 +182,31 @@ and opened the PR. A local run of the gate was made for the session's
 own reading of whether the code crashes; it is not evidence (P4) and no
 number from it is in this file. The CI run is under "Observed".
 
+## Observed
+
+The M02 gate on this PR at `9aa8480`, run
+[40249943382](https://github.com/andaro74/pharmadelta/actions/runs/40249943382),
+artifact `m02-gate-a9b305278715e45adc158e3abdd22ad1f39291a8`, read on
+2026-10-25 from the downloaded `result.json`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `GREEN` |
+| `written_by_ci` | true |
+| `clauses_mismatched`, `rows_mismatched`, `unreadable` | `[]`, `[]`, `[]` |
+| `rows_carried_diverging` | `[]`; every row's `carried.equal` true |
+| `counts` | clauses 9 of 9 matched; rows 7 of 7 matched |
+| `label_revised`, source against committed | `2022-06` on both lisinopril rows, `2023-07` on the three metformin rows, `2024-08` on both metoprolol tartrate rows; equal on all seven |
+| `sources/` | 21 entries, as run 38156488922 wrote |
+
+Equal to "Expected CI result on this PR" on every line. The M00 gate
+passed (run 40249943284). The M01 gate read PENDING, exit 3 (run
+40249943261), not required, not this PR's. On metoprolol tartrate the
+new rule's record shows the three package-label panels (`51945-4`)
+excluded as "after the highest-numbered standard section (34076-0)" and
+the product data section excluded by code; the month is unchanged
+because every section of that label carries the same date.
+
 ## What a reader can falsify
 
 - `git diff main --stat` on the PR touches four files: `src/ingest/gate.py`,
@@ -213,6 +238,6 @@ closed at `m02`.
 | 2 | `PLR_SECTIONS`, the 17 LOINC section codes, was hand-written without reading the stylesheet (Finding). Confirm each code against `spl-common.xsl`'s `maxSection17` list, in a browser, and against the SPL Implementation Guide. One wrong code moves the cut and can change `label_revised` on a label whose later sections carry a later date. **Answered in the second session** (ruling 4): the list is `plr-sections.xml`, read by fetch on 2026-10-25; the 17 codes equal it; two entries added (number 0; `38056-8` at 17). A browser read by the Data Owner is one URL and is not required by any rule. | Data Owner |
 | 3 | The reading of `maxSection17`: the build takes the highest-numbered standard section present and cuts after its first occurrence in document order, on the quoted select's `preceding-sibling` test. Whether the stylesheet picks the highest number or the last standard section in document order was not read. Equal when the sections are in PLR order, as the three labels are expected to be. **Answered in the second session** (ruling 4): `maxStdSectionNumber` is `max` over `@number[. <= 17]` of the standard sections present (`spl-common.xsl` lines 66 to 71), the highest number; the build's reading stands. | Data Owner, Engineering |
 | 4 | A top-level UNSCORABLE that read nothing writes an empty `sources/` with an empty `index.json`. Taken as "every response read", none. | Security |
-| 5 | This PR is named #18 without reading the repository's PR list (`gh` refused). | Product |
+| 5 | This PR is named #18 without reading the repository's PR list (`gh` refused). **Answered in the second session**: opened as #18. | Product |
 | 6 | The result gains three keys (`rows_carried_diverging`, `carried` per row, `fields_carried_checked`) and the summary a column; `section_effective_times` changes shape (top-level sections with `why`, not every section). No SPEC rule names the result's shape; M02's README describes the old one and is not edited beyond Unsure 23. | Engineering, Product |
 | 7 | The session's command budget was spent on branch creation (two refusals), so the PR is not open and the run is not observed. Whether a session with no approval surface should edit the working tree at all, or stop at the first refusal, is a rule for Product. The edits are uncommitted and reversible. | Product |
