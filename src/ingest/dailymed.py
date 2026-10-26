@@ -16,8 +16,11 @@ less `section_terms`, which is a reading and not a structure; see
   dosage_form    the products' form code display name, lowercased
   strengths      each product's active quantity, "<value> <unit>", unique, ascending, "; "-joined
   anda           the products' approval id
-  label_revised  the latest effectiveTime over the label's sections, as YYYY-MM: the "Revised:" month
-                 DailyMed prints in the Highlights (observed equal on the three labels, README)
+  label_revised  the "Revised:" month DailyMed prints, by FDA's stylesheet rule (spl-common.xsl, template
+                 effectiveDateHighlights, quoted in milestones/adoption/rulings/data-owner-cleanup.md 3):
+                 the latest effectiveTime over the top-level sections of the structured body, excluding
+                 the product data elements section (48780-1) and every section after the highest-numbered
+                 standard section up to 17 (PLR_SECTIONS below), as YYYY-MM
   format         201.56(d) when the SPL carries Highlights (any <highlight> element), else 201.56(e)
   section        the row's section code, when the SPL has that section ("bw": a Boxed Warning section,
                  LOINC 34066-1; "N" or "N.N": a section whose title begins with that number)
@@ -43,6 +46,34 @@ NS = {"h": "urn:hl7-org:v3"}
 H = "{urn:hl7-org:v3}"
 BOXED_WARNING = "34066-1"
 PRODUCT_DATA_ELEMENTS = "48780-1"
+# The standard sections of the PLR format (21 CFR 201.56(d), 201.57) and their LOINC section codes, the
+# set FDA's stylesheet calls `$standardSections` (spl-common.xsl line 41 reads it from plr-sections.xml,
+# beside the stylesheet) and cuts at as `maxSection17` (template `effectiveDateHighlights`). The numbers
+# are plr-sections.xml's top-level `number` attributes, read 2026-10-25 by fetch at the build-fixes PR
+# (milestones/adoption/rulings/build-fixes.md): 0 and 1 to 17, with two codes numbered 17. Nested
+# entries of that file (8.1 to 8.5, 9.1 to 9.3, 12.1 to 12.4, 13.1 to 13.2) are not top-level and are not
+# in the stylesheet's `$standardSections/v3:section`, so they are not here.
+PLR_SECTIONS = {
+    "34066-1": 0,   # BOXED WARNING
+    "34067-9": 1,   # INDICATIONS & USAGE
+    "34068-7": 2,   # DOSAGE & ADMINISTRATION
+    "43678-2": 3,   # DOSAGE FORMS & STRENGTHS
+    "34070-3": 4,   # CONTRAINDICATIONS
+    "43685-7": 5,   # WARNINGS AND PRECAUTIONS
+    "34084-4": 6,   # ADVERSE REACTIONS
+    "34073-7": 7,   # DRUG INTERACTIONS
+    "43684-0": 8,   # USE IN SPECIFIC POPULATIONS
+    "42227-9": 9,   # DRUG ABUSE AND DEPENDENCE
+    "34088-5": 10,  # OVERDOSAGE
+    "34089-3": 11,  # DESCRIPTION
+    "34090-1": 12,  # CLINICAL PHARMACOLOGY
+    "43680-8": 13,  # NONCLINICAL TOXICOLOGY
+    "34092-7": 14,  # CLINICAL STUDIES
+    "34093-5": 15,  # REFERENCES
+    "34069-5": 16,  # HOW SUPPLIED/STORAGE AND HANDLING
+    "34076-0": 17,  # PATIENT COUNSELING INFORMATION (INFORMATION FOR PATIENTS)
+    "38056-8": 17,  # SUPPLEMENTAL PATIENT MATERIAL SECTION (the stylesheet's second code numbered 17)
+}
 ACTIVE = frozenset({"ACTIB", "ACTIM", "ACTIR"})
 _SETID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 _SECTION_CODE = re.compile(r"^(bw|\d+(?:\.\d+)?)$")
@@ -253,21 +284,41 @@ def _headings_read(sec: SectionNode) -> list[str]:
 
 
 def label_revised(label: Label) -> tuple[str | None, list[dict]]:
-    """The latest section effectiveTime outside the product data elements section, as YYYY-MM."""
-    times = []
-    for s in label.sections:
+    """The "Revised:" month by the stylesheet's rule, as YYYY-MM, and the top-level sections it read.
+
+    spl-common.xsl, template `effectiveDateHighlights` (quoted in
+    milestones/adoption/rulings/data-owner-cleanup.md 3): over the top-level
+    sections of the structured body, in document order, take each section's
+    `effectiveTime/@value`, skipping the product data elements section
+    (48780-1) and every section after the first occurrence of the
+    highest-numbered standard section present (`maxSection17`); keep values
+    longer than seven characters; the latest is the month. Subsections are
+    not read. A label with no standard section has no cut: every top-level
+    section but 48780-1 is read.
+    """
+    numbered = [(PLR_SECTIONS[s.code], i) for i, s in enumerate(label.sections) if s.code in PLR_SECTIONS]
+    cut_code, cut_at = None, len(label.sections)
+    if numbered:
+        top = max(n for n, _ in numbered)
+        cut_at = min(i for n, i in numbered if n == top)
+        cut_code = label.sections[cut_at].code
+    read = []
+    for i, s in enumerate(label.sections):
+        value = s.effective_time if s.effective_time and len(s.effective_time) > 7 and re.match(r"^\d{8}", s.effective_time) else None
         if s.code == PRODUCT_DATA_ELEMENTS:
-            continue
-        stack = [s]
-        while stack:
-            n = stack.pop()
-            if n.effective_time and re.match(r"^\d{8}", n.effective_time):
-                times.append({"section": n.title, "effective_time": n.effective_time})
-            stack.extend(n.children)
-    if not times:
-        return None, times
-    latest = max(t["effective_time"][:8] for t in times)
-    return f"{latest[:4]}-{latest[4:6]}", times
+            why = "excluded: product data elements (48780-1)"
+        elif i > cut_at:
+            why = f"excluded: after the highest-numbered standard section ({cut_code})"
+        elif value is None:
+            why = "excluded: no effectiveTime of eight or more characters"
+        else:
+            why = "read"
+        read.append({"section": s.title, "code": s.code, "effective_time": s.effective_time, "why": why})
+    values = [r["effective_time"][:8] for r in read if r["why"] == "read"]
+    if not values:
+        return None, read
+    latest = max(values)
+    return f"{latest[:4]}-{latest[4:6]}", read
 
 
 def derive(label: Label, section_code: str) -> dict:
