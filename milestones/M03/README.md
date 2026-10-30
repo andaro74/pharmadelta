@@ -460,7 +460,41 @@ CI run is the measurement; the construction run decides nothing.
 
 ### Observed (CI run, 2026-10-30)
 
-Written on reading the run.
+The first run on this PR,
+[41126878288](https://github.com/andaro74/pharmadelta/actions/runs/41126878288),
+wrote the artifact `m03-gate-f97f292d7e9588807a5333835e1ae23fb759c683`
+(the sha is the pull request's merge ref, as M00's, M01's and M02's
+were; the branch head was `ab0b981`). It holds `result.json`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED` |
+| `answers_uncalled` | `["g-001"]`: `call is null` |
+| `answers_disagreed` | `[]`: the page's one answer equals the API's entry |
+| `answers_differing` | `[]`: nothing compared, the one served answer carries no call |
+| `unreadable` | `[]` |
+| `env_set` | all four true; no value of any in the file (grepped for `execute-api` and `us-west-2_`: no match) |
+| `sign_in` | `signed_in` true, status 200, `token_use` `access`, `token_username` `pharmadelta`, `expires_in` 3600, 622 ms |
+| `door[0]` for g-001's question | status 200; `request_id` `GE2QwjpovHcESyQ=` in the header `apigw-requestid` (Unsure 13, confirmed on an admitted call); response headers `apigw-requestid`, `connection`, `content-length`, `content-type`, `date`; `stop_reason` `tool_use`; `parsed` null; `text` empty; `error` null; `refused` null; `guardrail_topics` `[]`; `source` `dynamodb`; `latency_ms` 5969 (the runtime's), 10086 ms wall; `usage` 5591 in, 279 out |
+| `door[0].tool_calls` | three calls of `find_label_row`, each `{"label": "lisinopril", "section": 8.1}` with `section` a number, each `status` `error`: `8.1 is not one of ['bw', '5', '5.1', '6', '8.1']`. The model asked the right row three times and the tool refused the number where it holds strings; the run ended at the tool-call ceiling with no answer |
+| `written_by_ci` | `true`; `commit` `f97f292`, `dirty` false; exit 1; the `M03 gate` job failed. `M00 gate` and `M02 gate` on the same head passed ([41126878150](https://github.com/andaro74/pharmadelta/actions/runs/41126878150), [41126878245](https://github.com/andaro74/pharmadelta/actions/runs/41126878245)). `M01 gate` is not required and reads as it did on `main` |
+
+Equals the expected result above on every field the ledger row names.
+The plant is named as ledger row 4 expects. The door's reading is
+recorded beside it and decides nothing.
+
+What the door's reading says, for the seat that owns it (Unsure 23;
+carried to label-impact, not fixed here): the deployed agent gave no
+answer to g-001 because its tool refused the model's argument. The
+model sent `section` as the number `8.1`; `find_label_row` in
+label-impact's `agent.py` compares it with the strings `'bw'`, `'5'`,
+`'5.1'`, `'6'`, `'8.1'` and names it not one of them, three times, and
+the run stopped at `tool_use` with empty text. That is the same reading
+agentkeel's deploys recorded (`g-001 ordinary tool_use None`), now with
+the cause. It is label-impact's (SPEC/00 §3, the agent's own tests);
+this repository changes nothing there. For M03 it means the lift, as the
+agent stands, serves g-001 as "no answer" with its call record (PR 1,
+"Equality"), and the page shows that.
 
 ### What a reader can falsify
 
@@ -496,6 +530,15 @@ call made by this repository's CI as `pharmadelta` and its record
 written into `pages/api/answers.json`; how that record gets from a CI
 run into a commit is the lift PR's to say, not this one's.
 
+**Ruled at PR 2, on reading run 41126878288 (Product).** The lift is
+carried by PR 4, as M00's, M01's and M02's were. PR 3, if the cold review
+of #20 finds anything, repairs and does not lift; if it finds nothing,
+PR 3 is skipped. The Measured cell takes the `main` run after #20 merges
+(M01 Unsure 23, ruled at M02 PR 1), which reads as run 41126878288 did
+on the three lists, whatever the door answers that day. As the agent
+stands, the lift serves g-001 as "no answer" with its call record
+(Unsure 6, 23), and what row 4's cell then says is Product's at PR 4.
+
 ## Unsure (PR 2)
 
 Numbering continues from PR 1's. Each needs a seat's ruling. None blocks
@@ -505,7 +548,7 @@ the measurement.
 |---|---|---|
 | 11 | The uncalled answer's question is asked through the door and its reading recorded, though it decides nothing on the plant: one call per served answer per run whatever its record, so the Measured cell carries what the agent said on the day (PR 1, "The gate"). The alternative, asking only called answers, spends nothing on the plant and records nothing of the agent at PR 2. | Threshold Owner, Product |
 | 12 | `door_host` in the call record is the door URL's host, a repository variable's value; writing it into `pages/api/answers.json` at the lift commits that value, which this PR's gate takes care never to write. Whether the lift writes the host, a hash of it, or names the agent and the request id only. | Security |
-| 13 | The request id header: `apigw-requestid`, confirmed on a refused call at construction (401). The CI run on this PR reads it on an admitted call; the gate records the header name it found and every header name the door returned. | Engineering |
+| 13 | The request id header: `apigw-requestid`, confirmed on a refused call at construction (401). The CI run on this PR reads it on an admitted call; the gate records the header name it found and every header name the door returned. **Ruled at PR 2** (`rulings/pr2.md` 10): `apigw-requestid` on the admitted call too, `GE2QwjpovHcESyQ=`, the only request-id header the door returned. | Engineering |
 | 14 | An API that serves no answer reads UNSCORABLE, not GREEN: "every served answer carries a call record" is true of none, and the claim says the API serves answers. | Product |
 | 15 | "Byte for byte" (PR 1, "The gate") is read as equality of the parsed JSON values in canonical form, because the page's block and the API's entry are pretty-printed at different depths. A whitespace-only difference passes; a value difference does not. | Engineering, Tool Owner |
 | 16 | Whether `M03 gate` is made a required check on `main`, as M02's Unsure 16 asked for its gate. Not changed here. | Security, Product |
@@ -515,6 +558,7 @@ the measurement.
 | 20 | Construction touched the door once, with no token, to read its headers. The call left a refused record with no identity in the security account's log. Whether a construction run may call the door at all, and whether the refused record is owed a note in agentkeel. | Security |
 | 21 | The door call's timeout is 90 seconds here; the proxy invokes the runtime with 28 and the HTTP API's integration limit is 30 (row P item 4). A call that outlives the proxy reads as the door's status (a 5xx), not as a client timeout. | Engineering |
 | 22 | label-impact's runtime answers 200 with `{"error": ...}` on a failed model call and 403 with `{"refused": ...}` on a chain refusal (`server.py`). The gate records either and does not compare, so a called answer whose call failed that way reads UNSCORABLE, not differing. | Tool Owner, Engineering |
+| 23 | The deployed agent answers g-001 with no `parsed` object because its tool refuses the model's argument: `find_label_row` was called three times with `section` as the number `8.1` and answered `8.1 is not one of ['bw', '5', '5.1', '6', '8.1']` each time (Observed, `door[0].tool_calls`). The cause of the RED answer record at both deploys (PR 1, carried items). label-impact's to repair, in its own repository; nothing here changes. What row 4's cell says if the lift serves a call record with no answer is Unsure 6's. | Tool Owner, Engineering (label-impact); Product |
 
 ## Unsure (PR 1)
 

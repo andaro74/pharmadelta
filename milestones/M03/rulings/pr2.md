@@ -111,6 +111,18 @@ lifts the plant, and nothing under `pages/` changes.
    fixed before the first push. It decides nothing (P4).
 9. **Product.** "PRs used / cap" is 2 / 4. Which PR carries the lift is
    ruled on reading this PR's CI run, as M02's was.
+10. **Product, on reading run 41126878288.** The run wrote RED,
+    `answers_uncalled` `["g-001"]`, `answers_disagreed` `[]`,
+    `answers_differing` `[]`, `written_by_ci` true, on the merge ref
+    `f97f292`; the plant is named as the row expects. The sign-in
+    succeeded and the door answered 200 with request id
+    `GE2QwjpovHcESyQ=` in `apigw-requestid` (Unsure 13, confirmed),
+    `stop_reason` `tool_use`, `parsed` null: the agent's tool refused
+    `section` `8.1` sent as a number, three times (Unsure 23, carried to
+    label-impact). The lift is carried by PR 4. PR 3, if the cold review
+    of #20 finds anything, repairs and does not lift; if it finds
+    nothing, PR 3 is skipped. The Measured cell takes the `main` run
+    after #20 merges.
 
 ## What a reader can falsify
 
@@ -119,8 +131,9 @@ PR 2.
 
 ## What this ruling does not settle
 
-The items under Unsure (PR 2) in `milestones/M03/README.md`, 11 to 22,
-each with its seat, and PR 1's 1, 2, 6 and 7, still open. What matters
+The items under Unsure (PR 2) in `milestones/M03/README.md`, 11 to 23,
+each with its seat (13 ruled above), and PR 1's 1, 2, 6 and 7, still open. What matters
 most for the close: what the public API is (1), where it is served (2),
-the deployed agent's answer record (6), and how the lift's call record
-gets from a CI run into a commit ("After this PR goes RED").
+the deployed agent's answer record (6) and its cause (23), and how the
+lift's call record gets from a CI run into a commit ("After this PR goes
+RED").
