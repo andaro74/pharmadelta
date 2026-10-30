@@ -18,7 +18,7 @@ this is the same row with the open detail.
 | Seeded commit | `c7edf8f` on `m03-pr1`: `pages/api/answers.json`, the public API's served answers, one entry, the question of golden `g-001` with an answer written by hand, its row `lisinopril.8.1` and its clause `201.57(c)(9)(i)` copied from `data/` at `b9f84e3`, `agent` null, `call` null, `scripted` true, a `PLANT` key beside them; `pages/detail.html`, the detail page, showing that answer with its row and its clause, labelled scripted, the same object embedded. Nothing in the repository signs in to the door or calls the agent. |
 | Expected gate output | PR 2's gate, in CI, reads every answer the API serves and the page shows and names each that carries no call record or that the page and the API do not agree on; then signs in to label-impact's identity pool as `pharmadelta` with the repository secret, asks the deployed agent each called answer's question through the door, and compares the served answer with the door's. It writes a `result.json` that is RED when any served answer is uncalled, disagreed or differing, naming each; GREEN only when every served answer carries a call record, is shown as served and equals the door's answer; UNSCORABLE when nothing is RED and the served files, the pool or the door could not be read. On `c7edf8f`: RED, `answers_uncalled` `["g-001"]`, `answers_disagreed` `[]`, `answers_differing` `[]`. The Measured cell cites the `main` run after PR 2 merges (M01 Unsure 23, ruled at M02 PR 1). |
 | Measured | |
-| PRs used / cap | 1 / 4 |
+| PRs used / cap | 2 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -287,6 +287,235 @@ Per CLAUDE.md "Platform changes": named, never designed here.
 | M01's 23 (ruled at M02 PR 1) | The Measured cell cites the run on `main` after PR 2 merges, with the PR run named beside it when it was the one read at the time. Row 4's expected gate output says so. |
 | M01's 12 (ruled at M01 PR 2) | The registry read is designed at M03 as a read-only role in agentkeel assumed by OIDC, flagged there and not here. Row P item 1 above is that flag. Nothing in this PR designs it. |
 
+## Open detail (PR 2, 2026-10-30)
+
+PR 2 is the measure. It adds the gate that reads the plant and nothing
+that lifts it. `pages/api/answers.json` serves one answer with `call`
+null at the head this PR measures, and `pages/detail.html` shows it. M03
+is measured here.
+
+### What this PR holds
+
+- `src/m03/gate.py`, the gate. Python 3.14, standard library only
+  (`urllib`, `json`, `re`, `base64`); `pyproject.toml` and `uv.lock` are
+  unchanged. In order:
+  1. Reads `pages/api/answers.json` (the `answers` list) and the JSON in
+     the `<script type="application/json" id="answer">` block of
+     `pages/detail.html` (one object or a list).
+  2. `answers_uncalled`: every served answer whose `call` is null, is not
+     an object, lacks a field of the call record or holds it empty, or
+     whose `subject` is not `pharmadelta`. A read of the served file; no
+     door.
+  3. `answers_disagreed`: every page answer whose `id` the API does not
+     serve, or that is not equal to the API's entry of that `id` as
+     parsed JSON in canonical form (sorted keys, no whitespace). The
+     page's block and the API's entry are both pretty-printed at
+     different depths, so "byte for byte" is read as "the same JSON
+     value" (Unsure 15).
+  4. Signs in (below) when the environment holds the secret and the
+     three variables; else records `not attempted` and which were
+     missing, by name.
+  5. Asks the door every served answer's question, called or not, and
+     records the reading under `door` (Unsure 11).
+  6. `answers_differing`: every served answer that carries a call record
+     and whose `table_row`, `clause_id` or `answer_fields` is not what
+     the door's `parsed` holds on this run.
+  7. Writes `result.json` and exits 0 GREEN, 1 RED, 2 UNSCORABLE.
+- `.github/workflows/m03.yml`: on every pull request, every push to
+  `main` and by hand. `uv sync --locked`, the artifact directory, the
+  gate with the secret and the three variables in its `env`, then the
+  artifact `m03-gate-<sha>` holding `result.json`, uploaded whenever the
+  gate wrote a result. The gate writes its table to the job summary. The
+  job fails on anything but GREEN. `gate.yml`, `m01.yml` and `m02.yml`
+  are unchanged.
+- `result.json` records the commit, whether the tree was dirty, whether
+  CI wrote it (`written_by_ci`), the run's URL, the call record's fields,
+  the fields compared, which of the secret and the variables the
+  environment held (`env_set`, booleans), the sign-in's record, each
+  served answer's record check, page equality, door reading and
+  comparison, so the file says for itself whether it is evidence (P4).
+- `rulings/pr2.md`, and "PRs used / cap" set to 2 / 4 here and in the
+  ledger.
+
+### The sign-in and the call, as built
+
+Both are the platform's surfaces (agentkeel SPEC/10 §2, R2;
+`docs/developer/quickstart.md` §5b; `src/agent/run.py`
+`invoke_through_door`; `infra/construct/door.py`), used as the platform's
+own deploy uses them and redesigned nowhere.
+
+- **The sign-in.** `POST https://cognito-idp.us-west-2.amazonaws.com/`
+  with `X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth`,
+  `Content-Type: application/x-amz-json-1.1` and the body `{"AuthFlow":
+  "USER_PASSWORD_AUTH", "ClientId": <callers client>, "AuthParameters":
+  {"USERNAME": "pharmadelta", "PASSWORD": <secret>}}`. No AWS credential,
+  no client secret, no SigV4. The answer's `AuthenticationResult.AccessToken`
+  is the token sent to the door: the door's authoriser admits a token
+  whose `token_use` is `access`, whose `client_id` is the callers client
+  and whose `username` is in the manifest's `callers`
+  (`infra/construct/door.py`, `handler`), so the id token would be
+  refused. A `ChallengeName` in the answer, an HTTP error or no token is
+  recorded as a failed sign-in with Cognito's error type, and nothing is
+  called. The token is held in memory for the run and written nowhere;
+  the result records `signed_in`, `token_use` and `username` from its
+  claims, read without verification (the door verifies), and nothing
+  else of it (Unsure 18).
+- **The call.** `POST` on `M03_DOOR_URL` with `Authorization: Bearer
+  <access token>`, `Content-Type: application/json`, body `{"question":
+  "..."}`, a 90-second timeout (Unsure 21). The URL must be https on a
+  host under `.execute-api.us-west-2.amazonaws.com` with a path ending
+  `/invocations`; anything else is refused before a request is made.
+  Recorded per served answer: HTTP status, the request id and the header
+  it came in (`apigw-requestid` first; Unsure 13), the response's header
+  names, and from a 200 body `parsed`, `stop_reason`, `text`, `error`,
+  `refused`, `latency_ms`, `guardrail_topics`, `tool_calls`, `usage`,
+  `source` (label-impact `agent.py` `answer`). A body with `error` or
+  `refused` (label-impact `server.py` sends 200 with `error` on a failed
+  model call, 403 with `refused` on a chain refusal) is recorded and not
+  compared (Unsure 22).
+- **Never written**: the password, the URL, the pool id, the client id,
+  the token. `env_set` holds four booleans. The sign-in record holds the
+  pool id's region prefix (`us-west-2`) and nothing more of it.
+
+### The verdict
+
+- **RED** when `answers_uncalled`, `answers_disagreed` or
+  `answers_differing` is non-empty. The first two are reads of the served
+  files and come before the sign-in, so the plant reads RED whatever the
+  pool's or the door's state that day (Unsure 4, ruled).
+- **GREEN** only when every served answer carries a call record as
+  `pharmadelta`, every page answer is an API entry, and every served
+  answer that was compared equals the door's answer on this run, with
+  nothing unread.
+- **UNSCORABLE** when nothing is RED and: a served file could not be read
+  or parsed, the API serves no answer (Unsure 14), the environment lacks
+  the secret or a variable, the sign-in failed, or the door did not
+  answer 200 with an observation for a called answer. Never RED, never
+  GREEN.
+- A pull request from a fork gets no secret: UNSCORABLE unless an answer
+  is uncalled or disagreed (Unsure 19).
+
+### The call record's fields (Unsure 10, ruled)
+
+`subject` (`pharmadelta`), `issuer` (`self`), `door_host`, `request_id`,
+`called_at` (UTC), `agent` (`label-impact`), `agent_commit`, `run_url`.
+The gate names an answer uncalled when any is missing or empty or when
+`subject` is not `pharmadelta`. The lift writes them; `door_host` is a
+variable's value and is Unsure 12.
+
+### What this PR does not hold
+
+- No lift. `git diff main -- pages/` is empty: `pages/api/answers.json`
+  carries `call: null`, `scripted: true` and the `PLANT` key as at
+  `c7edf8f`.
+- No value of the secret or a variable. Grep `execute-api`, `us-west-2_`
+  and `amazonaws.com/` under `src/m03/` and `.github/workflows/m03.yml`:
+  the matches are the host suffix the gate requires and the Cognito
+  endpoint, never a URL, a pool id or a client id of this agent.
+- No change to `pyproject.toml`, `uv.lock`, `gate.yml`, `m01.yml`,
+  `m02.yml`, `data/`, `goldens/`, `src/baseline/` (P5), `src/gate/`,
+  `src/ingest/`, `src/m01/`, SPEC/00, CLAUDE.md or anything under
+  `milestones/M00/`, `M01/`, `M02/` or `adoption/`.
+- No change to label-impact or to agentkeel. The `M01 gate` still reads
+  PENDING, exit 3, and is not required; left alone.
+- No SigV4, no IAM credential, no runtime ARN, no door client secret: grep
+  `sigv4`, `AWS4`, `boto`, `arn:aws`, `client_secret`, case folded, under
+  `src/m03/` and the workflow: two matches, the sentence "Never SigV4,
+  never the runtime's ARN, never the door client's secret" in the gate's
+  docstring and in the workflow's comment.
+
+### Construction run (not evidence, P4)
+
+Run on 2026-10-30 on the branch before the first push, from the working
+tree, so `written_by_ci` is false and the tree was dirty. The caller's
+password is a repository secret and cannot be read outside Actions, so
+no construction run signed in; the door's own reading of the question
+is made first by the CI run on this PR. Four readings, in order:
+
+| Reading | What was read |
+|---|---|
+| the gate with no environment | `RED`, `answers_uncalled` `["g-001"]` (`call is null`), `answers_disagreed` `[]`, `answers_differing` `[]`; the page's one answer equal to the API's entry; sign-in `not attempted`, the four names missing; door not asked; exit 1 |
+| the gate with the three variables in the shell's environment (read with `gh variable get` into shell variables, never printed) and no password | the same verdict and lists; `env_set` `url`, `pool_id`, `client_id` true, `password` false; sign-in `not attempted`; door not asked. `result.json` grepped for `execute-api` and `us-west-2_`: no match |
+| one `POST` on the door with no token, `{"question": "probe: no token"}` (the call M10's run file names `none`) | `401`, body `{"message":"Unauthorized"}`, response headers `apigw-requestid` (16 characters), `connection`, `content-length`, `content-type`, `date`. The request id header is confirmed as `apigw-requestid`, the name the gate reads first. This call is a refused call with no identity and leaves a record in the security account's access log, as SPEC/10 §2 says it must; that record is agentkeel's to read, not this repository's (Unsure 20) |
+| seven made-up pairs of files in the session's scratch directory, not committed | a called answer with the page equal and no environment: `UNSCORABLE`, exit 2. The page's `owed` changed: `RED`, `answers_disagreed` `["g-001"]`. The page showing `g-999`: `RED`, `answers_disagreed` `["g-999"]`. A call record missing `run_url`: `RED`, `answers_uncalled`. A record with `subject` `platform`: `RED`, `answers_uncalled`. Zero served answers: `UNSCORABLE`. The page without its block while the plant is uncalled: `RED`. `compare()` on g-001's served answer: a flat `parsed` of the same values equal; the same values under `answer_fields` equal; the deploy's g-002 shape differs on `table_row`, `clause_id`, `impacted`, `owed`; null against an answer differs; null against null equal |
+
+One defect was found by the seventh pair and fixed before the first
+push: a page path outside the repository made `Path.relative_to` raise,
+and the uncalled plant then read `UNSCORABLE` instead of `RED`. The gate
+now names a file as the repository names it, or as given.
+
+### Expected CI result on this PR
+
+The ledger row says: RED, `answers_uncalled` `["g-001"]`,
+`answers_disagreed` `[]`, `answers_differing` `[]`. The CI run on this
+PR is expected to write that, with `written_by_ci` true and the run URL,
+and to fail the job (exit 1). Beside it, for the first time from this
+repository, the door's reading of g-001's question as `pharmadelta`: the
+sign-in's record, the HTTP status, the request id, `stop_reason` and
+`parsed`. That reading decides nothing on the plant. At both of
+agentkeel's deploys g-001 ended in `tool_use` with no parsed answer
+(PR 1, "The deployed agent, as read at open"), so a `parsed` of null is
+the likely reading and is recorded as what the agent said that day. The
+CI run is the measurement; the construction run decides nothing.
+
+### Observed (CI run, 2026-10-30)
+
+Written on reading the run.
+
+### What a reader can falsify
+
+- The artifact `m03-gate-<sha>` on this PR's run holds `result.json`
+  with `verdict: RED`, `answers_uncalled: ["g-001"]`,
+  `answers_disagreed: []`, `answers_differing: []` and `written_by_ci:
+  true`. Download it and read it.
+- In that `result.json`, `env_set` is four booleans; grep it for
+  `execute-api` and `us-west-2_`: no match. `sign_in` holds no token.
+- `door[0]` holds `status`, `request_id`, `request_id_header`,
+  `stop_reason` and `parsed` for g-001's question, or `asked: false` with
+  why.
+- `git diff main --stat` on this PR touches `src/m03/`,
+  `.github/workflows/m03.yml`, `milestones/README.md`,
+  `milestones/M03/README.md` and `milestones/M03/rulings/pr2.md` only.
+  `git diff main -- pages/ pyproject.toml uv.lock` is empty.
+- Grep `secrets.` and `vars.` in `.github/workflows/m03.yml`: four
+  matches, the four names, in the gate step's `env` only.
+- The gate reads two hosts: grep `https://` under `src/m03/`, the one
+  literal is the Cognito endpoint; the door's URL comes from the
+  environment and `check_url` refuses any host not under
+  `.execute-api.us-west-2.amazonaws.com`.
+
+### After this PR goes RED
+
+The plant is lifted by the one change named under "The false state":
+`agent` and `call` filled with the record of the call that produced the
+answer, the answer fields what that call returned, `scripted` false, the
+`PLANT` key removed, and the page rebuilt from it. Which PR carries the
+lift is ruled on reading this PR's CI run, as M02's was at PR 2
+(`milestones/M02/README.md`, "After this PR goes RED"). The lift needs a
+call made by this repository's CI as `pharmadelta` and its record
+written into `pages/api/answers.json`; how that record gets from a CI
+run into a commit is the lift PR's to say, not this one's.
+
+## Unsure (PR 2)
+
+Numbering continues from PR 1's. Each needs a seat's ruling. None blocks
+the measurement.
+
+| # | Item | Seat |
+|---|---|---|
+| 11 | The uncalled answer's question is asked through the door and its reading recorded, though it decides nothing on the plant: one call per served answer per run whatever its record, so the Measured cell carries what the agent said on the day (PR 1, "The gate"). The alternative, asking only called answers, spends nothing on the plant and records nothing of the agent at PR 2. | Threshold Owner, Product |
+| 12 | `door_host` in the call record is the door URL's host, a repository variable's value; writing it into `pages/api/answers.json` at the lift commits that value, which this PR's gate takes care never to write. Whether the lift writes the host, a hash of it, or names the agent and the request id only. | Security |
+| 13 | The request id header: `apigw-requestid`, confirmed on a refused call at construction (401). The CI run on this PR reads it on an admitted call; the gate records the header name it found and every header name the door returned. | Engineering |
+| 14 | An API that serves no answer reads UNSCORABLE, not GREEN: "every served answer carries a call record" is true of none, and the claim says the API serves answers. | Product |
+| 15 | "Byte for byte" (PR 1, "The gate") is read as equality of the parsed JSON values in canonical form, because the page's block and the API's entry are pretty-printed at different depths. A whitespace-only difference passes; a value difference does not. | Engineering, Tool Owner |
+| 16 | Whether `M03 gate` is made a required check on `main`, as M02's Unsure 16 asked for its gate. Not changed here. | Security, Product |
+| 17 | The ruling file names this PR as #20, the next number on this repository. | Product |
+| 18 | The result records two claims of the access token, `token_use` and `username`, read from its payload without verification, and the pool id's region prefix. Whether recording any claim of the token, or any part of the pool id, is allowed; the token itself is never written. | Security |
+| 19 | A pull request from a fork gets no secret and reads UNSCORABLE unless an answer is uncalled or disagreed, and its job fails either way. Whether that is the wanted reading for an outside contribution. | Security, Product |
+| 20 | Construction touched the door once, with no token, to read its headers. The call left a refused record with no identity in the security account's log. Whether a construction run may call the door at all, and whether the refused record is owed a note in agentkeel. | Security |
+| 21 | The door call's timeout is 90 seconds here; the proxy invokes the runtime with 28 and the HTTP API's integration limit is 30 (row P item 4). A call that outlives the proxy reads as the door's status (a 5xx), not as a client timeout. | Engineering |
+| 22 | label-impact's runtime answers 200 with `{"error": ...}` on a failed model call and 403 with `{"refused": ...}` on a chain refusal (`server.py`). The gate records either and does not compare, so a called answer whose call failed that way reads UNSCORABLE, not differing. | Tool Owner, Engineering |
+
 ## Unsure (PR 1)
 
 Each needs a seat's ruling. None blocks the plant.
@@ -295,11 +524,11 @@ Each needs a seat's ruling. None blocks the plant.
 |---|---|---|
 | 1 | What "a public API" is at M03: a read API, a public JSON file of answers each produced by a CI call as `pharmadelta` with its record (this file's assumption), or a live path that forwards a visitor's question on request, which needs a host that runs code and holds the credential, and exposes the agent's daily budget to anyone. Proposed: the read API at M03; a live path is a later row's or a platform item. | Product, Security |
 | 2 | Where the pages and the API are served. GitHub Pages is not enabled on this repository (404, 2026-10-25); enabling it, and from which branch and directory, is a repository setting. Until it is, "public" means readable in the repository. `/site` is ignored by `.gitignore` line 170, so the directory is `pages/`. | Product, Security |
-| 3 | The secret and the variables PR 2 reads: `M03_DOOR_PASSWORD` as the one secret; the door URL, the pool id and the callers client id as repository variables (none is a secret; the URL is public and the ids are not credentials); who sets them and under whose record. Names proposed under "Carried to PR 2". | Security |
-| 4 | The verdict's shape: RED on an uncalled served answer needs no door read, so the plant's RED does not depend on the pool or the door that day; UNSCORABLE only when nothing is RED and a read failed. M02's gate read UNSCORABLE whenever a source could not be read; this differs, because F3.1's first arm is a read of the served files alone. | Product, Engineering |
-| 5 | What "equals the door's answer" compares: `table_row`, `clause_id` and `answer_fields` of the door's `parsed` object on the gate's run. The agent runs at temperature 0, but the deploys show it does not always parse to an answer; a served answer whose call returned none is shown as "no answer" with its call record. Whether the comparison is against the run's own call (proposed) or against the call that produced the served answer, which only the security account's records could confirm. | Product, Data Owner, Threshold Owner |
+| 3 | The secret and the variables PR 2 reads: `M03_DOOR_PASSWORD` as the one secret; the door URL, the pool id and the callers client id as repository variables (none is a secret; the URL is public and the ids are not credentials); who sets them and under whose record. Names proposed under "Carried to PR 2". **Ruled at PR 2** (`rulings/pr2.md` 2): the names as proposed. The owner set the secret `M03_DOOR_PASSWORD` and the variables `M03_DOOR_URL`, `M03_DOOR_POOL_ID` and `M03_DOOR_CALLERS_CLIENT_ID` in this repository's settings before PR 2 (names read with `gh secret list` and `gh variable list` on 2026-10-30; values never read into a file). The workflow reads them from its environment and the gate writes none of them; `env_set` records only which were present. | Security |
+| 4 | The verdict's shape: RED on an uncalled served answer needs no door read, so the plant's RED does not depend on the pool or the door that day; UNSCORABLE only when nothing is RED and a read failed. M02's gate read UNSCORABLE whenever a source could not be read; this differs, because F3.1's first arm is a read of the served files alone. **Ruled at PR 2** (`rulings/pr2.md` 3): as proposed and as built. RED on an uncalled or disagreed answer is a read of the served files alone, before any sign-in; UNSCORABLE only when nothing is RED and a reading failed. The construction run read RED with no door. | Product, Engineering |
+| 5 | What "equals the door's answer" compares: `table_row`, `clause_id` and `answer_fields` of the door's `parsed` object on the gate's run. The agent runs at temperature 0, but the deploys show it does not always parse to an answer; a served answer whose call returned none is shown as "no answer" with its call record. Whether the comparison is against the run's own call (proposed) or against the call that produced the served answer, which only the security account's records could confirm. **Ruled at PR 2** (`rulings/pr2.md` 4): the comparison is against the run's own call, on `table_row`, `clause_id` and the three `answer_fields` as the door's `parsed` holds them, flat (the deploys' shape) or under an `answer_fields` key. A served answer of null equals a `parsed` of null. The originating call is matched only by its `request_id` in the security account, which this repository cannot read (Unsure 10). | Product, Data Owner, Threshold Owner |
 | 6 | The deployed agent's answer record is RED at both deploys and `g-001` gave no parsed answer through the door (carried items). Whether M03 proceeds to PR 2 with the agent as it stands, and what row 4's cell says if the lift serves a call record with no answer. Not this repository's to fix. | Engineering, Tool Owner (label-impact); Product |
 | 7 | Numbers on the page: the row's strengths, dates and application numbers and the clause's citation, dates and source note are the row's and the clause's own data, each with its source, not a measured result. Whether SPEC/00 §11's "a number on a page comes from a CI-written result" reaches a row's data. | Product |
-| 8 | The ruling file names this PR as #19, the next number on this repository. | Product |
-| 9 | Cost and ceilings: one call per served answer per gate run on every pull request and push to `main`, under the agent's `concurrency` 2, `rps_per_edge` 1 and `daily_usd` 10; the spend is the agent's, not this repository's. Whether the gate runs on every pull request or on `main` and by hand only. | Threshold Owner, Security |
-| 10 | The call record's fields on a served answer and which the gate can verify from here: `run_url` is a run of this repository's workflow, readable through GitHub's API; the `request_id` can be matched to the door's access log only in the security account, which agentkeel's observer reads, not this repository. | Engineering, Security |
+| 8 | The ruling file names this PR as #19, the next number on this repository. **Ruled at PR 2** (`rulings/pr2.md` 5): PR 1 was #19. | Product |
+| 9 | Cost and ceilings: one call per served answer per gate run on every pull request and push to `main`, under the agent's `concurrency` 2, `rps_per_edge` 1 and `daily_usd` 10; the spend is the agent's, not this repository's. Whether the gate runs on every pull request or on `main` and by hand only. **Ruled at PR 2** (`rulings/pr2.md` 6): the gate runs on every pull request, every push to `main` and by hand, one call per served answer per run, called or not (Unsure 11), under the agent's ceilings; the spend is the agent's. Narrowing the triggers is a one-line change for PR 3 if the Threshold Owner asks. | Threshold Owner, Security |
+| 10 | The call record's fields on a served answer and which the gate can verify from here: `run_url` is a run of this repository's workflow, readable through GitHub's API; the `request_id` can be matched to the door's access log only in the security account, which agentkeel's observer reads, not this repository. **Ruled at PR 2** (`rulings/pr2.md` 7): the fields are fixed as `subject`, `issuer`, `door_host`, `request_id`, `called_at`, `agent`, `agent_commit`, `run_url`; the gate names an answer uncalled when any is missing or empty or `subject` is not `pharmadelta`. From here `run_url` is readable through GitHub's API and `request_id` is not; `door_host` is Unsure 12. | Engineering, Security |
