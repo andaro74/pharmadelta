@@ -691,6 +691,47 @@ the door gives that day, recorded here and not in a ledger cell (M03
   `served_read: true`.
 - `git diff m00 --stat -- src/baseline/` on this branch is empty.
 
+### Observed (CI run, 2026-10-31)
+
+The first run on this PR,
+[41235927800](https://github.com/andaro74/pharmadelta/actions/runs/41235927800),
+wrote the artifact `m04-gate-4dbe2931e631d079d1c7f5706abd8874ca5ab931`
+(the sha is the pull request's merge ref; the branch head was
+`9737262`). It holds `result.json` and `observations.json`, read with
+`gh run download` in this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F4.1 holds: served answers g-001 carry no run record" |
+| `answers_unrun` | `["g-001"]`: `served[0].run_record.why` "run is null" |
+| `answers_disagreed` | `[]`: the page's baseline answer equals the file's entry as parsed JSON |
+| `answers_differing` | `[]`: nothing compared, `not_compared` "no run record" |
+| `agent_disagreed` | `[]`: the page's agent answer equals `pages/api/answers.json`'s entry |
+| `baseline_changed` | `false`; `baseline.tag_commit` `e94b76b`, `baseline.baseline_commit` `df860b7`, `diff_exit` 0 |
+| `unreadable` | `[]` |
+| `served_read` | `true`: the field this PR adds, present |
+| `observations` | `read` true, six ids `g-001` to `g-006`, `commit` `4dbe293`, `dirty` false, `started_at` `2026-10-31T19:48:36+00:00`, `method` "keyword matching; see src/baseline/answer.py" |
+| `served[0].observation` | `lisinopril.8.1`, `201.57(c)(9)(i)`, `impacted` true, `owed` `follow-rld`, `escalate` false, as the two earlier runs wrote; decides nothing |
+| `written_by_ci` | `true`; `commit` `4dbe293`, `dirty` false; `ci.event` `pull_request`, `ci.ref` `refs/pull/25/merge`; exit 1; the `M04 gate` job failed. On the same head `M00 gate` passed ([41235927743](https://github.com/andaro74/pharmadelta/actions/runs/41235927743)), `M02 gate` passed ([41235927824](https://github.com/andaro74/pharmadelta/actions/runs/41235927824)), `M01 gate` is not required and reads as it did on `main` ([41235927762](https://github.com/andaro74/pharmadelta/actions/runs/41235927762)) |
+
+Equals the expected result above on every field. The plant is still
+named as ledger row 5 expects, and the repair changed nothing on it: the
+RED is the missing run record and nothing else.
+
+The `M03 gate` on the same head,
+[41235927809](https://github.com/andaro74/pharmadelta/actions/runs/41235927809),
+artifact `m03-gate-4dbe2931e631d079d1c7f5706abd8874ca5ab931`, read
+`GREEN`: `answers_uncalled` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`; sign-in as `pharmadelta` 200; the door 200,
+`request_id` `GH_jUhHtvHcEP5Q=`, `stop_reason` `end_turn`, `parsed` null
+after two refused `find_label_row` calls with `section` the number `8.1`
+(M03 Unsure 23, label-impact's), then prose; `latency_ms` 5841, 9908 ms
+wall; 5591 in, 296 out; the result grepped for `execute-api` and
+`us-west-2_`: no match. The same shape as run 41233100879 on #24. A
+reading after the measurement; it does not reopen row 4 (M03
+`rulings/pr4.md` 6, 22) and is recorded here and in the PR, not in a
+ledger cell.
+
 ## Unsure (PR 3)
 
 Numbering continues from PR 2's. Each needs a seat's ruling. None blocks
