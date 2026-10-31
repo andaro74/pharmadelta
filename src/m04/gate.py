@@ -44,8 +44,15 @@ The verdict is ledger row 5's F4.1 and nothing else:
               `m00`; nothing unread.
   UNSCORABLE  nothing is RED and: a served file could not be read or parsed, the baseline file
               serves no answer, a served answer is neither null nor an object, the tag `m00` is not
-              in the checkout, or the observations file was not written or could not be read (the
-              baseline could not run). Never RED, never GREEN.
+              in the checkout or git could not answer, or the observations file was not written or
+              could not be read (the baseline could not run). Never RED, never GREEN.
+
+RED comes first (M04 PR 2, ruling 6). Nothing that fails after a served
+file was read turns a RED into UNSCORABLE: a baseline file that cannot be
+read leaves the agent column judged (M04 PR 3, Defect 1); git that cannot
+be run leaves the freeze check unread and the served answers judged
+(Defect 2); a summary that cannot be appended leaves `result.json` as
+written (Defect 3).
 
 No secret, no variable, no network: the gate reads the checkout and the
 observations file only.
@@ -267,20 +274,38 @@ def disagreed(served: list[dict], shown: list[dict], source: str) -> tuple[list[
 
 
 # ------------------------------------------------------------ the control
+def git_error(exc: BaseException) -> str:
+    """Why a git command gave no answer: its stderr when it ran and failed, else the OS error (git absent, not executable)."""
+    if isinstance(exc, subprocess.CalledProcessError):
+        return (exc.stderr or "").strip()[:200]
+    return f"git could not be run: {type(exc).__name__}: {exc}"[:200]
+
+
 def baseline_state() -> tuple[bool | None, dict]:
-    """Whether `src/baseline/` differs from tag `m00` in the checkout, and the commits a reader checks it against."""
+    """Whether `src/baseline/` differs from tag `m00` in the checkout, and the commits a reader checks it against.
+
+    Never raises: when git cannot be run or the tag is not in the checkout, `changed` is None and `error` says why, so a
+    RED read from the served files still comes first (M04 PR 3, Defect 2).
+    """
     record: dict[str, Any] = {"tag": BASELINE_TAG, "dir": BASELINE_DIR, "command": f"git diff {BASELINE_TAG} --quiet -- {BASELINE_DIR}"}
     try:
         record["tag_commit"] = git("rev-parse", f"{BASELINE_TAG}^{{commit}}")
     except subprocess.CalledProcessError as exc:
-        record.update(changed=None, error=f"the tag {BASELINE_TAG} is not in the checkout: {exc.stderr.strip()[:200]}")
+        record.update(changed=None, error=f"the tag {BASELINE_TAG} is not in the checkout: {git_error(exc)}")
+        return None, record
+    except OSError as exc:
+        record.update(changed=None, error=f"the tag {BASELINE_TAG} could not be resolved: {git_error(exc)}")
         return None, record
     try:
         record["baseline_commit"] = git("log", "-1", "--format=%H", "--", BASELINE_DIR) or None
-    except subprocess.CalledProcessError as exc:
+    except (subprocess.CalledProcessError, OSError) as exc:
         record["baseline_commit"] = None
-        record["baseline_commit_error"] = exc.stderr.strip()[:200]
-    proc = subprocess.run(["git", "diff", BASELINE_TAG, "--quiet", "--", BASELINE_DIR], cwd=ROOT, capture_output=True, text=True)
+        record["baseline_commit_error"] = git_error(exc)
+    try:
+        proc = subprocess.run(["git", "diff", BASELINE_TAG, "--quiet", "--", BASELINE_DIR], cwd=ROOT, capture_output=True, text=True, check=False)
+    except OSError as exc:
+        record.update(changed=None, error=f"the freeze check could not be run: {git_error(exc)}")
+        return None, record
     record["diff_exit"] = proc.returncode
     if proc.returncode not in (0, 1):
         record.update(changed=None, error=f"git diff exited {proc.returncode}: {proc.stderr.strip()[:200]}")
@@ -371,17 +396,20 @@ def summary_markdown(result: dict) -> str:
         lines += [f"`{result['error']['type']}: {result['error']['message']}`", ""]
     if result.get("baseline"):
         b = result["baseline"]
-        lines += [f"`{BASELINE_DIR}` against tag `{BASELINE_TAG}` (`{(b.get('tag_commit') or 'not in the checkout')[:7]}`): changed `{b.get('changed')}`" + (f"; `{b.get('error')}`" if b.get("error") else "") + ".", ""]
+        tag_commit = b.get("tag_commit")
+        lines += [f"`{BASELINE_DIR}` against tag `{BASELINE_TAG}` (`{tag_commit[:7] if tag_commit else 'not resolved'}`): changed `{b.get('changed')}`" + (f"; `{b.get('error')}`" if b.get("error") else "") + ".", ""]
     if result.get("observations"):
         o = result["observations"]
         lines += [f"The run's observations: read `{o.get('read')}`, {o.get('count')} observations, commit `{(o.get('commit') or 'unknown')[:7]}`, started `{o.get('started_at')}`" + (f"; `{o.get('error')}`" if o.get("error") else "") + ".", ""]
     if result.get("served"):
+        page_read = (result.get("page") or {}).get("read", True)
         lines += ["| served | run record | page equal | compared |", "|---|---|---|---|"]
         for e in result["served"]:
             cmp = e.get("comparison")
             cmp_s = f"not compared: {e.get('not_compared') or 'no run record'}" if cmp is None else ("equal" if cmp["equal"] else cmp["why"])
             page = e.get("page_equal")
-            lines.append(f"| {e['id']} | {'yes' if e['run_record']['has_record'] else 'no: ' + e['run_record']['why']} | {'not shown' if page is None else ('yes' if page else 'no')} | {cmp_s} |")
+            page_s = "page not read" if not page_read else ("not shown" if page is None else ("yes" if page else "no"))
+            lines.append(f"| {e['id']} | {'yes' if e['run_record']['has_record'] else 'no: ' + e['run_record']['why']} | {page_s} | {cmp_s} |")
         lines.append("")
     if result.get("agent"):
         a = result["agent"]
@@ -401,19 +429,33 @@ def write_json(path: Path, obj: Any) -> None:
 
 
 def write_result(args: argparse.Namespace, result: dict) -> None:
+    """Write `result.json`, print the summary, append it to `--summary` when one was given.
+
+    The summary is a copy for the job page; `result.json` is the result. A summary that cannot be appended is
+    reported on stderr and does not overturn the verdict already written (M04 PR 3, Defect 3).
+    """
     write_json(args.out_dir / "result.json", result)
     text = summary_markdown(result)
     print(text)
     if args.summary:
-        args.summary.parent.mkdir(parents=True, exist_ok=True)
-        with args.summary.open("a", encoding="utf-8") as fh:
-            fh.write(text)
+        try:
+            args.summary.parent.mkdir(parents=True, exist_ok=True)
+            with args.summary.open("a", encoding="utf-8") as fh:
+                fh.write(text)
+        except OSError as exc:
+            print(f"the summary could not be appended to {args.summary}: {exc!r}; result.json stands as written", file=sys.stderr)
 
 
 def run(args: argparse.Namespace) -> int:
     unreadable: list[str] = []
     # The served files alone, first: RED on an unrun or disagreed answer needs no run of the baseline (M03 Unsure 4's rule).
-    served = read_served(args.api)
+    # A baseline file that cannot be read is recorded, not raised: the agent column is read from the page and the public
+    # API alone, so `agent_disagreed` still reads RED first (M04 PR 3, Defect 1); with nothing RED the run is UNSCORABLE.
+    try:
+        served: list[dict] | None = read_served(args.api)
+    except Unscorable as exc:
+        served = None
+        unreadable.append(str(exc))
     try:
         shown: list[dict] | None = read_page(args.page, BASELINE_BLOCK)
     except Unscorable as exc:
@@ -428,8 +470,8 @@ def run(args: argparse.Namespace) -> int:
     except Unscorable as exc:
         api = None
         unreadable.append(f"the public API for the agent column: {exc}")
-    unrun_ids, checks = unrun(served)
-    disagreed_ids, page_entries = disagreed(served, shown, rel(args.api)) if shown is not None else ([], [])
+    unrun_ids, checks = unrun(served) if served is not None else ([], {})
+    disagreed_ids, page_entries = disagreed(served, shown, rel(args.api)) if served is not None and shown is not None else ([], [])
     page_equal = {e["id"]: e["equal"] for e in page_entries}
     agent_ids, agent_entries = disagreed(api, shown_agent, rel(args.agent_api)) if api is not None and shown_agent is not None else ([], [])
 
@@ -454,7 +496,7 @@ def run(args: argparse.Namespace) -> int:
         )  # fmt: skip
 
     entries, differing_ids = [], []
-    for a in served:
+    for a in served or []:
         entry: dict[str, Any] = {"id": a["id"], "run_record": checks[a["id"]], "page_equal": page_equal.get(a["id"]), "served_answer": a.get("answer")}
         shape = served_answer_check(a.get("answer"))
         entry["answer_shape"] = shape or "null or an object; can be compared"
@@ -478,9 +520,10 @@ def run(args: argparse.Namespace) -> int:
 
     result = {
         **provenance(),
-        **judge(served, unrun_ids, disagreed_ids, differing_ids, agent_ids, changed, unreadable),
+        **judge(served or [], unrun_ids, disagreed_ids, differing_ids, agent_ids, changed, unreadable),
         "baseline": baseline,
         "observations": observations_record,
+        "served_read": served is not None,
         "served": entries,
         "page": {
             "read": shown is not None,
@@ -517,7 +560,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--out-dir", required=True, type=Path, help="where result.json is written")
     parser.add_argument("--observations", type=Path, help="the file src.baseline.run --out wrote in this job; absent, the baseline did not run")
-    parser.add_argument("--summary", type=Path, help="append a Markdown summary here (GITHUB_STEP_SUMMARY in CI)")
+    parser.add_argument("--summary", type=lambda s: Path(s) if s else None, help="append a Markdown summary here (GITHUB_STEP_SUMMARY in CI); empty means none")
     parser.add_argument("--api", type=Path, default=ROOT / "pages" / "api" / "baseline.json", help="the ordinary assistant's served answers")
     parser.add_argument("--agent-api", type=Path, default=ROOT / "pages" / "api" / "answers.json", help="the public API's served answers, for the agent column")
     parser.add_argument("--page", type=Path, default=ROOT / "pages" / "side-by-side.html")
