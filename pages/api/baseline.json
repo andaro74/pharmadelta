@@ -1,0 +1,55 @@
+{
+  "what": "The ordinary assistant's answers pharmadelta serves on the side-by-side page, one per question, each produced by a run of the frozen baseline (src/baseline/, a keyword matcher with no model, frozen at tag m00, SPEC/00 P5) made by this repository's CI, with the record of that run (milestones/M04/README.md). `answer` is what the run wrote for the question, verbatim; `row` and `clause` are copies of data/table.json and data/clauses.json at `data_commit` when the table holds the answer's row and the clauses hold its clause, else null. A number in this file is the row's or the clause's own data, or the run record's, never a measured result.",
+  "baseline": "src/baseline/ of this repository: answer.py, keyword matching over the question, the table and the clauses; run.py, the runner. No model, no network, no randomness. Frozen at tag m00 and never improved (SPEC/00 P5). It is the control the agent is compared with. It is a keyword matcher, not an assistant, and the page says so (milestones/M00/rulings/pr2.md 1).",
+  "company": "Ardentia Generics is fictional; its portfolio and every 'our label' statement are invented (SPEC/00 §2, §9)",
+  "data_commit": "595dd68",
+  "answers": [
+    {
+      "id": "g-001",
+      "question": "FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?",
+      "answer": {
+        "table_row": "lisinopril.8.1",
+        "clause_id": "201.57(c)(9)(i)",
+        "answer_fields": {
+          "impacted": true,
+          "owed": "follow-rld",
+          "escalate": false
+        }
+      },
+      "row": {
+        "table_row": "lisinopril.8.1",
+        "holder": "Ardentia Generics",
+        "holder_fictional": true,
+        "ingredient": "lisinopril",
+        "dosage_form": "tablet",
+        "strengths": "2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg",
+        "anda": "ANDA075743",
+        "rld_nda": "NDA019777",
+        "dailymed_set_id": "f8d16c85-50e2-4d99-afae-6fb902734e42",
+        "label_revised": "2022-06",
+        "label_read_on": "2026-10-09",
+        "format": "201.56(d)",
+        "section": "8.1",
+        "section_title": "Pregnancy",
+        "section_terms": "Risk Summary; Clinical Considerations",
+        "section_terms_read_on": "2026-10-10",
+        "requirement": "201.57(c)(9)(i)"
+      },
+      "clause": {
+        "id": "201.57(c)(9)(i)",
+        "citation": "21 CFR 201.57(c)(9)(i)",
+        "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
+        "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
+        "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
+        "ecfr_as_of": "2026-10-07",
+        "effective_date": "2016-11-29",
+        "text_copied_on": "2026-10-10",
+        "existence_checked_by_hand_on": "2026-10-09",
+        "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
+      },
+      "run": null,
+      "scripted": true,
+      "PLANT": "M04 PR 1 (milestones/M04/README.md, 'The false state'): this answer was written by hand. No run of the baseline produced it: `run` is null. It is an illustration (SPEC/00 §11, P8). Lifted in the PR the milestone names, when the entry carries the record of the CI run of src.baseline.run that produced it."
+    }
+  ]
+}
