@@ -133,6 +133,21 @@ not one line of `src/baseline/` changes (P5).
     was.
 12. **Product.** This PR is #24, the next number on this repository
     (Unsure 10).
+13. **Product, on reading run 41233100816.** The run wrote RED,
+    `answers_unrun` `["g-001"]`, `answers_disagreed` `[]`,
+    `answers_differing` `[]`, `agent_disagreed` `[]`,
+    `baseline_changed` false, `unreadable` `[]`, `written_by_ci` true,
+    on the merge ref `a724249`; the plant is named as the row expects.
+    The tag `m00` resolved to `e94b76b` in the checkout (Unsure 14,
+    read). The baseline wrote six observations, g-001's equal in value
+    to the hand-written answer; the RED is the missing run record and
+    nothing else. The lift is carried by PR 4, by M03's path (b): a CI
+    run's artifact and a writer in `src/m04/` that rebuilds the file
+    and the page from it by hand. PR 3, if the cold review of #24 finds
+    anything, repairs and does not lift; if it finds nothing, PR 3 is
+    skipped. The Measured cell takes the `main` run after #24 merges.
+    The `M03 gate` on the same head read GREEN with `parsed` null; a
+    reading after the measurement, recorded in the README and the PR.
 
 ## What a reader can falsify
 
@@ -142,7 +157,7 @@ PR 2.
 ## What this ruling does not settle
 
 The items under Unsure (PR 2) in `milestones/M04/README.md`, 10 to 18,
-each with its seat (10 ruled above), and PR 1's 1, 2, 6 and 9, carried.
+each with its seat (10 ruled and 14 read above), and PR 1's 1, 2, 6 and 9, carried.
 What matters most for the close: what "live" means (1), where the pages
 are served (2), whether the lift judges `baseline_commit` (13), and how
 the lift's run record gets from a CI run into a commit ("After this PR

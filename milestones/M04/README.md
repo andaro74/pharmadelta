@@ -378,6 +378,46 @@ reading is after the measurement and never reopens row 4 (M03
 cell. The CI run is the measurement; the construction run decides
 nothing.
 
+### Observed (CI run, 2026-10-31)
+
+The first run on this PR,
+[41233100816](https://github.com/andaro74/pharmadelta/actions/runs/41233100816),
+wrote the artifact `m04-gate-a7242498e5bd9fc47e714271df8ee604c04deca4`
+(the sha is the pull request's merge ref, as M00's to M03's were; the
+branch head was `f54fca6`). It holds `result.json` and
+`observations.json`, read with `gh run download` in this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F4.1 holds: served answers g-001 carry no run record" |
+| `answers_unrun` | `["g-001"]`: `served[0].run_record.why` "run is null" |
+| `answers_disagreed` | `[]`: the page's baseline answer equals the file's entry as parsed JSON |
+| `answers_differing` | `[]`: nothing compared, `not_compared` "no run record" |
+| `agent_disagreed` | `[]`: the page's agent answer equals `pages/api/answers.json`'s entry |
+| `baseline_changed` | `false`; `baseline.tag_commit` `e94b76b`, `baseline.baseline_commit` `df860b7`, `diff_exit` 0 (Unsure 14: the tag resolved under `fetch-depth: 0`) |
+| `unreadable` | `[]` |
+| `observations` | `read` true, six ids `g-001` to `g-006`, `commit` `a724249`, `dirty` false, `started_at` `2026-10-31T19:12:26+00:00`, `method` "keyword matching; see src/baseline/answer.py" |
+| `served[0].observation` | `lisinopril.8.1`, `201.57(c)(9)(i)`, `impacted` true, `owed` `follow-rld`, `escalate` false: the baseline's observation of g-001, equal in value to the hand-written answer the plant serves, recorded beside the unrun answer; it decides nothing |
+| `written_by_ci` | `true`; `commit` `a724249`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/24/merge`; exit 1; the `M04 gate` job failed. On the same head `M00 gate` passed ([41233100811](https://github.com/andaro74/pharmadelta/actions/runs/41233100811)), `M02 gate` passed ([41233100772](https://github.com/andaro74/pharmadelta/actions/runs/41233100772)), `M01 gate` is not required and reads as it did on `main` ([41233100819](https://github.com/andaro74/pharmadelta/actions/runs/41233100819)) |
+
+Equals the expected result above on every field the ledger row names.
+The plant is named as ledger row 5 expects: the RED is the missing run
+record and nothing else, as M03's was the missing call record.
+
+The `M03 gate` on the same head,
+[41233100879](https://github.com/andaro74/pharmadelta/actions/runs/41233100879),
+artifact `m03-gate-a7242498e5bd9fc47e714271df8ee604c04deca4`, read
+`GREEN`: `answers_uncalled` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`; sign-in as `pharmadelta` 200, 506 ms; the
+door 200, `request_id` `GH6QBin8vHcEPoA=` in `apigw-requestid`,
+`stop_reason` `end_turn`, `parsed` null after two refused
+`find_label_row` calls with `section` the number `8.1` (M03 Unsure 23,
+label-impact's), then prose; `latency_ms` 5805, 9496 ms wall; 5591 in,
+296 out; the result grepped for `execute-api` and `us-west-2_`: no
+match. A reading after the measurement; it does not reopen row 4 (M03
+`rulings/pr4.md` 6, 22) and is recorded here and in the PR, not in a
+ledger cell.
+
 ### What a reader can falsify
 
 - The artifact `m04-gate-<sha>` on this PR's run holds `result.json`
@@ -421,6 +461,17 @@ the lift is carried by PR 4, as M00's to M03's were; PR 3, if the cold
 review of #24 finds anything, repairs and does not lift; if it finds
 nothing, PR 3 is skipped. Ruled in `rulings/pr2.md` on reading the run.
 
+**Ruled at PR 2, on reading run 41233100816 (Product).** The lift is
+carried by PR 4, as M00's to M03's were. PR 3, if the cold review of #24
+finds anything, repairs and does not lift; if it finds nothing, PR 3 is
+skipped. The Measured cell takes the `main` run after #24 merges (M01
+Unsure 23, ruled at M02 PR 1), which reads as run 41233100816 did on the
+four lists and the freeze check; the baseline is deterministic. The
+lift's path is M03's (b): the `m04` workflow's own artifact holds
+`observations.json` with the run's `commit` and `started_at`, and a
+writer in `src/m04/` rebuilds the file and the page from it by hand,
+with the artifact and the run named in the record (`rulings/pr2.md` 13).
+
 ## Unsure (PR 2)
 
 Numbering continues from PR 1's. Each needs a seat's ruling. None blocks
@@ -428,11 +479,11 @@ the measurement.
 
 | # | Item | Seat |
 |---|---|---|
-| 10 | The ruling file names this PR as #24, the next number on this repository. | Product |
+| 10 | The ruling file names this PR as #24, the next number on this repository. **Ruled at PR 2** (`rulings/pr2.md` 12): #24. | Product |
 | 11 | A served baseline answer the page does not show is not named, as the M03 gate does not name a served answer the detail page does not show (M03 Unsure 25's reading). F4.1's third arm is "the page shows an answer the file does not serve", the other direction. With one served answer, shown, the two readings agree. | Product, Engineering |
 | 12 | A served answer with a run record whose `id` has no golden under `goldens/`, or no observation in the run, reads differing, not UNSCORABLE: the baseline runs over `goldens/`, so nothing it writes could have produced that answer. The alternative reads it as "not read". Built: differing. | Product, Engineering |
 | 13 | What the gate verifies of the run record from here: presence and non-emptiness of the seven fields and `written_by_ci` true, as M03's gate verified its call record (M03 `rulings/pr2.md` 7). `baseline_commit` is checkable against the checkout's last baseline commit, which the gate records under `baseline.baseline_commit` and does not judge; `run_url` and `artifact` need GitHub's API, which the gate does not read (no network). Whether the lift PR adds the `baseline_commit` check to the verdict. Proposed: recorded, not judged, at PR 2. | Engineering, Threshold Owner |
-| 14 | When the tag `m00` is not in the checkout, `baseline_changed` is null and the run reads UNSCORABLE unless something is RED, the reading "a reading could not be made". The alternative, RED, would name the checkout, not the control. Built: UNSCORABLE. `fetch-depth: 0` in the workflow fetches the tags; the CI run on this PR confirms. | Threshold Owner, Engineering |
+| 14 | When the tag `m00` is not in the checkout, `baseline_changed` is null and the run reads UNSCORABLE unless something is RED, the reading "a reading could not be made". The alternative, RED, would name the checkout, not the control. Built: UNSCORABLE. `fetch-depth: 0` in the workflow fetches the tags; the CI run on this PR confirms. **Read at PR 2** (run 41233100816): the tag resolved to `e94b76b` on the merge ref, `baseline_changed` false. The reading on a missing tag stays proposed. | Threshold Owner, Engineering |
 | 15 | Equality is against the gate's own run of the baseline in the same job, not against the run the record names (M03 `rulings/pr2.md` 4's reading). The baseline is deterministic at fixed `data/` and `goldens/`, so the two runs write the same observation unless `data/` or `goldens/` changed between them, which `answers_differing` then names. Built so. | Product, Data Owner, Threshold Owner |
 | 16 | Whether `M04 gate` is made a required check on `main`, as M02's 16 and M03's 16 asked for theirs; both carried to the owner's settings, outside any milestone. Not changed here. | Security, Product |
 | 17 | The artifact `m04-gate-<sha>` holds `observations.json`, the same content `m00-gate-<sha>`'s artifact holds on the same head. A second copy, so the gate's artifact holds what the gate compared. Proposed: keep. | Engineering |
