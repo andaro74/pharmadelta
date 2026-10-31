@@ -1,0 +1,81 @@
+# The M04 gate (milestones/README.md row 5, F4.1).
+#
+# Reads what the baseline file serves (pages/api/baseline.json), what the
+# side-by-side page shows (the id="baseline-answer" and id="agent-answer"
+# blocks of pages/side-by-side.html) and what the public API serves
+# (pages/api/answers.json), names every served ordinary-assistant answer
+# that carries no run record, every page answer the baseline file does not
+# serve and every agent answer the API does not serve; checks src/baseline/
+# equals its state at tag m00; then runs the frozen baseline over goldens/
+# with the command gate.yml runs and compares each served answer that
+# carries a run record with the run's observation of the same id. Writes
+# the result as the artifact `m04-gate-<sha>`. The job fails when the
+# verdict is not GREEN. Only what this workflow writes is evidence (SPEC/00
+# P4); a local run of the same commands is not.
+#
+# Not one line of src/baseline/ changes and no argument is added to it
+# (P5): the baseline step below is gate.yml's, with a different output
+# path. No secret, no variable, no network beyond the checkout. gate.yml
+# (M00), m01.yml (M01), m02.yml (M02), m03.yml and m03-lift.yml (M03) are
+# unchanged.
+
+name: m04
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m04-gate:
+    name: M04 gate
+    runs-on: ubuntu-latest
+    steps:
+      # Full history and tags: the gate diffs src/baseline/ against the tag
+      # m00 and records the last commit touching it (M04 Unsure 7).
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      # The artifact directory exists before anything can crash, so the
+      # upload below always has a directory to read (M00 PR 3, Q3 b).
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m04-gate"
+
+      # The command gate.yml runs, unchanged but for the output path. The
+      # observations file goes into the artifact beside result.json.
+      - name: Run the frozen baseline over goldens/ (observations, scores nothing)
+        id: baseline
+        run: uv run python -m src.baseline.run --out "$RUNNER_TEMP/m04-gate/observations.json"
+
+      # Runs whenever the baseline step ran, crashed or not. RED on an unrun
+      # or disagreed answer is a read of the served files alone; with no
+      # observations file and nothing RED, the gate writes result.json with
+      # verdict UNSCORABLE and exits 2, so the artifact still says what
+      # happened (Q3 b). A failure before `main` (an import error) exits 1
+      # with no file, and the upload below then fails on if-no-files-found.
+      - name: Read the served answers and the page; check the freeze; compare with the run; judge row 5
+        if: ${{ !cancelled() && steps.baseline.outcome != 'skipped' }}
+        run: >
+          uv run python -m src.m04.gate
+          --out-dir "$RUNNER_TEMP/m04-gate"
+          --observations "$RUNNER_TEMP/m04-gate/observations.json"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Write the result as a CI artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: m04-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/m04-gate/
+          if-no-files-found: error
+          retention-days: 90
