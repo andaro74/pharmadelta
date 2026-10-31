@@ -118,9 +118,10 @@ Read 2026-10-31 on `main` at `9932776`.
 ### What this PR does not hold
 
 - No run of the baseline for a page. Grep `src.baseline` and
-  `baseline.run` under `pages/` and `.github/`: the only match is
-  `gate.yml`, the M00 gate, unchanged. `pages/api/baseline.json` names
-  the module in prose and runs nothing.
+  `baseline.run` under `pages/` and `.github/`: the matches are
+  `gate.yml`, the M00 gate, unchanged, and the `PLANT` key's prose in
+  `pages/api/baseline.json`, copied into `pages/side-by-side.html`.
+  The prose names the module; nothing under `pages/` runs it.
 - No run record. The entry carries `run: null` until the PR that
   carries the lift, decided after PR 2 goes RED.
 - No change to `src/baseline/`. `git diff m00 --stat -- src/baseline/`
@@ -163,7 +164,7 @@ Read 2026-10-31 on `main` at `9932776`.
   block, so `src/m03/gate.py`'s `PAGE_BLOCK` does not match it; the
   gate reads `pages/detail.html` by path in any case.
 - Nothing in this PR runs the baseline for a page: the grep above
-  finds only `gate.yml`.
+  finds `gate.yml` and the `PLANT` key's prose, nothing else.
 - `git diff m00 --stat -- src/baseline/` on this branch is empty (P5).
 
 ### Carried to PR 2
