@@ -17,7 +17,7 @@ this is the same row with the open detail.
 | Seeded commit | `a896442` on `m04-pr1`: `pages/api/baseline.json`, the ordinary assistant's served answers, one entry, the question of golden `g-001` with an answer written by hand, its row `lisinopril.8.1` and its clause `201.57(c)(9)(i)` copied from `data/` at `595dd68`, `run` null, `scripted` true, a `PLANT` key beside them; `pages/side-by-side.html`, the side-by-side page, showing that answer in the ordinary-assistant column, labelled an illustration, with no run record, beside the deployed agent's entry copied from `pages/api/answers.json` with its call record. Nothing in the repository runs the baseline for a page. |
 | Expected gate output | PR 2's gate, in CI, reads every ordinary-assistant answer the baseline file serves and the page shows and names each that carries no run record or that the page and the file do not agree on, and names each agent answer the page shows that the public API does not serve; then runs the frozen baseline in CI with the command `gate.yml` runs, `uv run python -m src.baseline.run`, over `goldens/`, compares each served answer with the run's observation of the same id (the served question must equal the golden's), and checks `src/baseline/` equals its state at tag `m00`. It writes a `result.json` that is RED when any served answer is unrun, disagreed or differing, any agent answer disagrees, or the baseline has changed, naming each; GREEN only when every served answer carries a run record, is shown as served and equals the run's observation, every agent answer shown is the API's, and `src/baseline/` equals `m00`; UNSCORABLE when nothing is RED and a served file could not be read or the baseline could not run. On `a896442`: RED, `answers_unrun` `["g-001"]`, `answers_disagreed` `[]`, `answers_differing` `[]`, `agent_disagreed` `[]`, `baseline_changed` false. The Measured cell cites the `main` run after PR 2 merges (M01 Unsure 23, ruled at M02 PR 1). |
 | Measured | |
-| PRs used / cap | 2 / 4 |
+| PRs used / cap | 3 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -471,6 +471,239 @@ lift's path is M03's (b): the `m04` workflow's own artifact holds
 `observations.json` with the run's `commit` and `started_at`, and a
 writer in `src/m04/` rebuilds the file and the page from it by hand,
 with the artifact and the run named in the record (`rulings/pr2.md` 13).
+
+## Repair (PR 3, 2026-10-31)
+
+PR 3 is the repair: what the cold review of PR 2 (#24) found, and nothing
+else. The plant stands: `pages/api/baseline.json` serves g-001 with `run`
+null and `pages/side-by-side.html` shows it under its illustration
+banner, as at `a896442`; `git diff main -- pages/` is empty. Nothing here
+lifts, and nothing here decides the row: the `main` run after #24 merged
+is the measurement, and PR 4 fills the "Measured" cell from it
+(`rulings/pr2.md` 13). The review found three defects in the gate's
+verdict path and two wrong labels in its job summary, so this is PR 3.
+
+### The `main` run after #24 merged, read at PR 3
+
+[Run 41234548875](https://github.com/andaro74/pharmadelta/actions/runs/41234548875)
+on `main` at `4d92676` (push, 2026-10-31 19:30 UTC), the run the Measured
+cell cites (M01 Unsure 23). Read first in this session with `gh run
+download`, before any edit; artifact
+`m04-gate-4d926760c985e973bdd5d35f1c76f0db47660808`, its `result.json`
+and `observations.json`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F4.1 holds: served answers g-001 carry no run record" |
+| `answers_unrun` | `["g-001"]`: `served[0].run_record.why` "run is null" |
+| `answers_disagreed` | `[]`: the page's baseline answer equals the file's entry as parsed JSON |
+| `answers_differing` | `[]`: nothing compared, `not_compared` "no run record" |
+| `agent_disagreed` | `[]`: the page's agent answer equals `pages/api/answers.json`'s entry |
+| `baseline_changed` | `false`; `baseline.tag_commit` `e94b76b`, `baseline.baseline_commit` `df860b7`, `diff_exit` 0 |
+| `unreadable` | `[]` |
+| `observations` | `read` true, six ids `g-001` to `g-006`, `commit` `4d92676`, `dirty` false, `started_at` `2026-10-31T19:30:43+00:00`, `method` "keyword matching; see src/baseline/answer.py"; `observations.json` in the artifact holds the same six |
+| `served[0].observation` | `lisinopril.8.1`, `201.57(c)(9)(i)`, `impacted` true, `owed` `follow-rld`, `escalate` false; recorded beside the unrun answer, decides nothing |
+| `written_by_ci` | `true`; `commit` `4d92676`, `dirty` false; `ci.event` `push`, `ci.ref` `refs/heads/main`; exit 1; the `M04 gate` job failed |
+
+Equals ledger row 5's expected output on every field the row names, and
+equals run 41233100816 on the four lists, `baseline_changed`,
+`unreadable` and the observation of g-001. The plant is not changed.
+
+### Cold review of #24
+
+Read on `main` at `4d92676`, before any edit: `src/m04/gate.py` line by
+line against "Open detail (PR 2)" and `rulings/pr2.md` 1 to 13;
+`.github/workflows/m04.yml` against `gate.yml` and `m03.yml`;
+`pages/api/baseline.json` and `pages/side-by-side.html` as the gate reads
+them; `src/baseline/run.py` for what a golden does to the runner; the PR
+run 41233100816 and the main run 41234548875 against the "Observed"
+table. Nine findings. Three are defects in the verdict path and are
+repaired here; two are wrong labels in the job summary and are repaired
+beside them; four are readings, named under Unsure (PR 3).
+
+1. **Defect 1, repaired.** `run()` read `pages/api/baseline.json` first
+   and let its `Unscorable` raise to `main`'s handler, so a baseline file
+   that could not be read or parsed, or served no `answers` list, wrote
+   the whole run UNSCORABLE before the page's agent column was read
+   against `pages/api/answers.json`. With the page showing an agent
+   answer the API does not serve, that run read UNSCORABLE with no
+   `agent_disagreed` list, where `rulings/pr2.md` 6 says RED comes first
+   and UNSCORABLE is for when nothing is RED. Reproduced at construction
+   (cases 22 and 24 below). Not reachable on the plant or on a lift that
+   serves a readable file.
+2. **Defect 2, repaired.** `baseline_state()` caught
+   `CalledProcessError` from git and nothing else. When git cannot be
+   run at all (not on `PATH`, not executable) `subprocess.run` raises
+   `FileNotFoundError` after the served files were read, and the run
+   wrote UNSCORABLE with no `answers_unrun` list: the plant's RED turned
+   UNSCORABLE. The same family as M03 PR 3's Defect 1: a failure after
+   the served files were read overturning a RED. Reproduced at
+   construction with git removed from `PATH` (case 25). Not reachable in
+   CI as the workflow stands: `actions/checkout` needs git.
+3. **Defect 3, repaired.** `write_result` wrote `result.json`, then
+   appended the summary to `--summary`. A summary path that cannot be
+   opened for append (the empty string, which `Path` reads as the
+   current directory; a directory; an unwritable file) raised after
+   `result.json` was written RED, and `main`'s handler then overwrote it
+   with UNSCORABLE, exit 2. Reproduced at construction (cases 27 and
+   28). In CI `GITHUB_STEP_SUMMARY` is set and writable; the path is
+   reached when the workflow's command is run with it empty.
+4. **Label, repaired.** The summary printed the tag's commit as the first
+   seven characters of its fallback text, "not in ", when the tag was
+   not in the checkout. Reproduced in a clone made with `--no-tags`. It
+   now prints "not resolved".
+5. **Label, repaired.** The summary's "page equal" column printed "not
+   shown" for every served answer when the page's `baseline-answer`
+   block could not be read, the same word it prints for a served answer
+   the page does not show. It now prints "page not read" (case 29).
+6. **Reading, Unsure 19.** The freeze check trusts the tag `m00` in the
+   checkout. `tag_commit` is recorded (`e94b76b` in both CI runs) and
+   not judged against the ledger's `e94b76b`; a moved tag would pass.
+7. **Reading, Unsure 20.** The gate does not check the observations
+   file's `commit` equals the checkout's. The workflow writes the file
+   in the same job; both commits are recorded (`observations.commit`,
+   `commit`) and equal in both CI runs.
+8. **Reading, Unsure 21.** `run_record_check` reads a field as empty
+   when it is null or the empty string. A field holding `0`, `false`,
+   `[]` or `{}` counts as present; `written_by_ci` false is caught by
+   its own check.
+9. **Reading, Unsure 22.** `read_golden_question` returns None for a
+   golden with no `question` string, and `compare` then reads the served
+   `question` against None, so a served entry with no `question` key
+   would read equal on that field. Not reachable in the same job:
+   `src/baseline/run.py` reads `golden["question"]` and lowercases it,
+   so such a golden stops the baseline before any observation is
+   written, and `compare` is reached only with an observation of that
+   id.
+
+Also read, no finding: `compare()` returns on every shape of served
+answer (null, object, string), of `answer_fields` (object, string,
+absent) and of observation (present, absent, malformed) and raises on
+none; `read_page`'s pattern matches the page's two blocks and no
+`id="answer"` block; `m04.yml`'s baseline step is `gate.yml`'s command
+with the output path changed, its gate step runs on
+`!cancelled() && steps.baseline.outcome != 'skipped'` as `gate.yml`'s
+scorer does, so a baseline crash still runs the gate (the plant reads
+RED; a lift reads UNSCORABLE naming the observations file), the artifact
+uploads on `if: always()` with `if-no-files-found: error`, `permissions`
+is `contents: read`, `fetch-depth: 0` resolved the tag in both runs, and
+no `secrets.`, `vars.` or `env:` appears; the two CI results equal the
+"Observed" table on every field it names.
+
+### The repair
+
+`src/m04/gate.py` only, 61 lines added and 18 removed; the docstring
+says what changed.
+
+- **Defect 1.** `run` catches `Unscorable` from the baseline file as it
+  already did from the page and the API, records it under `unreadable`,
+  and goes on: `answers_unrun` and `answers_disagreed` are `[]` with no
+  served list to read, the agent column is judged, the freeze check and
+  the observations file are read and recorded. `result.json` gains
+  `served_read` (true when the baseline file was read) beside `served`.
+  With nothing RED the run is UNSCORABLE naming the file, as before.
+- **Defect 2.** `baseline_state` catches `OSError` on each of its three
+  git calls and returns `changed` None with `error` saying git could not
+  be run; `git_error` writes the reason for either exception. The run
+  then reads as a missing tag does: unreadable, RED first.
+- **Defect 3.** `write_result` appends the summary inside a `try`; on
+  `OSError` it prints why on stderr and `result.json` stands as written.
+  `--summary ""` now means no summary.
+- **Labels.** "not resolved" for a tag commit the gate has none of;
+  "page not read" when the page's baseline block was not read.
+
+The verdict on every input PR 2's construction run exercised is
+unchanged (below). The fields compared, the run record's fields and
+`m04.yml` are unchanged. No new dependency.
+
+### Construction readings (not evidence, P4)
+
+Run 2026-10-31 on this branch from the working tree, `written_by_ci`
+false, `dirty` true. The observations file was written by `uv run python
+-m src.baseline.run --out <scratch>/observations.json` from the tree at
+`4d92676` with the gate uncommitted: six observations, g-001's equal to
+the main run's. Thirty made-up pairs of files in the session's scratch
+directory, built by one script and run against the gate before and
+after the repair, not committed (M01 Unsure 21's reading: no test file).
+No probe touched `src/baseline/`'s working tree (PR 2 Unsure 18: once,
+done); the git-absent probe ran the gate with git removed from `PATH`,
+and the missing-tag probe ran it in a clone made with `--no-tags`.
+
+| Reading | Before the repair | After |
+|---|---|---|
+| cases 1 to 21: PR 2's twenty pairs, rebuilt, and the real pages | the plant: `RED`, `answers_unrun` `["g-001"]`, exit 1. The lifted entry: `GREEN`, exit 0. `written_by_ci` false, `artifact` missing, `run` a string: `RED`, `answers_unrun`. Page `owed` changed: `answers_unrun` and `answers_disagreed` `["g-001"]`. Page g-999: `answers_disagreed` `["g-999"]`. Agent `request_id` changed, plant and lifted: `agent_disagreed` `["g-001"]`. Lifted `owed` changed, `question` extended, `answer` null, g-999 with a record: `answers_differing`, the four reasons PR 2 recorded. No `--observations`, file missing, lifted: `UNSCORABLE`. Plant with the file missing: `RED`. Plant plus a string answer: `RED`, `unreadable` names g-002. String entry alone, zero served, lifted without the agent block: `UNSCORABLE`. Agent API malformed on the plant: `RED` | the same verdict, the same lists and the same exit on all twenty-one; `served_read` true on each, false on "zero served answers", whose `result.json` now holds the lists and `unreadable` instead of the error |
+| case 22: baseline file not JSON, page agent `request_id` changed | `UNSCORABLE`, exit 2, `Unscorable` from `read_served`, no lists | `RED`, exit 1, `agent_disagreed` `["g-001"]`, `unreadable` names the baseline file, `served_read` false |
+| case 23: baseline file not JSON, agent column equal | `UNSCORABLE`, exit 2, no lists | `UNSCORABLE`, exit 2, the lists `[]`, `unreadable` names the file |
+| case 24: baseline file with `answers` a string, agent `request_id` changed | `UNSCORABLE`, no lists | `RED`, `agent_disagreed` `["g-001"]` |
+| case 25: the plant, git not on `PATH` | `UNSCORABLE`, exit 2, `FileNotFoundError`, no `answers_unrun` | `RED`, exit 1, `answers_unrun` `["g-001"]`, `baseline_changed` null, `baseline.error` "the tag m00 could not be resolved: git could not be run: FileNotFoundError", `unreadable` names the freeze check |
+| case 26: the lifted entry, git not on `PATH` | `UNSCORABLE`, `FileNotFoundError` | `UNSCORABLE`, exit 2, g-001 equal, `unreadable` names the freeze check: nothing RED, as `rulings/pr2.md` 6 reads a missing tag |
+| cases 27 and 28: the plant, `--summary ""` and `--summary <a directory>` | `result.json` first written `RED` then overwritten `UNSCORABLE`, `PermissionError`, exit 2 | `RED`, exit 1, `result.json` as written; case 28 prints on stderr that the summary could not be appended |
+| case 29: the lifted entry, page without its `baseline-answer` block | `UNSCORABLE`; the summary's page column "not shown" | `UNSCORABLE`, the same lists; the column "page not read" |
+| case 30: the plant plus g-002 with `answer_fields` a string | `RED`, `answers_unrun` `["g-001"]`, `unreadable` names g-002 | the same |
+| the clone made with `--no-tags`, the real pages | `RED`, `answers_unrun` `["g-001"]`, `baseline_changed` null, `unreadable` "the tag m00 is not in the checkout"; the summary line "against tag `m00` (`not in `)" | the same verdict and lists; the summary line "against tag `m00` (`not resolved`)" |
+| the real pages with the gate's default paths, `--summary` a scratch file | | `RED`, `answers_unrun` `["g-001"]`, the other lists `[]`, `baseline_changed` false (tag `e94b76b`, `baseline_commit` `df860b7`, diff exit 0), `unreadable` `[]`, `served_read` true, exit 1; the summary appended |
+| the M00 scorer on the same observations file | | `GREEN`, exit 0 |
+| the M02 gate | | `GREEN`, `clauses_mismatched` `[]`, `rows_mismatched` `[]`, exit 0 |
+
+### What this PR does not hold
+
+- No lift. `git diff main -- pages/` is empty: `run` null, `scripted`
+  true, the `PLANT` key and the illustration banner stand.
+- No change to the verdict on any input PR 2's construction run
+  exercised, to the fields compared, to the run record's fields, or to
+  `.github/workflows/m04.yml`.
+- No change to `src/baseline/` (P5; `git diff m00 --stat --
+  src/baseline/` is empty), `src/m03/`, `src/gate/`, `src/ingest/`,
+  `gate.yml`, `m01.yml`, `m02.yml`, `m03.yml`, `m03-lift.yml`,
+  `goldens/`, `data/`, `pyproject.toml`, `uv.lock`, SPEC/00, CLAUDE.md,
+  the README, or anything under `milestones/M00/` to `milestones/M03/`
+  or `milestones/adoption/`.
+- No construction probe touched `src/baseline/`'s working tree.
+- No secret, no variable, no network in `m04.yml` or the gate.
+- No "Measured" cell and no tag. Those are PR 4's.
+- No number on a page. No word of SPEC/00 §11's six. No brand name.
+
+### Expected CI result on this PR
+
+The plant stands, so the run on this PR is expected to read as
+41234548875 did: `RED`, `answers_unrun` `["g-001"]`, `answers_disagreed`
+`[]`, `answers_differing` `[]`, `agent_disagreed` `[]`,
+`baseline_changed` false, `unreadable` `[]`, `written_by_ci` true, exit
+1, the `M04 gate` job failed. New in the result: `served_read` true. On
+the same head the `M00 gate` is expected GREEN, the `M02 gate` GREEN, the
+`M01 gate` PENDING and not required, and the `M03 gate` whatever shape
+the door gives that day, recorded here and not in a ledger cell (M03
+`rulings/pr4.md` 6, 22).
+
+### What a reader can falsify
+
+- `git diff main --stat` on this PR touches `src/m04/gate.py`,
+  `milestones/README.md`, `milestones/M04/README.md` and
+  `milestones/M04/rulings/pr3.md` only. `git diff main -- pages/
+  src/baseline/ .github/` is empty.
+- In `src/m04/gate.py`, `baseline_state` catches `OSError`;
+  `write_result` appends the summary inside a `try`; `run` catches
+  `Unscorable` from `read_served(args.api)`; `summary_markdown` holds
+  the strings "not resolved" and "page not read".
+- The artifact on this PR's run holds `result.json` with `verdict: RED`,
+  `answers_unrun: ["g-001"]`, the other three lists `[]`,
+  `baseline_changed: false`, `unreadable: []`, `written_by_ci: true` and
+  `served_read: true`.
+- `git diff m00 --stat -- src/baseline/` on this branch is empty.
+
+## Unsure (PR 3)
+
+Numbering continues from PR 2's. Each needs a seat's ruling. None blocks
+the measurement, which is in.
+
+| # | Item | Seat |
+|---|---|---|
+| 19 | The freeze check trusts the tag `m00` in the checkout and records its commit; it does not judge `tag_commit` against the ledger's `e94b76b`. A tag moved to another commit would read `baseline_changed` false against that commit. Both CI runs read `e94b76b`. Proposed: recorded, not judged; a reader checks the seven characters. The alternative pins the commit in the gate, a gate change for a repair slot that this PR did not make unruled. | Threshold Owner, Engineering |
+| 20 | The gate does not check the observations file's `commit` equals the checkout's `commit`. The workflow writes the file in the same job from the same checkout, and both are recorded and equal in both CI runs. Proposed: recorded, not judged, as built. | Engineering |
+| 21 | `run_record_check` reads a field as empty when it is null or the empty string only; `0`, `false`, `[]` and `{}` count as present (`written_by_ci` false is caught by its own check). Proposed: as built; the lift writes strings and one boolean, and a reader reads the record. | Engineering |
+| 22 | A golden with no `question` string reads None from `read_golden_question`, and `compare` then reads the served `question` against None. Unreachable in one job (`src/baseline/run.py` stops on such a golden before any observation is written). Proposed: not changed; the baseline is frozen and the gate compares only with an observation. | Engineering, Data Owner |
+| 23 | Defect 1's reading: a baseline file that cannot be read leaves the agent column judged, so a page agent answer the API does not serve reads RED beside an unreadable baseline file. Built from `rulings/pr2.md` 6's letter (RED first; UNSCORABLE when nothing is RED). The alternative reads an unreadable served file as "nothing can be judged". The seats confirm at PR 4. | Product, Engineering |
+| 24 | The ruling file names this PR as #25, the next number on this repository. | Product |
 
 ## Unsure (PR 2)
 
