@@ -454,8 +454,9 @@ def write(args: argparse.Namespace) -> int:
     entries = build_entries(doc)
     api = api_document(old, doc, entries, data_commit)
     args.api.parent.mkdir(parents=True, exist_ok=True)
-    args.api.write_text(json_text(api) + "\n", encoding="utf-8")
-    args.page.write_text(render_page(api), encoding="utf-8")
+    # LF on every platform, as .gitattributes stores the files: a rebuild on Windows then equals the committed bytes.
+    args.api.write_text(json_text(api) + "\n", encoding="utf-8", newline="\n")
+    args.page.write_text(render_page(api), encoding="utf-8", newline="\n")
     for e in entries:
         print(f"{e['id']}: {'answer shown with its row and its clause' if answer_shown(e) else 'no row found; the page shows the question, the record and what the call returned'}; request_id {e['call']['request_id']}; run {e['call']['run_url']}")
     print(f"wrote {args.api} and {args.page} from {path}")
