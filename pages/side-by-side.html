@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pharmadelta: side by side, g-001</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 72rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #1a1a1a; background: #fff; }
+  .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  @media (max-width: 60rem) { .columns { grid-template-columns: 1fr; } }
+  .column { border: 1px solid #ccc; padding: 0 1rem 1rem; }
+  .scripted { border: 3px solid #b00020; padding: 0.75rem 1rem; background: #fff4f4; }
+  .scripted strong { color: #b00020; }
+  .norow { border: 3px solid #8a6d00; padding: 0.75rem 1rem; background: #fffbe6; }
+  .norow strong { color: #8a6d00; }
+  table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1rem; }
+  th, td { border: 1px solid #bbb; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; font-size: 0.95rem; }
+  th[scope=row] { width: 11rem; font-weight: normal; color: #444; }
+  blockquote { border-left: 4px solid #999; margin: 0.5rem 0; padding: 0.25rem 1rem; }
+  pre { white-space: pre-wrap; word-break: break-word; font-size: 0.85rem; background: #f6f6f6; padding: 0.5rem; }
+  footer { margin-top: 2rem; font-size: 0.9rem; color: #444; }
+  code { font-family: Consolas, monospace; }
+</style>
+</head>
+<body>
+<header>
+  <p><strong>pharmadelta</strong> · side-by-side page</p>
+  <p>pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.
+     The company, Ardentia Generics, is fictional; its portfolio and every “our label” statement are invented.
+     The label is a real public-domain label of an old off-patent generic, read from DailyMed.</p>
+  <p>This page shows the same question answered by an ordinary assistant and by the deployed agent (SPEC/00 §1).
+     The ordinary assistant is this repository's frozen baseline, <code>src/baseline/</code>: a keyword matcher over the question, the
+     label table and the clauses, with no model, frozen at tag <code>m00</code> and never improved (SPEC/00 P5). It is the control
+     the agent is compared with, not an assistant anyone would ship. The agent is <code>label-impact</code>, a tenant of agentkeel,
+     called through its door as the caller <code>pharmadelta</code>. The left column copies <code>api/baseline.json</code>; the right
+     column copies <code>api/answers.json</code>, the same entry the detail page <a href="detail.html">detail.html</a> shows.</p>
+</header>
+<h1>Does this rule change touch our label, and what do we owe?</h1>
+<h2>The question</h2>
+<blockquote><p>FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?</p></blockquote>
+<div class="columns">
+<section class="column" id="ordinary-assistant">
+<h2>An ordinary assistant</h2>
+<p><code>src/baseline/</code>, the frozen baseline: keyword matching, no model, no network, no randomness.</p>
+<div class="scripted" role="note">
+  <p><strong>Illustration.</strong> This answer was written by hand. No run of the baseline produced it: <code>run</code> is
+     <code>null</code> and <code>scripted</code> is <code>true</code> in <code>api/baseline.json</code>. There is no CI run to link.
+     It is labelled an illustration because it is one (SPEC/00 §11, P8). SPEC/00 §11 says the ordinary assistant is a real run of
+     the frozen baseline from M04; this page is M04's planted false state (<code>milestones/M04/README.md</code>, “The false state”)
+     and is lifted when the entry carries the record of the run that produced it.</p>
+</div>
+<h3>The answer</h3>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>lisinopril.8.1</code></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td></tr>
+        <tr><th scope="row">impacted</th><td><code>true</code></td></tr>
+        <tr><th scope="row">owed</th><td><code>follow-rld</code></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
+<h3>The row</h3>
+<p>Row <code>lisinopril.8.1</code> of the label table, as <code>data/table.json</code> holds it at <code>595dd68</code>. The holder is fictional; the label is real.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>lisinopril.8.1</code></td></tr>
+        <tr><th scope="row">holder</th><td><code>Ardentia Generics</code></td></tr>
+        <tr><th scope="row">holder_fictional</th><td><code>true</code></td></tr>
+        <tr><th scope="row">ingredient</th><td><code>lisinopril</code></td></tr>
+        <tr><th scope="row">dosage_form</th><td><code>tablet</code></td></tr>
+        <tr><th scope="row">strengths</th><td><code>2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg</code></td></tr>
+        <tr><th scope="row">anda</th><td><code>ANDA075743</code></td></tr>
+        <tr><th scope="row">rld_nda</th><td><code>NDA019777</code></td></tr>
+        <tr><th scope="row">dailymed_set_id</th><td><code>f8d16c85-50e2-4d99-afae-6fb902734e42</code></td></tr>
+        <tr><th scope="row">label_revised</th><td><code>2022-06</code></td></tr>
+        <tr><th scope="row">label_read_on</th><td><code>2026-10-09</code></td></tr>
+        <tr><th scope="row">format</th><td><code>201.56(d)</code></td></tr>
+        <tr><th scope="row">section</th><td><code>8.1</code></td></tr>
+        <tr><th scope="row">section_title</th><td><code>Pregnancy</code></td></tr>
+        <tr><th scope="row">section_terms</th><td><code>Risk Summary; Clinical Considerations</code></td></tr>
+        <tr><th scope="row">section_terms_read_on</th><td><code>2026-10-10</code></td></tr>
+        <tr><th scope="row">requirement</th><td><code>201.57(c)(9)(i)</code></td></tr>
+  </tbody>
+</table>
+<h3>The clause</h3>
+<p>Clause <code>201.57(c)(9)(i)</code>, as <code>data/clauses.json</code> holds it at <code>595dd68</code>.</p>
+<blockquote><p>(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:</p></blockquote>
+<table>
+  <tbody>
+        <tr><th scope="row">citation</th><td>21 CFR 201.57(c)(9)(i)</td></tr>
+        <tr><th scope="row">source note</th><td>[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]</td></tr>
+        <tr><th scope="row">eCFR</th><td><a href="https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)">https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)</a></td></tr>
+        <tr><th scope="row">eCFR as of</th><td><code>2026-10-07</code></td></tr>
+        <tr><th scope="row">effective date</th><td><code>2016-11-29</code></td></tr>
+        <tr><th scope="row">text copied on</th><td><code>2026-10-10</code></td></tr>
+        <tr><th scope="row">existence checked by hand on</th><td><code>2026-10-09</code></td></tr>
+        <tr><th scope="row">note</th><td>Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.</td></tr>
+  </tbody>
+</table>
+<h3>Where this answer came from</h3>
+<p>Nowhere a reader can check. <code>run</code> is <code>null</code>: no run id, no commit, no time, no artifact. That is the
+   false state this milestone plants.</p>
+</section>
+<section class="column" id="deployed-agent">
+<h2>The deployed agent</h2>
+<p><code>label-impact</code>, agentkeel-studio/label-impact, called through its door as <code>pharmadelta</code> by this repository's CI.</p>
+<div class="norow" role="note">
+  <p><strong>No row found.</strong> The call returned no parsed answer (<code>stop_reason</code> <code>tool_use</code>).
+     This page shows no answer here: an answer is shown only with its row and its clause (SPEC/00 §11). No row and no clause are
+     copied in. What the call returned is below, verbatim, and the call's record follows.</p>
+</div>
+<h3>What the call returned, verbatim</h3>
+<p>The door's <code>parsed</code> object, or <code>null</code> when the agent's text held no JSON object:</p>
+<pre>null</pre>
+<h3>Where this answer came from</h3>
+<p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under
+   <code>run_url</code> wrote the record; its artifact <code>m03-lift-e5f79ef8f33fe7b2d63f3bc9b08e31fcea584695</code> holds the door's full reading.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">agent</th><td><code>label-impact</code>, agentkeel-studio/label-impact at <code>8cf0563</code>, deployed on agentkeel m10</td></tr>
+        <tr><th scope="row">call.subject</th><td><code>pharmadelta</code></td></tr>
+        <tr><th scope="row">call.issuer</th><td><code>self</code></td></tr>
+        <tr><th scope="row">call.door_host</th><td><code>sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139</code> (the SHA-256 of the door URL's host; the host is not written, M03 Unsure 12)</td></tr>
+        <tr><th scope="row">call.request_id</th><td><code>GHmo8jHQPHcEMNA=</code></td></tr>
+        <tr><th scope="row">call.called_at</th><td><code>2026-10-31T16:58:32+00:00</code></td></tr>
+        <tr><th scope="row">call.agent</th><td><code>label-impact</code></td></tr>
+        <tr><th scope="row">call.agent_commit</th><td><code>8cf0563</code></td></tr>
+        <tr><th scope="row">call.run_url</th><td><a href="https://github.com/andaro74/pharmadelta/actions/runs/41222218526">https://github.com/andaro74/pharmadelta/actions/runs/41222218526</a></td></tr>
+        <tr><th scope="row">door status</th><td><code>200</code>, request id in <code>apigw-requestid</code></td></tr>
+        <tr><th scope="row">scripted</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
+</section>
+</div>
+<h2>The same answers, as the files serve them</h2>
+<p>The first object below is the entry in <code>api/baseline.json</code>; the second is the entry in <code>api/answers.json</code>.
+   Each is the same JSON value its file holds. A reader of the page reads them from here.</p>
+<h3>The ordinary assistant's entry</h3>
+<script type="application/json" id="baseline-answer">
+{
+  "id": "g-001",
+  "question": "FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?",
+  "answer": {
+    "table_row": "lisinopril.8.1",
+    "clause_id": "201.57(c)(9)(i)",
+    "answer_fields": {
+      "impacted": true,
+      "owed": "follow-rld",
+      "escalate": false
+    }
+  },
+  "row": {
+    "table_row": "lisinopril.8.1",
+    "holder": "Ardentia Generics",
+    "holder_fictional": true,
+    "ingredient": "lisinopril",
+    "dosage_form": "tablet",
+    "strengths": "2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg",
+    "anda": "ANDA075743",
+    "rld_nda": "NDA019777",
+    "dailymed_set_id": "f8d16c85-50e2-4d99-afae-6fb902734e42",
+    "label_revised": "2022-06",
+    "label_read_on": "2026-10-09",
+    "format": "201.56(d)",
+    "section": "8.1",
+    "section_title": "Pregnancy",
+    "section_terms": "Risk Summary; Clinical Considerations",
+    "section_terms_read_on": "2026-10-10",
+    "requirement": "201.57(c)(9)(i)"
+  },
+  "clause": {
+    "id": "201.57(c)(9)(i)",
+    "citation": "21 CFR 201.57(c)(9)(i)",
+    "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
+    "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
+    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
+    "ecfr_as_of": "2026-10-07",
+    "effective_date": "2016-11-29",
+    "text_copied_on": "2026-10-10",
+    "existence_checked_by_hand_on": "2026-10-09",
+    "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
+  },
+  "run": null,
+  "scripted": true,
+  "PLANT": "M04 PR 1 (milestones/M04/README.md, 'The false state'): this answer was written by hand. No run of the baseline produced it: `run` is null. It is an illustration (SPEC/00 §11, P8). Lifted in the PR the milestone names, when the entry carries the record of the CI run of src.baseline.run that produced it."
+}
+</script>
+<pre>{
+  &quot;id&quot;: &quot;g-001&quot;,
+  &quot;question&quot;: &quot;FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?&quot;,
+  &quot;answer&quot;: {
+    &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
+    &quot;clause_id&quot;: &quot;201.57(c)(9)(i)&quot;,
+    &quot;answer_fields&quot;: {
+      &quot;impacted&quot;: true,
+      &quot;owed&quot;: &quot;follow-rld&quot;,
+      &quot;escalate&quot;: false
+    }
+  },
+  &quot;row&quot;: {
+    &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
+    &quot;holder&quot;: &quot;Ardentia Generics&quot;,
+    &quot;holder_fictional&quot;: true,
+    &quot;ingredient&quot;: &quot;lisinopril&quot;,
+    &quot;dosage_form&quot;: &quot;tablet&quot;,
+    &quot;strengths&quot;: &quot;2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg&quot;,
+    &quot;anda&quot;: &quot;ANDA075743&quot;,
+    &quot;rld_nda&quot;: &quot;NDA019777&quot;,
+    &quot;dailymed_set_id&quot;: &quot;f8d16c85-50e2-4d99-afae-6fb902734e42&quot;,
+    &quot;label_revised&quot;: &quot;2022-06&quot;,
+    &quot;label_read_on&quot;: &quot;2026-10-09&quot;,
+    &quot;format&quot;: &quot;201.56(d)&quot;,
+    &quot;section&quot;: &quot;8.1&quot;,
+    &quot;section_title&quot;: &quot;Pregnancy&quot;,
+    &quot;section_terms&quot;: &quot;Risk Summary; Clinical Considerations&quot;,
+    &quot;section_terms_read_on&quot;: &quot;2026-10-10&quot;,
+    &quot;requirement&quot;: &quot;201.57(c)(9)(i)&quot;
+  },
+  &quot;clause&quot;: {
+    &quot;id&quot;: &quot;201.57(c)(9)(i)&quot;,
+    &quot;citation&quot;: &quot;21 CFR 201.57(c)(9)(i)&quot;,
+    &quot;text&quot;: &quot;(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:&quot;,
+    &quot;source_note&quot;: &quot;[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]&quot;,
+    &quot;ecfr_url&quot;: &quot;https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)&quot;,
+    &quot;ecfr_as_of&quot;: &quot;2026-10-07&quot;,
+    &quot;effective_date&quot;: &quot;2016-11-29&quot;,
+    &quot;text_copied_on&quot;: &quot;2026-10-10&quot;,
+    &quot;existence_checked_by_hand_on&quot;: &quot;2026-10-09&quot;,
+    &quot;note&quot;: &quot;Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.&quot;
+  },
+  &quot;run&quot;: null,
+  &quot;scripted&quot;: true,
+  &quot;PLANT&quot;: &quot;M04 PR 1 (milestones/M04/README.md, &#x27;The false state&#x27;): this answer was written by hand. No run of the baseline produced it: `run` is null. It is an illustration (SPEC/00 §11, P8). Lifted in the PR the milestone names, when the entry carries the record of the CI run of src.baseline.run that produced it.&quot;
+}</pre>
+<h3>The deployed agent's entry</h3>
+<script type="application/json" id="agent-answer">
+{
+  "id": "g-001",
+  "question": "FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?",
+  "answer": null,
+  "row": null,
+  "clause": null,
+  "agent": {
+    "name": "label-impact",
+    "repository": "agentkeel-studio/label-impact",
+    "commit": "8cf0563",
+    "platform": "agentkeel m10"
+  },
+  "call": {
+    "subject": "pharmadelta",
+    "issuer": "self",
+    "door_host": "sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139",
+    "request_id": "GHmo8jHQPHcEMNA=",
+    "called_at": "2026-10-31T16:58:32+00:00",
+    "agent": "label-impact",
+    "agent_commit": "8cf0563",
+    "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41222218526"
+  },
+  "door": {
+    "status": 200,
+    "request_id_header": "apigw-requestid",
+    "stop_reason": "tool_use",
+    "parsed": null,
+    "text": ""
+  },
+  "scripted": false
+}
+</script>
+<pre>{
+  &quot;id&quot;: &quot;g-001&quot;,
+  &quot;question&quot;: &quot;FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?&quot;,
+  &quot;answer&quot;: null,
+  &quot;row&quot;: null,
+  &quot;clause&quot;: null,
+  &quot;agent&quot;: {
+    &quot;name&quot;: &quot;label-impact&quot;,
+    &quot;repository&quot;: &quot;agentkeel-studio/label-impact&quot;,
+    &quot;commit&quot;: &quot;8cf0563&quot;,
+    &quot;platform&quot;: &quot;agentkeel m10&quot;
+  },
+  &quot;call&quot;: {
+    &quot;subject&quot;: &quot;pharmadelta&quot;,
+    &quot;issuer&quot;: &quot;self&quot;,
+    &quot;door_host&quot;: &quot;sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139&quot;,
+    &quot;request_id&quot;: &quot;GHmo8jHQPHcEMNA=&quot;,
+    &quot;called_at&quot;: &quot;2026-10-31T16:58:32+00:00&quot;,
+    &quot;agent&quot;: &quot;label-impact&quot;,
+    &quot;agent_commit&quot;: &quot;8cf0563&quot;,
+    &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/41222218526&quot;
+  },
+  &quot;door&quot;: {
+    &quot;status&quot;: 200,
+    &quot;request_id_header&quot;: &quot;apigw-requestid&quot;,
+    &quot;stop_reason&quot;: &quot;tool_use&quot;,
+    &quot;parsed&quot;: null,
+    &quot;text&quot;: &quot;&quot;
+  },
+  &quot;scripted&quot;: false
+}</pre>
+<footer>
+  <p>This demo produces the evidence a validation would need. It is not medical information: the agent assesses
+     regulatory impact on labeling and never answers a treatment question (SPEC/00 §2). The authority for what this demo claims is
+     <code>SPEC/00-overview.md</code>; what was measured is in <code>milestones/README.md</code>. No number on this page is a
+     measured result: the row's and the clause's numbers are their own data, and the call record's are the CI run's, linked above.</p>
+</footer>
+</body>
+</html>
