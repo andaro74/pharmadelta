@@ -902,6 +902,47 @@ read `RED`, `answers_differing` `["g-001"]`, the served null against a
 `21 CFR 201.57(c)(9)(i)`, `end_turn`, `request_id` `GIcTGjL5vHcESmg=`;
 a reading after M03's measurement, M03 `rulings/pr4.md` 6, 22).
 
+### Observed (CI runs, 2026-10-31)
+
+The first run on this PR,
+[41252104790](https://github.com/andaro74/pharmadelta/actions/runs/41252104790),
+on the merge ref `5ac7e90` (branch head `0d6f696`, the close commit),
+artifact `m04-gate-5ac7e906800d5407b4d8d270e5bf9c7b93d4d1f4`, its
+`result.json` and `observations.json`, read with `gh run download` in
+this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `GREEN`; `reason` "F4.1 does not hold: every served answer carries a run record written by CI, is shown as served and equals the run's observation, every agent answer shown is the public API's, and src/baseline/ equals tag m00" |
+| `answers_unrun` | `[]`: `served[0].run_record` "a run record written by CI, every field present" |
+| `answers_disagreed` | `[]`: the page's baseline answer equals the file's entry as parsed JSON |
+| `answers_differing` | `[]`: `comparison` "all equal" on `question` (the golden's), `table_row`, `clause_id` and the three answer fields |
+| `agent_disagreed` | `[]`: the page's agent answer equals `pages/api/answers.json`'s entry |
+| `baseline_changed` | `false`; `baseline.tag_commit` `e94b76b`, `baseline.baseline_commit` `df860b7`, `diff_exit` 0 |
+| `unreadable` | `[]` |
+| `served_read` | `true` |
+| `observations` | `read` true, six ids `g-001` to `g-006`, `commit` `5ac7e90`, `dirty` false, `started_at` `2026-10-31T23:20:32+00:00`, `method` "keyword matching; see src/baseline/answer.py" |
+| `written_by_ci` | `true`; `commit` `5ac7e90`, `dirty` false; `ci.event` `pull_request`, `ci.ref` `refs/pull/26/merge`; exit 0; the `M04 gate` job passed, the first pass of this gate. On the same head `M00 gate` passed ([41252104879](https://github.com/andaro74/pharmadelta/actions/runs/41252104879)), `M02 gate` passed ([41252104821](https://github.com/andaro74/pharmadelta/actions/runs/41252104821)), `M01 gate` is not required and reads as it does on `main` ([41252104888](https://github.com/andaro74/pharmadelta/actions/runs/41252104888)) |
+
+Equals "What the gate on this PR can read" on every field. The served
+answer is the record's run's observation, and the gate's own run in
+this job wrote the same one. A reading after the measurement; the cell
+above is the `main` run on the plant and is not changed by it.
+
+The `M03 gate` on the same head,
+[41252104785](https://github.com/andaro74/pharmadelta/actions/runs/41252104785),
+artifact `m03-gate-5ac7e906800d5407b4d8d270e5bf9c7b93d4d1f4`, read
+`GREEN`: `answers_uncalled` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`; sign-in as `pharmadelta` 200; the door 200,
+`request_id` `GIelcidGPHcEQ1w=`, `stop_reason` `tool_use`, `parsed` null
+after three refused `find_label_row` calls with `section` the number
+`8.1` (M03 Unsure 23, label-impact's); `latency_ms` 4827, 8521 ms wall;
+5591 in, 279 out; the result grepped for `execute-api` and `us-west-2_`:
+no match. The served null equals the run's null. A reading after M03's
+measurement; it does not reopen row 4 (M03 `rulings/pr4.md` 6, 22) and
+is recorded here and in the PR, not in a ledger cell. Runs on later
+commits of this PR, if any, are named in the PR's comments.
+
 ### Rulings carried
 
 | # | Ruled |

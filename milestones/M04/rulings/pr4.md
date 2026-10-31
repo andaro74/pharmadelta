@@ -192,6 +192,14 @@ with `gh run download` before the cell was written, with the PR run
     are recorded in the README as construction. They decide nothing
     (P4); the CI run on this PR is the reading, and it is a reading
     after the measurement.
+22. **Product, on reading run 41252104790.** The gate on this PR read
+    GREEN on the merge ref `5ac7e90`: every list `[]`,
+    `baseline_changed` false, `unreadable` `[]`, `served_read` true,
+    `written_by_ci` true, `comparison` "all equal" on g-001; the first
+    pass of this gate. The `M03 gate` on the same head read GREEN with
+    `parsed` null against the served null. Both are readings after the
+    measurement: neither touches the cell, and the milestone is not
+    reopened by what a later run reads.
 
 ## What a reader can falsify
 
