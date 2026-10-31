@@ -711,6 +711,36 @@ nothing. It is one more call as `pharmadelta` (ruling 6).
 - Grep `secrets.` and `vars.` in `.github/workflows/m03.yml`: unchanged,
   four matches in the gate step's `env`.
 
+### Observed (CI run, 2026-10-31)
+
+The first run on this PR,
+[41216016582](https://github.com/andaro74/pharmadelta/actions/runs/41216016582),
+wrote the artifact `m03-gate-f82422576e2f3d96935abee98e32f2f41f6d3001`
+(the sha is the pull request's merge ref; the branch head was `2c15639`).
+Its `result.json`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED` |
+| `answers_uncalled` | `["g-001"]`: `call is null` |
+| `answers_disagreed` | `[]`: the page's one answer equals the API's entry |
+| `answers_differing` | `[]`: nothing compared |
+| `unreadable` | `[]` |
+| `served[0]` | `answer_shape` "null or an object; can be compared"; `not_compared` "no call record"; `comparison` null; `page_equal` true. The two fields this PR adds, present |
+| `env_set` | all four true; grepped for `execute-api` and `us-west-2_`: no match |
+| `sign_in` | `signed_in` true, status 200, `token_use` `access`, `token_username` `pharmadelta`, `expires_in` 3600, 570 ms |
+| `door[0]` for g-001's question | status 200; `request_id` `GHbUBguyvHcEMoQ=` in `apigw-requestid`; `stop_reason` `end_turn`; `parsed` null; `error` null; `refused` null; `guardrail_topics` `[]`; `source` `dynamodb`; `latency_ms` 6120, 9949 ms wall; `usage` 5591 in, 296 out |
+| `door[0].tool_calls` | two calls of `find_label_row`, `{"label": "lisinopril", "section": 8.1}`, each refused as before. The model then stopped and wrote prose: it met a tool error, will not fabricate a row or clause, asks for the question to be resubmitted. No JSON object in the text, so `parsed` is null |
+| `written_by_ci` | `true`; `commit` `f824225`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/21/merge`; exit 1; the `M03 gate` job failed. `M00 gate` and `M02 gate` on the same head passed ([41216016830](https://github.com/andaro74/pharmadelta/actions/runs/41216016830), [41216016645](https://github.com/andaro74/pharmadelta/actions/runs/41216016645)). `M01 gate` is not required and reads as it did on `main` |
+
+Equals the expected result above on every field. The plant is still named
+as ledger row 4 expects, and the repair changed nothing on it. The
+door's reading is a third shape in three CI runs: `tool_use` with
+`parsed` null (41126878288), `end_turn` with an object whose `table_row`
+is null (41171470951), `end_turn` with prose and `parsed` null (this
+run). Same two refusals each time. Recorded for Unsure 26; decides
+nothing.
+
 ## Unsure (PR 3)
 
 Numbering continues from PR 2's. Each needs a seat's ruling. None blocks
