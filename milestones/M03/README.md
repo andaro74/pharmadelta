@@ -18,7 +18,7 @@ this is the same row with the open detail.
 | Seeded commit | `c7edf8f` on `m03-pr1`: `pages/api/answers.json`, the public API's served answers, one entry, the question of golden `g-001` with an answer written by hand, its row `lisinopril.8.1` and its clause `201.57(c)(9)(i)` copied from `data/` at `b9f84e3`, `agent` null, `call` null, `scripted` true, a `PLANT` key beside them; `pages/detail.html`, the detail page, showing that answer with its row and its clause, labelled scripted, the same object embedded. Nothing in the repository signs in to the door or calls the agent. |
 | Expected gate output | PR 2's gate, in CI, reads every answer the API serves and the page shows and names each that carries no call record or that the page and the API do not agree on; then signs in to label-impact's identity pool as `pharmadelta` with the repository secret, asks the deployed agent each called answer's question through the door, and compares the served answer with the door's. It writes a `result.json` that is RED when any served answer is uncalled, disagreed or differing, naming each; GREEN only when every served answer carries a call record, is shown as served and equals the door's answer; UNSCORABLE when nothing is RED and the served files, the pool or the door could not be read. On `c7edf8f`: RED, `answers_uncalled` `["g-001"]`, `answers_disagreed` `[]`, `answers_differing` `[]`. The Measured cell cites the `main` run after PR 2 merges (M01 Unsure 23, ruled at M02 PR 1). |
 | Measured | |
-| PRs used / cap | 2 / 4 |
+| PRs used / cap | 3 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -539,6 +539,222 @@ on the three lists, whatever the door answers that day. As the agent
 stands, the lift serves g-001 as "no answer" with its call record
 (Unsure 6, 23), and what row 4's cell then says is Product's at PR 4.
 
+## Repair (PR 3, 2026-10-31)
+
+PR 3 is the repair: what the cold review of PR 2 (#20) found, and nothing
+else. The plant stands: `pages/api/answers.json` serves g-001 with `call`
+null and `pages/detail.html` shows it, as at `c7edf8f`; `git diff main --
+pages/` is empty. Nothing here lifts, and nothing here decides the row:
+the `main` run after #20 merged is the measurement, and PR 4 fills the
+"Measured" cell from it. `rulings/pr2.md` 10 said: PR 3, if the cold
+review finds anything, repairs and does not lift. It found one defect in
+the gate's verdict path, so this is PR 3.
+
+### The `main` run after #20 merged, read at PR 3
+
+[Run 41171470951](https://github.com/andaro74/pharmadelta/actions/runs/41171470951)
+on `main` at `0b8d2ec` (push, 2026-10-31 05:09 UTC), the run the Measured
+cell cites (M01 Unsure 23). Read first in this session with `gh run
+download`; artifact `m03-gate-0b8d2ec7598b61c30f861a3f2114c2a13e89ad71`,
+its `result.json`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED` |
+| `answers_uncalled` | `["g-001"]`: `call is null` |
+| `answers_disagreed` | `[]`: the page's one answer equals the API's entry |
+| `answers_differing` | `[]`: nothing compared |
+| `unreadable` | `[]` |
+| `env_set` | all four true; grepped for `execute-api` and `us-west-2_`: no match |
+| `sign_in` | `signed_in` true, status 200, `token_use` `access`, `token_username` `pharmadelta`, `expires_in` 3600, 691 ms |
+| `door[0]` for g-001's question | status 200; `request_id` `GF-1ZhzEvHcEMbQ=` in `apigw-requestid`; `stop_reason` `end_turn`; `parsed` `{"table_row": null, "clause_id": "21 CFR 201.57(c)(9)(i)", "impacted": false, "owed": "none", "escalate": false}`; `error` null; `refused` null; `guardrail_topics` `[]`; `source` `dynamodb`; `latency_ms` 7058, 10845 ms wall; `usage` 5591 in, 412 out |
+| `door[0].tool_calls` | two calls of `find_label_row`, each `{"label": "lisinopril", "section": 8.1}`, each refused: `8.1 is not one of ['bw', '5', '5.1', '6', '8.1']`. The model then stopped calling and wrote an answer whose text says it met a tool error, must not invent a row, and answers "not found" |
+| `written_by_ci` | `true`; `commit` `0b8d2ec`, `dirty` false; `event` `push`, `ref` `refs/heads/main`; exit 1; the job failed |
+
+The same as run 41126878288 on the three lists, `unreadable`,
+`written_by_ci` and the sign-in. Equals ledger row 4's expected output
+on every field the row names. The door's reading differs from the PR
+run's: there the model called the tool three times and ended at
+`tool_use` with `parsed` null; here it called twice, gave up and ended at
+`end_turn` with a parsed object whose `table_row` is null and whose
+`clause_id` carries a `21 CFR ` prefix that `data/clauses.json`'s id does
+not. The cause is the same (Unsure 23); what it does to the lift is
+Unsure 26.
+
+### Cold review of #20
+
+Read on `main` at `0b8d2ec`, before any edit: `src/m03/gate.py` line by
+line against "Open detail (PR 2)" and `rulings/pr2.md` 1 to 7,
+`.github/workflows/m03.yml`, `pages/api/answers.json`,
+`pages/detail.html`, and the two CI results (41126878288 and
+41171470951) against the "Observed" tables. Four findings. One is a
+defect in the verdict path and is repaired here; one is a wrong label in
+the job summary and is repaired beside it; two are readings, named under
+Unsure.
+
+1. **Defect 1, repaired.** `compare()` calls `.get` on the served
+   `answer` and on its `answer_fields`. A served answer that carries a
+   call record and whose `answer` is neither null nor an object (or whose
+   `answer_fields` is not an object) raises `AttributeError` once the
+   door has answered 200, and `main`'s handler then writes the whole run
+   `UNSCORABLE`, exit 2, with no `answers_uncalled` list. On a file that
+   also serves the uncalled plant, that run reads UNSCORABLE where ruling
+   3 (Unsure 4) says RED comes first and UNSCORABLE only when nothing is
+   RED. Reproduced at construction (below) with the sign-in and the door
+   stubbed. The same family as the `Path.relative_to` defect PR 2 fixed
+   before its first push. Not reachable on the plant (nothing is
+   compared) or on the lift as PR 1 describes it (null or an object).
+2. **Label, repaired.** The job summary's "compared" column printed "not
+   compared (uncalled)" for every served answer that was not compared,
+   including a called one the door was not asked or did not answer 200
+   for. It now prints why: "no call record", the shape, or the door's
+   status.
+3. **Reading, Unsure 25.** Ledger row 4's expected output says GREEN
+   "only when every served answer carries a call record, is shown as
+   served and equals the door's answer". The gate names a page answer
+   the API does not serve, or that differs from the API's entry, and
+   does not name a served answer the page does not show, as PR 1's "The
+   gate" and F3.1's third arm define it. With one served answer, shown,
+   the two readings agree.
+4. **Reading, Unsure 27.** The gate names an answer uncalled when
+   `door_host` is missing or empty (ruling 7). If Security rules Unsure
+   12 as "not written", no lift can pass the gate as it stands; that
+   change is this PR's slot or none, and this PR does not make it
+   unruled.
+
+Also read, no finding: `check_url` refuses any host not under
+`.execute-api.us-west-2.amazonaws.com` before a request; `sign_in` returns
+on every error path before `answer` is read; `ask_door` records the
+status and the body on a non-200 and never the token; no exception
+message on any path carries a value of the secret or the variables
+(`HTTPError` and `URLError` print no URL; `Request` is built only after
+`check_url`); the workflow reads the four names in the gate step's `env`
+only, uploads on `if: always()` with `if-no-files-found: error`, and
+`permissions` is `contents: read`. `pyproject.toml`, `uv.lock`,
+`gate.yml`, `m01.yml`, `m02.yml` are unchanged by #20.
+
+### Defect 1: the repair
+
+`src/m03/gate.py`, three places and the docstring:
+
+- `served_answer_check(answer)`: None for null or an object whose
+  `answer_fields` is null, absent or an object; else why it cannot be
+  compared. Exactly the shapes that raised; a served answer PR 2
+  compared is compared the same way.
+- In `run`, each served answer's shape is checked before the comparison
+  and recorded as `answer_shape`. A malformed answer is recorded under
+  `unreadable` by id, is not compared, and `not_compared` says why. The
+  order is: no call record, then shape, then the door's status, then
+  `compare`. RED on an uncalled, disagreed or differing answer still
+  comes first; a malformed served answer makes the run UNSCORABLE only
+  when nothing is RED, the same reading as "a served file could not be
+  read" (ruling 3), at the entry (Unsure 24).
+- `compare` no longer raises on any input: a non-object served answer
+  reads "cannot be compared", `answer_fields` is read only when it is an
+  object. `run` does not reach it with those shapes; this is so a reader
+  of `compare` alone finds no path that raises.
+- The summary's "compared" column prints `not_compared`.
+
+The verdict on every input PR 2's construction run exercised is
+unchanged (below).
+
+### Construction readings (not evidence, P4)
+
+Run 2026-10-31 on this branch from the working tree, `written_by_ci`
+false. No sign-in: the password is a repository secret. Readings:
+
+| Reading | Before the repair | After |
+|---|---|---|
+| the real pages, no environment | `RED`, `answers_uncalled` `["g-001"]`, exit 1 | the same; the summary's compared column reads "not compared: no call record" |
+| pair a: the plant plus a called `g-002` whose `answer` is the string `"no answer"`, the sign-in and the door stubbed to answer as run 41171470951 did | `UNSCORABLE`, exit 2, `AttributeError: 'str' object has no attribute 'get'`, no `answers_uncalled` | `RED`, `answers_uncalled` `["g-001"]`, `unreadable` `["g-002: the served answer is a str, not null or an object, and cannot be compared"]`, g-002 not compared, exit 1 |
+| pair b: as a, with `answer_fields` the string `"none"` | `UNSCORABLE`, exit 2, the same error | `RED`, `answers_uncalled` `["g-001"]`, `unreadable` names g-002's `answer_fields`, exit 1 |
+| `compare()` alone | `compare(plant's served answer, the main run's parsed)`: differs on `table_row`, `clause_id`, `impacted`, `owed`; `compare(None, that parsed)`: one side has an answer; `compare("no answer", …)` raises | the first two the same; the third reads "not null or an object and cannot be compared"; an object with string `answer_fields` differs on all five |
+
+The stub files and the script live in the session's scratch directory
+and are not committed (M01 Unsure 21's reading: no test file).
+
+### What this PR does not hold
+
+- No lift. `git diff main -- pages/` is empty.
+- No change to the verdict on any input PR 2 compared, to the fields
+  compared, to the call record's fields, to the sign-in, to the call, to
+  what is written of the environment, or to `.github/workflows/m03.yml`.
+- No change to `pyproject.toml`, `uv.lock`, `gate.yml`, `m01.yml`,
+  `m02.yml`, `data/`, `goldens/`, `src/baseline/` (P5), SPEC/00,
+  CLAUDE.md, or anything under `milestones/M00/`, `M01/`, `M02/` or
+  `adoption/`. The `M01 gate` still reads PENDING and is not required.
+- No change to label-impact or to agentkeel.
+- No "Measured" cell and no tag. Those are PR 4's.
+
+### Expected CI result on this PR
+
+The plant stands, so the run on this PR is expected to read as 41171470951
+did: `RED`, `answers_uncalled` `["g-001"]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`, `unreadable` `[]`, `written_by_ci` true, the
+job failed. New in the result: `answer_shape` "null or an object; can be
+compared" and `not_compared` "no call record" on g-001. The door's
+reading beside it is whatever the agent says that day and decides
+nothing. It is one more call as `pharmadelta` (ruling 6).
+
+### What a reader can falsify
+
+- `git diff main --stat` on this PR touches `src/m03/gate.py`,
+  `milestones/README.md`, `milestones/M03/README.md` and
+  `milestones/M03/rulings/pr3.md` only.
+- In `src/m03/gate.py`, `served_answer_check` returns None for `None`
+  and for `{"answer_fields": {}}`, and a string for `"x"` and for
+  `{"answer_fields": "x"}`; `compare("x", None)` returns a dict and does
+  not raise.
+- The artifact on this PR's run holds `result.json` with `verdict: RED`,
+  `answers_uncalled: ["g-001"]`, `unreadable: []`, `written_by_ci: true`,
+  and `served[0].answer_shape` and `served[0].not_compared` present.
+- Grep `secrets.` and `vars.` in `.github/workflows/m03.yml`: unchanged,
+  four matches in the gate step's `env`.
+
+### Observed (CI run, 2026-10-31)
+
+The first run on this PR,
+[41216016582](https://github.com/andaro74/pharmadelta/actions/runs/41216016582),
+wrote the artifact `m03-gate-f82422576e2f3d96935abee98e32f2f41f6d3001`
+(the sha is the pull request's merge ref; the branch head was `2c15639`).
+Its `result.json`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED` |
+| `answers_uncalled` | `["g-001"]`: `call is null` |
+| `answers_disagreed` | `[]`: the page's one answer equals the API's entry |
+| `answers_differing` | `[]`: nothing compared |
+| `unreadable` | `[]` |
+| `served[0]` | `answer_shape` "null or an object; can be compared"; `not_compared` "no call record"; `comparison` null; `page_equal` true. The two fields this PR adds, present |
+| `env_set` | all four true; grepped for `execute-api` and `us-west-2_`: no match |
+| `sign_in` | `signed_in` true, status 200, `token_use` `access`, `token_username` `pharmadelta`, `expires_in` 3600, 570 ms |
+| `door[0]` for g-001's question | status 200; `request_id` `GHbUBguyvHcEMoQ=` in `apigw-requestid`; `stop_reason` `end_turn`; `parsed` null; `error` null; `refused` null; `guardrail_topics` `[]`; `source` `dynamodb`; `latency_ms` 6120, 9949 ms wall; `usage` 5591 in, 296 out |
+| `door[0].tool_calls` | two calls of `find_label_row`, `{"label": "lisinopril", "section": 8.1}`, each refused as before. The model then stopped and wrote prose: it met a tool error, will not fabricate a row or clause, asks for the question to be resubmitted. No JSON object in the text, so `parsed` is null |
+| `written_by_ci` | `true`; `commit` `f824225`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/21/merge`; exit 1; the `M03 gate` job failed. `M00 gate` and `M02 gate` on the same head passed ([41216016830](https://github.com/andaro74/pharmadelta/actions/runs/41216016830), [41216016645](https://github.com/andaro74/pharmadelta/actions/runs/41216016645)). `M01 gate` is not required and reads as it did on `main` |
+
+Equals the expected result above on every field. The plant is still named
+as ledger row 4 expects, and the repair changed nothing on it. The
+door's reading is a third shape in three CI runs: `tool_use` with
+`parsed` null (41126878288), `end_turn` with an object whose `table_row`
+is null (41171470951), `end_turn` with prose and `parsed` null (this
+run). Same two refusals each time. Recorded for Unsure 26; decides
+nothing.
+
+## Unsure (PR 3)
+
+Numbering continues from PR 2's. Each needs a seat's ruling. None blocks
+the measurement, which is in.
+
+| # | Item | Seat |
+|---|---|---|
+| 24 | A served answer that is neither null nor an object, or whose `answer_fields` is not an object, is read as "could not be read" at the entry: not compared, named under `unreadable`, UNSCORABLE only when nothing is RED. The alternative, naming it under `answers_differing` (a served answer with no `table_row` differs from any door answer), would make a malformed served file RED. Proposed and built: unreadable, because F3.1 compares fields the entry does not have. | Product, Engineering |
+| 25 | Ledger row 4's "is shown as served" against the gate's reading: the gate names page answers the API does not serve or that differ from the API's entry (F3.1's third arm, PR 1 "The gate"), and does not name a served answer the page does not show. Confirm the row's words mean the gate's reading, or rule that every served answer must be shown, which is a gate change for the repair slot. | Product |
+| 26 | The door's answer to g-001 differs between the two CI runs: run 41126878288 ended at `tool_use` with `parsed` null after three refused tool calls; run 41171470951 ended at `end_turn` with `parsed` `{"table_row": null, "clause_id": "21 CFR 201.57(c)(9)(i)", "impacted": false, "owed": "none", "escalate": false}` after two. Under ruling 4 the comparison is against the run's own call, so after the lift a served answer equals the door's only on a run whose call returns the same shape; the Measured cell is read from the `main` run after PR 4 merges and may name g-001 under `answers_differing` by the day. Also: the parsed object's `table_row` is null and its `clause_id` carries a `21 CFR ` prefix `data/clauses.json`'s ids do not, so an answer the lift serves from such a call has no row to show and a clause id the table does not hold; CLAUDE.md says a page never shows an answer without its row and its clause. PR 1's "Equality" covered `parsed` null ("no answer" with the call record), not this shape. Proposed for PR 4: the lift serves what its call returned, verbatim, with `table_row` null shown as "no row found" beside the question and the call record and no row or clause copied in; the cell says what the `main` run read. The cause is label-impact's (Unsure 23). | Product, Tool Owner, Data Owner |
+| 27 | `door_host` (Unsure 12, Security, open): the gate names an answer uncalled when `door_host` is missing or empty (ruling 7). A ruling of "not written" needs a gate change, and this PR is the milestone's repair slot. Security is asked to rule Unsure 12 before PR 4 opens: the host, a hash of it (fits the gate as it stands), or "not written" (does not). This PR changes nothing on it unruled. | Security |
+| 28 | How the lift's call record gets from a CI run into a commit is still undecided ("After this PR goes RED"). PR 4 proposes the smallest path and states it under Unsure for Engineering and Security before building it. Named here so PR 4's body has the item. | Engineering, Security |
+| 29 | The ruling file names this PR as #21, the next number on this repository. | Product |
+
 ## Unsure (PR 2)
 
 Numbering continues from PR 1's. Each needs a seat's ruling. None blocks
@@ -558,7 +774,7 @@ the measurement.
 | 20 | Construction touched the door once, with no token, to read its headers. The call left a refused record with no identity in the security account's log. Whether a construction run may call the door at all, and whether the refused record is owed a note in agentkeel. | Security |
 | 21 | The door call's timeout is 90 seconds here; the proxy invokes the runtime with 28 and the HTTP API's integration limit is 30 (row P item 4). A call that outlives the proxy reads as the door's status (a 5xx), not as a client timeout. | Engineering |
 | 22 | label-impact's runtime answers 200 with `{"error": ...}` on a failed model call and 403 with `{"refused": ...}` on a chain refusal (`server.py`). The gate records either and does not compare, so a called answer whose call failed that way reads UNSCORABLE, not differing. | Tool Owner, Engineering |
-| 23 | The deployed agent answers g-001 with no `parsed` object because its tool refuses the model's argument: `find_label_row` was called three times with `section` as the number `8.1` and answered `8.1 is not one of ['bw', '5', '5.1', '6', '8.1']` each time (Observed, `door[0].tool_calls`). The cause of the RED answer record at both deploys (PR 1, carried items). label-impact's to repair, in its own repository; nothing here changes. What row 4's cell says if the lift serves a call record with no answer is Unsure 6's. | Tool Owner, Engineering (label-impact); Product |
+| 23 | The deployed agent answers g-001 with no `parsed` object because its tool refuses the model's argument: `find_label_row` was called three times with `section` as the number `8.1` and answered `8.1 is not one of ['bw', '5', '5.1', '6', '8.1']` each time (Observed, `door[0].tool_calls`). The cause of the RED answer record at both deploys (PR 1, carried items). label-impact's to repair, in its own repository; nothing here changes. What row 4's cell says if the lift serves a call record with no answer is Unsure 6's. **Read again at PR 3** (run 41171470951): the same refusal twice, then the model stopped and answered `table_row` null with a `21 CFR `-prefixed `clause_id`; the shape varies by run (Unsure 26). Still label-impact's. | Tool Owner, Engineering (label-impact); Product |
 
 ## Unsure (PR 1)
 
