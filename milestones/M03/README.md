@@ -951,18 +951,38 @@ The second run, on `6dd2fc2` (the LF pin),
 [41222395263](https://github.com/andaro74/pharmadelta/actions/runs/41222395263)
 on the merge ref `63f4f31`: the same on every field above; `request_id`
 `GHm9iiHXPHcEPRA=`, `end_turn`, `parsed` null, two refused tool calls,
-497 ms sign-in, `latency_ms` 6104. The run on the close commit is named
-under "After this PR" when read.
+497 ms sign-in, `latency_ms` 6104.
 
-Both are readings after the measurement. GREEN here says: on those two
-calls the agent again parsed nothing, so the served "no answer" equals
-the door's. It does not say the agent answers the question; it does
-not. The cell above is the `main` run on the plant and is not changed by
-these runs. Four shapes in seven CI calls now: `tool_use` null
-(41126878288, 41222218526), `end_turn` with an object whose `table_row`
-is null (41171470951, 41221327681), `end_turn` prose and null
-(41216016582, 41222318273, 41222395263). Same refusal every time
-(Unsure 23, label-impact's).
+The third run, on `419ba00` (the close commit),
+[41223017320](https://github.com/andaro74/pharmadelta/actions/runs/41223017320)
+on the merge ref `03badba`, artifact
+`m03-gate-03badba60d2a10cf75499a9b1691cd022a430798`: `RED`,
+`answers_uncalled` `[]`, `answers_disagreed` `[]`, `answers_differing`
+`["g-001"]`, `unreadable` `[]`, `written_by_ci` true; `comparison`
+"one side has an answer and the other has none": the served `answer` is
+null and the door's `parsed` that day was `{"table_row": null,
+"clause_id": null, "impacted": false, "owed": "none", "escalate":
+false}`, `end_turn`, after the same two refused tool calls;
+`request_id` `GHoC2i0iPHcESfw=`; `latency_ms` 7271, 10948 ms wall; 486
+ms sign-in; exit 1, the `M03 gate` job failed. `M00 gate` and `M02 gate`
+on the same head passed. The reading "What the gate on this PR can
+read" named second. Runs on later commits of this PR, if any, are named
+in the PR's comments.
+
+All three are readings after the measurement. GREEN on the first two
+says: on those calls the agent again parsed nothing, so the served "no
+answer" equals the door's. RED on the third says: on that call the
+agent parsed an object with no row and no clause, which is not "no
+answer". Neither says the agent answers the question; it does not. The
+served entry is what its own call returned (ruling pr4.md 3) and is not
+rewritten to chase the day's shape. The cell above is the `main` run on
+the plant and is not changed by any of these runs. Five shapes in eight
+CI calls now: `tool_use` null (41126878288, 41222218526), `end_turn`
+with an object whose `table_row` is null and whose `clause_id` is
+`21 CFR 201.57(c)(9)(i)` (41171470951, 41221327681), `end_turn` prose
+and null (41216016582, 41222318273, 41222395263), `end_turn` with an
+object whose `table_row` and `clause_id` are both null (41223017320).
+Same refusal every time (Unsure 23, label-impact's).
 
 ### Rulings carried
 
@@ -1029,13 +1049,14 @@ Tag `m03` on the merge commit, as `m00`, `m01` and `m02` were tagged,
 after this PR's run on `main` is read with `gh run download`. That run's
 verdict is recorded in the tag's message and in a comment on #22, not in
 a commit: the milestone's four PRs are used and a fifth is a RED close
-(Unsure 31). Whatever it reads, the cell stands. Row 4 is GREEN. The
-milestone is closed, not reopened, by what the agent answers later.
+(Unsure 31). Whatever it reads, GREEN or RED on `answers_differing` by
+the day's shape, the cell stands. Row 4 is GREEN. The milestone is
+closed, not reopened, by what the agent answers later.
 
 Carried by name: Unsure 2 (GitHub Pages) to M04, the first milestone
 that serves a page to a visitor; Unsure 6 and 23 (the agent's tool
 refuses `section` as a number; the answer record RED at every deploy)
-to label-impact, with the four shapes above; Unsure 16 (the gate as a
+to label-impact, with the five shapes above; Unsure 16 (the gate as a
 required check) with M02's 16 to the owner's settings, outside any
 milestone; the deadlock finding and the refused construction call
 (Unsure 20) to agentkeel, as PR 1's carried items say. Row 4's cell
@@ -1063,7 +1084,7 @@ the measurement, which is in.
 |---|---|---|
 | 24 | A served answer that is neither null nor an object, or whose `answer_fields` is not an object, is read as "could not be read" at the entry: not compared, named under `unreadable`, UNSCORABLE only when nothing is RED. The alternative, naming it under `answers_differing` (a served answer with no `table_row` differs from any door answer), would make a malformed served file RED. Proposed and built: unreadable, because F3.1 compares fields the entry does not have. **Ruled at PR 4** (`rulings/pr4.md` 20): confirmed as built. | Product, Engineering |
 | 25 | Ledger row 4's "is shown as served" against the gate's reading: the gate names page answers the API does not serve or that differ from the API's entry (F3.1's third arm, PR 1 "The gate"), and does not name a served answer the page does not show. Confirm the row's words mean the gate's reading, or rule that every served answer must be shown, which is a gate change for the repair slot. **Ruled at PR 4** (`rulings/pr4.md` 21): the row's words mean the gate's reading; the gate is not changed. | Product |
-| 26 | The door's answer to g-001 differs between the two CI runs: run 41126878288 ended at `tool_use` with `parsed` null after three refused tool calls; run 41171470951 ended at `end_turn` with `parsed` `{"table_row": null, "clause_id": "21 CFR 201.57(c)(9)(i)", "impacted": false, "owed": "none", "escalate": false}` after two. Under ruling 4 the comparison is against the run's own call, so after the lift a served answer equals the door's only on a run whose call returns the same shape; the Measured cell is read from the `main` run after PR 4 merges and may name g-001 under `answers_differing` by the day. Also: the parsed object's `table_row` is null and its `clause_id` carries a `21 CFR ` prefix `data/clauses.json`'s ids do not, so an answer the lift serves from such a call has no row to show and a clause id the table does not hold; CLAUDE.md says a page never shows an answer without its row and its clause. PR 1's "Equality" covered `parsed` null ("no answer" with the call record), not this shape. Proposed for PR 4: the lift serves what its call returned, verbatim, with `table_row` null shown as "no row found" beside the question and the call record and no row or clause copied in; the cell says what the `main` run read. The cause is label-impact's (Unsure 23). **Ruled at PR 4** (`rulings/pr4.md` 3): as proposed; the lift served g-001 as "no answer" with its record, the call having parsed nothing; both PR runs read GREEN against a null of their own. | Product, Tool Owner, Data Owner |
+| 26 | The door's answer to g-001 differs between the two CI runs: run 41126878288 ended at `tool_use` with `parsed` null after three refused tool calls; run 41171470951 ended at `end_turn` with `parsed` `{"table_row": null, "clause_id": "21 CFR 201.57(c)(9)(i)", "impacted": false, "owed": "none", "escalate": false}` after two. Under ruling 4 the comparison is against the run's own call, so after the lift a served answer equals the door's only on a run whose call returns the same shape; the Measured cell is read from the `main` run after PR 4 merges and may name g-001 under `answers_differing` by the day. Also: the parsed object's `table_row` is null and its `clause_id` carries a `21 CFR ` prefix `data/clauses.json`'s ids do not, so an answer the lift serves from such a call has no row to show and a clause id the table does not hold; CLAUDE.md says a page never shows an answer without its row and its clause. PR 1's "Equality" covered `parsed` null ("no answer" with the call record), not this shape. Proposed for PR 4: the lift serves what its call returned, verbatim, with `table_row` null shown as "no row found" beside the question and the call record and no row or clause copied in; the cell says what the `main` run read. The cause is label-impact's (Unsure 23). **Ruled at PR 4** (`rulings/pr4.md` 3): as proposed; the lift served g-001 as "no answer" with its record, the call having parsed nothing; two PR runs read GREEN against a null of their own and the third RED on `answers_differing` against an object, recorded as what the agent said that day; the entry is not rewritten. | Product, Tool Owner, Data Owner |
 | 27 | `door_host` (Unsure 12, Security, open): the gate names an answer uncalled when `door_host` is missing or empty (ruling 7). A ruling of "not written" needs a gate change, and this PR is the milestone's repair slot. Security is asked to rule Unsure 12 before PR 4 opens: the host, a hash of it (fits the gate as it stands), or "not written" (does not). This PR changes nothing on it unruled. **Ruled at PR 4** (`rulings/pr4.md` 1): a hash, before the lift. | Security |
 | 28 | How the lift's call record gets from a CI run into a commit is still undecided ("After this PR goes RED"). PR 4 proposes the smallest path and states it under Unsure for Engineering and Security before building it. Named here so PR 4's body has the item. **Ruled at PR 4** (`rulings/pr4.md` 2): the artifact path, built. | Engineering, Security |
 | 29 | The ruling file names this PR as #21, the next number on this repository. **Ruled at PR 4** (`rulings/pr4.md` 13): #21. | Product |
@@ -1087,7 +1108,7 @@ the measurement.
 | 20 | Construction touched the door once, with no token, to read its headers. The call left a refused record with no identity in the security account's log. Whether a construction run may call the door at all, and whether the refused record is owed a note in agentkeel. **Ruled at PR 4** (`rulings/pr4.md` 16): the one call stands; no construction call touches the door from here on; the refused record is named to agentkeel in the carried items. | Security |
 | 21 | The door call's timeout is 90 seconds here; the proxy invokes the runtime with 28 and the HTTP API's integration limit is 30 (row P item 4). A call that outlives the proxy reads as the door's status (a 5xx), not as a client timeout. **Ruled at PR 4** (`rulings/pr4.md` 17): as built. | Engineering |
 | 22 | label-impact's runtime answers 200 with `{"error": ...}` on a failed model call and 403 with `{"refused": ...}` on a chain refusal (`server.py`). The gate records either and does not compare, so a called answer whose call failed that way reads UNSCORABLE, not differing. **Ruled at PR 4** (`rulings/pr4.md` 18): confirmed. | Tool Owner, Engineering |
-| 23 | The deployed agent answers g-001 with no `parsed` object because its tool refuses the model's argument: `find_label_row` was called three times with `section` as the number `8.1` and answered `8.1 is not one of ['bw', '5', '5.1', '6', '8.1']` each time (Observed, `door[0].tool_calls`). The cause of the RED answer record at both deploys (PR 1, carried items). label-impact's to repair, in its own repository; nothing here changes. What row 4's cell says if the lift serves a call record with no answer is Unsure 6's. **Read again at PR 3** (run 41171470951): the same refusal twice, then the model stopped and answered `table_row` null with a `21 CFR `-prefixed `clause_id`; the shape varies by run (Unsure 26). Still label-impact's. **Carried at PR 4** (`rulings/pr4.md` 19) to label-impact by name, with the four shapes; row 4 closes on the call. | Tool Owner, Engineering (label-impact); Product |
+| 23 | The deployed agent answers g-001 with no `parsed` object because its tool refuses the model's argument: `find_label_row` was called three times with `section` as the number `8.1` and answered `8.1 is not one of ['bw', '5', '5.1', '6', '8.1']` each time (Observed, `door[0].tool_calls`). The cause of the RED answer record at both deploys (PR 1, carried items). label-impact's to repair, in its own repository; nothing here changes. What row 4's cell says if the lift serves a call record with no answer is Unsure 6's. **Read again at PR 3** (run 41171470951): the same refusal twice, then the model stopped and answered `table_row` null with a `21 CFR `-prefixed `clause_id`; the shape varies by run (Unsure 26). Still label-impact's. **Carried at PR 4** (`rulings/pr4.md` 19) to label-impact by name, with the five shapes; row 4 closes on the call. | Tool Owner, Engineering (label-impact); Product |
 
 ## Unsure (PR 1)
 

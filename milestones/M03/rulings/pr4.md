@@ -119,16 +119,18 @@ with `gh run download` before the cell was written.
    the artifact of CI run 41222218526. `git diff c7edf8f -- pages/` is
    the whole of both files, because the hand-written answer and the row
    and clause copied for it are gone with it; nothing else changes.
-6. **Product, on reading runs 41222318273 and 41222395263.** The gate
-   on this PR read GREEN twice: every served answer carries a call
-   record as `pharmadelta`, the page's answer equals the API's, and the
-   served null equals a `parsed` null of the run's own call. The first
-   GREEN of this gate. It is a reading after the measurement: it says
-   the agent gave no answer on those calls, as on the lift's; it does
-   not say the agent answers the question, and it does not touch the
-   cell. A later run that parses an object reads RED on
-   `answers_differing` and is recorded as what the agent said that day
-   (ruling 3); the milestone is not reopened by it.
+6. **Product, on reading runs 41222318273, 41222395263 and
+   41223017320.** The gate on this PR read GREEN twice, then RED. GREEN:
+   every served answer carries a call record as `pharmadelta`, the
+   page's answer equals the API's, and the served null equals a `parsed`
+   null of the run's own call; the first GREEN of this gate. RED, on
+   the close commit: `answers_differing` `["g-001"]`, the served null
+   against a `parsed` object with `table_row` and `clause_id` both null,
+   a fifth shape. All three are readings after the measurement: they
+   say what the agent gave on each call; none says the agent answers the
+   question, and none touches the cell. The served entry is what its own
+   call returned (ruling 3) and is not rewritten to match a later day's
+   shape; the milestone is not reopened by it.
 7. **Product, Security (PR 1's Unsure 1 and 2).** At M03 "a public API"
    is the read API: a public JSON file of answers, each produced by a CI
    call as `pharmadelta` with its record, served beside the page. That
@@ -178,7 +180,7 @@ with `gh run download` before the cell was written.
     `pharmadelta`, including the lift's.
 17. **Engineering (Unsure 21).** As built: the door call's timeout is 90
     seconds, the proxy's 28; a call that outlives the proxy reads as the
-    door's status, never as a client timeout. Seven CI calls answered in
+    door's status, never as a client timeout. Eight CI calls answered in
     7 to 11 seconds wall.
 18. **Tool Owner, Engineering (Unsure 22).** Confirmed: a 200 with
     `error` or a 403 with `refused` is recorded and not compared, and a
@@ -187,8 +189,8 @@ with `gh run download` before the cell was written.
     the record.
 19. **Tool Owner, Engineering (label-impact); Product (Unsure 23, 6).**
     Carried by name to label-impact: `find_label_row` refuses `section`
-    sent as the number `8.1` on every call read from here, seven in CI,
-    and the agent's answer to g-001 takes four shapes (`milestones/M03/README.md`,
+    sent as the number `8.1` on every call read from here, eight in CI,
+    and the agent's answer to g-001 takes five shapes (`milestones/M03/README.md`,
     "Observed (CI runs, 2026-10-31)"). The agent's goldens are its own
     tests (SPEC/00 §3); nothing here changes there. For row 4: the cell
     closes on the call, the page says the agent gave no row, and that is
