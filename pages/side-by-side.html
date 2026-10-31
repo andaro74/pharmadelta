@@ -34,6 +34,9 @@
      the agent is compared with, not an assistant anyone would ship. The agent is <code>label-impact</code>, a tenant of agentkeel,
      called through its door as the caller <code>pharmadelta</code>. The left column copies <code>api/baseline.json</code>; the right
      column copies <code>api/answers.json</code>, the same entry the detail page <a href="detail.html">detail.html</a> shows.</p>
+  <p>Every ordinary-assistant answer on this page is a real run of the frozen baseline (SPEC/00 §11), made by this repository's CI:
+     <a href="https://github.com/andaro74/pharmadelta/actions/runs/41250971500">https://github.com/andaro74/pharmadelta/actions/runs/41250971500</a>, artifact <code>m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09</code>. The page was rebuilt from
+     that artifact by <code>src/m04/lift.py</code>.</p>
 </header>
 <h1>Does this rule change touch our label, and what do we owe?</h1>
 <h2>The question</h2>
@@ -42,13 +45,6 @@
 <section class="column" id="ordinary-assistant">
 <h2>An ordinary assistant</h2>
 <p><code>src/baseline/</code>, the frozen baseline: keyword matching, no model, no network, no randomness.</p>
-<div class="scripted" role="note">
-  <p><strong>Illustration.</strong> This answer was written by hand. No run of the baseline produced it: <code>run</code> is
-     <code>null</code> and <code>scripted</code> is <code>true</code> in <code>api/baseline.json</code>. There is no CI run to link.
-     It is labelled an illustration because it is one (SPEC/00 §11, P8). SPEC/00 §11 says the ordinary assistant is a real run of
-     the frozen baseline from M04; this page is M04's planted false state (<code>milestones/M04/README.md</code>, “The false state”)
-     and is lifted when the entry carries the record of the run that produced it.</p>
-</div>
 <h3>The answer</h3>
 <table>
   <tbody>
@@ -57,6 +53,14 @@
         <tr><th scope="row">impacted</th><td><code>true</code></td></tr>
         <tr><th scope="row">owed</th><td><code>follow-rld</code></td></tr>
         <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
+<p>What each answer field means (<code>milestones/M00/fields.md</code>):</p>
+<table>
+  <tbody>
+        <tr><th scope="row">impacted</th><td>this label&#x27;s section must change because of what the question describes</td></tr>
+        <tr><th scope="row">owed</th><td>what the holder owes now: none; cbe-0 (a changes-being-effected supplement under 314.70(c)(6)(iii)(A)); follow-rld (keep the label the same as the reference listed drug&#x27;s and adopt its change when it is approved, 314.150(b)(10)); alert-report (a 15-day Alert report under 314.80(c)(1)(i))</td></tr>
+        <tr><th scope="row">escalate</th><td>an adverse drug experience in the question is both serious and unexpected (314.80(a)) against the label&#x27;s 6 row; true starts the reporting path</td></tr>
   </tbody>
 </table>
 <h3>The row</h3>
@@ -98,8 +102,21 @@
   </tbody>
 </table>
 <h3>Where this answer came from</h3>
-<p>Nowhere a reader can check. <code>run</code> is <code>null</code>: no run id, no commit, no time, no artifact. That is the
-   false state this milestone plants.</p>
+<p>The record of the run that produced it: <code>uv run python -m src.baseline.run</code> over <code>goldens/</code>, made by this
+   repository's CI in the <code>m04</code> workflow. The run linked under <code>run_url</code> wrote the observation; its artifact <code>m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09</code>
+   holds it in <code>observations.json</code> beside the gate's <code>result.json</code>. The time and the commits below are that run's.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">run.run_url</th><td><a href="https://github.com/andaro74/pharmadelta/actions/runs/41250971500">https://github.com/andaro74/pharmadelta/actions/runs/41250971500</a></td></tr>
+        <tr><th scope="row">run.artifact</th><td><code>m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09</code></td></tr>
+        <tr><th scope="row">run.commit</th><td><code>36c453aa306377137a324e9a1f340af1fb3c7e09</code> (the commit the run checked out)</td></tr>
+        <tr><th scope="row">run.baseline_commit</th><td><code>df860b7f67d44947bf1c6c53b4c38f0322c32ce5</code> (the last commit touching <code>src/baseline/</code>, at or before tag <code>m00</code>)</td></tr>
+        <tr><th scope="row">run.started_at</th><td><code>2026-10-31T23:04:49+00:00</code></td></tr>
+        <tr><th scope="row">run.method</th><td><code>keyword matching; see src/baseline/answer.py</code></td></tr>
+        <tr><th scope="row">run.written_by_ci</th><td><code>true</code></td></tr>
+        <tr><th scope="row">scripted</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
 </section>
 <section class="column" id="deployed-agent">
 <h2>The deployed agent</h2>
@@ -180,9 +197,16 @@
     "existence_checked_by_hand_on": "2026-10-09",
     "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
   },
-  "run": null,
-  "scripted": true,
-  "PLANT": "M04 PR 1 (milestones/M04/README.md, 'The false state'): this answer was written by hand. No run of the baseline produced it: `run` is null. It is an illustration (SPEC/00 §11, P8). Lifted in the PR the milestone names, when the entry carries the record of the CI run of src.baseline.run that produced it."
+  "run": {
+    "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41250971500",
+    "artifact": "m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09",
+    "commit": "36c453aa306377137a324e9a1f340af1fb3c7e09",
+    "baseline_commit": "df860b7f67d44947bf1c6c53b4c38f0322c32ce5",
+    "started_at": "2026-10-31T23:04:49+00:00",
+    "method": "keyword matching; see src/baseline/answer.py",
+    "written_by_ci": true
+  },
+  "scripted": false
 }
 </script>
 <pre>{
@@ -228,9 +252,16 @@
     &quot;existence_checked_by_hand_on&quot;: &quot;2026-10-09&quot;,
     &quot;note&quot;: &quot;Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.&quot;
   },
-  &quot;run&quot;: null,
-  &quot;scripted&quot;: true,
-  &quot;PLANT&quot;: &quot;M04 PR 1 (milestones/M04/README.md, &#x27;The false state&#x27;): this answer was written by hand. No run of the baseline produced it: `run` is null. It is an illustration (SPEC/00 §11, P8). Lifted in the PR the milestone names, when the entry carries the record of the CI run of src.baseline.run that produced it.&quot;
+  &quot;run&quot;: {
+    &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/41250971500&quot;,
+    &quot;artifact&quot;: &quot;m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09&quot;,
+    &quot;commit&quot;: &quot;36c453aa306377137a324e9a1f340af1fb3c7e09&quot;,
+    &quot;baseline_commit&quot;: &quot;df860b7f67d44947bf1c6c53b4c38f0322c32ce5&quot;,
+    &quot;started_at&quot;: &quot;2026-10-31T23:04:49+00:00&quot;,
+    &quot;method&quot;: &quot;keyword matching; see src/baseline/answer.py&quot;,
+    &quot;written_by_ci&quot;: true
+  },
+  &quot;scripted&quot;: false
 }</pre>
 <h3>The deployed agent's entry</h3>
 <script type="application/json" id="agent-answer">
@@ -301,7 +332,8 @@
   <p>This demo produces the evidence a validation would need. It is not medical information: the agent assesses
      regulatory impact on labeling and never answers a treatment question (SPEC/00 §2). The authority for what this demo claims is
      <code>SPEC/00-overview.md</code>; what was measured is in <code>milestones/README.md</code>. No number on this page is a
-     measured result: the row's and the clause's numbers are their own data, and the call record's are the CI run's, linked above.</p>
+     measured result: the row's and the clause's numbers are their own data, and the run record's and the call record's are
+     the CI runs', linked above.</p>
 </footer>
 </body>
 </html>
