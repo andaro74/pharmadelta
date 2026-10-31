@@ -3,6 +3,11 @@
   "baseline": "src/baseline/ of this repository: answer.py, keyword matching over the question, the table and the clauses; run.py, the runner. No model, no network, no randomness. Frozen at tag m00 and never improved (SPEC/00 P5). It is the control the agent is compared with. It is a keyword matcher, not an assistant, and the page says so (milestones/M00/rulings/pr2.md 1).",
   "company": "Ardentia Generics is fictional; its portfolio and every 'our label' statement are invented (SPEC/00 §2, §9)",
   "data_commit": "595dd68",
+  "lift": {
+    "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41250971500",
+    "artifact": "m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09",
+    "written_from": "observations.json and result.json in that artifact; `uv run python -m src.m04.lift write --from <dir>` rebuilds this file and pages/side-by-side.html from them"
+  },
   "answers": [
     {
       "id": "g-001",
@@ -47,9 +52,16 @@
         "existence_checked_by_hand_on": "2026-10-09",
         "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
       },
-      "run": null,
-      "scripted": true,
-      "PLANT": "M04 PR 1 (milestones/M04/README.md, 'The false state'): this answer was written by hand. No run of the baseline produced it: `run` is null. It is an illustration (SPEC/00 §11, P8). Lifted in the PR the milestone names, when the entry carries the record of the CI run of src.baseline.run that produced it."
+      "run": {
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41250971500",
+        "artifact": "m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09",
+        "commit": "36c453aa306377137a324e9a1f340af1fb3c7e09",
+        "baseline_commit": "df860b7f67d44947bf1c6c53b4c38f0322c32ce5",
+        "started_at": "2026-10-31T23:04:49+00:00",
+        "method": "keyword matching; see src/baseline/answer.py",
+        "written_by_ci": true
+      },
+      "scripted": false
     }
   ]
 }
