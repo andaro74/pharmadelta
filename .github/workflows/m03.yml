@@ -1,0 +1,77 @@
+# The M03 gate (milestones/README.md row 4, F3.1).
+#
+# Reads what the public API serves (pages/api/answers.json) and what the
+# detail page shows (the id="answer" block of pages/detail.html), names
+# every served answer that carries no call record and every page answer
+# the API does not serve; then signs in to label-impact's identity pool as
+# the caller `pharmadelta` and asks the deployed agent each served answer's
+# question through its door, comparing each called answer with the door's.
+# Writes the result as the artifact `m03-gate-<sha>`. The job fails when
+# the verdict is not GREEN. Only what this workflow writes is evidence
+# (SPEC/00 P4); a local run of the same command is not.
+#
+# What it reads, and with what: Cognito's InitiateAuth endpoint in
+# us-west-2 (USER_PASSWORD_AUTH on the pool's callers client: no AWS
+# credential, no client secret) and the door's URL, an API Gateway HTTP API
+# in us-west-2 (agentkeel SPEC/10 §2, R2), with a bearer token the sign-in
+# issued for this run. The secret M03_DOOR_PASSWORD is the caller's
+# password, set by the owner by hand in the pool (agentkeel M10 README item
+# 4) and in this repository's secrets; the variables M03_DOOR_URL,
+# M03_DOOR_POOL_ID and M03_DOOR_CALLERS_CLIENT_ID are the stack's outputs
+# and the pool's callers client, none a credential. The gate reads them
+# from its environment and writes none of them. A pull request from a fork
+# gets no secret, so that run reads UNSCORABLE unless an answer is uncalled.
+# Never SigV4, never the runtime's ARN, never the door client's secret.
+# gate.yml (M00), m01.yml (M01) and m02.yml (M02) are unchanged.
+
+name: m03
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m03-gate:
+    name: M03 gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      # The artifact directory exists before anything can crash, so the
+      # upload below always has a directory to read (M00 PR 3, Q3 b).
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m03-gate"
+
+      # The gate writes result.json whenever its `main` runs: UNSCORABLE with
+      # the error when a served file, the pool or the door could not be read
+      # and nothing is RED. A failure before `main` (an import error) exits 1
+      # with no file, and the upload below then fails on if-no-files-found.
+      - name: Read the served answers and the page; sign in as pharmadelta; ask the agent through its door; judge row 4
+        env:
+          M03_DOOR_PASSWORD: ${{ secrets.M03_DOOR_PASSWORD }}
+          M03_DOOR_URL: ${{ vars.M03_DOOR_URL }}
+          M03_DOOR_POOL_ID: ${{ vars.M03_DOOR_POOL_ID }}
+          M03_DOOR_CALLERS_CLIENT_ID: ${{ vars.M03_DOOR_CALLERS_CLIENT_ID }}
+        run: >
+          uv run python -m src.m03.gate
+          --out-dir "$RUNNER_TEMP/m03-gate"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Write the result as a CI artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: m03-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/m03-gate/
+          if-no-files-found: error
+          retention-days: 90
