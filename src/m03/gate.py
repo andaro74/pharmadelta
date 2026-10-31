@@ -33,7 +33,10 @@ Reads `pages/api/answers.json`, the public API's served answers, and the
 5. `answers_differing`: every served answer that carries a call record
    and whose `table_row`, `clause_id` or `answer_fields` is not what the
    door's `parsed` holds on this run (M03 Unsure 5: the run's own call).
-   A served answer of null equals a `parsed` of null.
+   A served answer of null equals a `parsed` of null. A served answer
+   that is neither null nor an object, or whose `answer_fields` is not
+   an object, cannot be compared: it is recorded as not read, so a RED
+   on another served answer still comes first (M03 PR 3, Defect 1).
 
 The verdict is ledger row 4's F3.1 and nothing else:
 
@@ -41,8 +44,9 @@ The verdict is ledger row 4's F3.1 and nothing else:
   GREEN       every served answer carries a call record as `pharmadelta`, every page answer is an
               API entry, and every served answer equals the door's answer on this run.
   UNSCORABLE  nothing is RED and: a served file could not be read or parsed, the API serves no
-              answer, the environment lacks the secret or a variable, the sign-in failed, or the
-              door answered anything but 200 for a called answer. Never RED, never GREEN.
+              answer, a served answer is neither null nor an object, the environment lacks the
+              secret or a variable, the sign-in failed, or the door answered anything but 200 for
+              a called answer. Never RED, never GREEN.
 
 Hosts: the sign-in goes to `cognito-idp.us-west-2.amazonaws.com` and the
 call to the door's URL, which must be https on a host under
@@ -217,6 +221,18 @@ def call_record_check(entry: dict) -> dict:
     return {"has_record": True, "why": "a call record as pharmadelta, every field present"}
 
 
+def served_answer_check(answer: Any) -> str | None:
+    """Why a served `answer` cannot be compared, or None. Null and an object are compared; anything else is not read (PR 3, Defect 1)."""
+    if answer is None:
+        return None
+    if not isinstance(answer, dict):
+        return f"the served answer is a {type(answer).__name__}, not null or an object, and cannot be compared"
+    fields = answer.get("answer_fields")
+    if fields is not None and not isinstance(fields, dict):
+        return f"the served answer's answer_fields is a {type(fields).__name__}, not an object, and cannot be compared"
+    return None
+
+
 def uncalled(served: list[dict]) -> tuple[list[str], dict[str, dict]]:
     checks = {a["id"]: call_record_check(a) for a in served}
     return [i for i, c in checks.items() if not c["has_record"]], checks
@@ -370,14 +386,18 @@ def compare(served_answer: Any, door_parsed: Any) -> dict:
     door = door_answer(door_parsed)
     if served_answer is None and door is None:
         return {"equal": True, "why": "the served answer is null and the door parsed no answer", "fields": {}}
+    if served_answer is not None and not isinstance(served_answer, dict):
+        return {"equal": False, "why": "the served answer is not null or an object and cannot be compared", "fields": {}, "served": served_answer, "door": door}
     if served_answer is None or door is None:
         return {"equal": False, "why": "one side has an answer and the other has none", "fields": {}, "served": served_answer, "door": door}
+    served_fields = served_answer.get("answer_fields")
+    served_fields = served_fields if isinstance(served_fields, dict) else {}
     fields = {}
     for name in ("table_row", "clause_id"):
         s, d = served_answer.get(name), door.get(name)
         fields[name] = {"equal": s == d, "served": s, "door": d}
     for f in ANSWER_FIELDS:
-        s, d = (served_answer.get("answer_fields") or {}).get(f), door["answer_fields"].get(f)
+        s, d = served_fields.get(f), door["answer_fields"].get(f)
         fields[f"answer_fields.{f}"] = {"equal": s == d, "served": s, "door": d}
     unequal = [k for k, v in fields.items() if not v["equal"]]
     return {"equal": not unequal, "why": "all equal" if not unequal else f"differs on {unequal}", "fields": fields, "unequal": unequal}
@@ -427,7 +447,7 @@ def summary_markdown(result: dict) -> str:
             parsed = d.get("parsed")
             parsed_s = "null" if parsed is None else ("object" if isinstance(parsed, dict) else type(parsed).__name__)
             cmp = e.get("comparison")
-            cmp_s = "not compared (uncalled)" if cmp is None else ("equal" if cmp["equal"] else cmp["why"])
+            cmp_s = f"not compared: {e.get('not_compared') or 'no call record'}" if cmp is None else ("equal" if cmp["equal"] else cmp["why"])
             page = e.get("page_equal")
             lines.append(f"| {e['id']} | {'yes' if e['call_record']['has_record'] else 'no: ' + e['call_record']['why']} | {'not shown' if page is None else ('yes' if page else 'no')} | {d.get('status') if d.get('asked') else 'not asked'} | {d.get('request_id_header') or 'none'} | {d.get('stop_reason') or ''} | {parsed_s} | {cmp_s} |")
         lines.append("")
@@ -490,16 +510,22 @@ def run(args: argparse.Namespace) -> int:
         else:
             entry["door"] = {"asked": False, "why": "no token" if token is None else "the served answer has no question string"}
         door = entry["door"]
-        if checks[a["id"]]["has_record"]:
-            if door.get("asked") and door.get("status") == 200 and not door.get("error") and not door.get("refused"):
-                entry["comparison"] = compare(a.get("answer"), door.get("parsed"))
-                if not entry["comparison"]["equal"]:
-                    differing_ids.append(a["id"])
-            else:
-                entry["comparison"] = None
-                unreadable.append(f"{a['id']}: a called answer that was not compared: " + (f"the door answered {door.get('status')} ({door.get('error') or door.get('refused')})" if door.get("asked") else f"not asked ({door.get('why')})"))
+        shape = served_answer_check(a.get("answer"))
+        entry["answer_shape"] = shape or "null or an object; can be compared"
+        if shape:
+            unreadable.append(f"{a['id']}: {shape}")
+        if not checks[a["id"]]["has_record"]:
+            entry["comparison"], entry["not_compared"] = None, "no call record"
+        elif shape:
+            entry["comparison"], entry["not_compared"] = None, shape
+        elif door.get("asked") and door.get("status") == 200 and not door.get("error") and not door.get("refused"):
+            entry["comparison"] = compare(a.get("answer"), door.get("parsed"))
+            if not entry["comparison"]["equal"]:
+                differing_ids.append(a["id"])
         else:
             entry["comparison"] = None
+            entry["not_compared"] = f"the door answered {door.get('status')} ({door.get('error') or door.get('refused')})" if door.get("asked") else f"not asked ({door.get('why')})"
+            unreadable.append(f"{a['id']}: a called answer that was not compared: {entry['not_compared']}")
         entries.append(entry)
 
     result = {
