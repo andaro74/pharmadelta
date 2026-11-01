@@ -52,7 +52,13 @@ The verdict is ledger row 6's F5.1 and nothing else:
               GREEN.
 
 RED comes first. Nothing that fails after the served file was read turns a
-RED into UNSCORABLE.
+RED into UNSCORABLE. PR 3 (the cold review of #28) made that hold for the
+sign-in and the door: a failure M03's `sign_in` or `ask_door` does not catch
+itself (http.client's exceptions are not OSError; a Cognito body that is not
+an object) is recorded as a sign-in or a door reading that was not made, and
+a door URL `urlsplit` cannot parse is recorded by the exception's type alone,
+because its message can quote the URL. The lists stand; `unreadable` names
+what was not read.
 
 Hosts: the sign-in goes to Cognito in us-west-2 and the call to the door's
 URL, which M03's `check_url` holds to https under
@@ -263,10 +269,28 @@ def disagreed(served: list[dict], shown: list[dict]) -> tuple[list[str], list[di
 
 
 # ---------------------------------------------------------------- the door
+def sign_in_guarded(pool_id: str, client_id: str, password: str) -> tuple[str | None, dict]:
+    """M03's `sign_in`; a failure its own except clauses do not catch is a sign-in not made, recorded as its type, never raised (PR 3)."""
+    try:
+        return sign_in(pool_id, client_id, password)
+    except Exception as exc:  # noqa: BLE001  http.client's exceptions are not OSError; a body that is not an object raises on .get
+        return None, {"flow": "USER_PASSWORD_AUTH", "username": SUBJECT, "signed_in": False, "status": None, "error": type(exc).__name__, "message": str(exc)[:200]}
+
+
+def ask_door_guarded(url: str, token: str, question: str) -> dict:
+    """M03's `ask_door`; a failure its own except clauses do not catch is a reading not made, in the shape of its own transport error (PR 3)."""
+    try:
+        return ask_door(url, token, question)
+    except Exception as exc:  # noqa: BLE001  the same classes as above; the token is in no exception's message
+        return {"asked": True, "status": None, "error": f"{type(exc).__name__}: {exc}"[:300], "parsed": None, "stop_reason": None}
+
+
 def stop_reading(door: dict) -> dict:
     """What the door's body says about a stop, from the fields it carried. Reads; defines nothing."""
     if not door.get("asked"):
         return {"read": False, "why": f"not asked ({door.get('why')})", "stopped": None, "rules_named": None}
+    if door.get("status") is None:
+        return {"read": False, "why": f"the door did not answer ({door.get('error')})", "stopped": None, "rules_named": None}
     if door.get("status") != 200 or door.get("error"):
         return {"read": False, "why": f"the door answered {door.get('status')} ({door.get('error') or door.get('refused')})", "stopped": None, "rules_named": None}
     topics = door.get("guardrail_topics")
@@ -334,6 +358,7 @@ def summary_markdown(result: dict) -> str:
         s = result["sign_in"]
         lines += [f"Sign-in as `{s.get('username')}`: signed in `{s.get('signed_in')}`" + (f", status `{s.get('status')}`" if s.get("status") is not None else "") + (f", `{s.get('error')}`" if s.get("error") else "") + ".", ""]
     if result.get("served"):
+        page_read = (result.get("page") or {}).get("read", True)
         lines += ["| served | shown blocked | call record | trace | page equal | door status | stop_reason | rules named | compared |", "|---|---|---|---|---|---|---|---|---|"]
         for e in result["served"]:
             d, stop = e.get("door") or {}, e.get("stop") or {}
@@ -343,11 +368,12 @@ def summary_markdown(result: dict) -> str:
             rules = stop.get("rules_named")
             call_s = "yes" if e["call_record"]["has_record"] else "no: " + e["call_record"]["why"]
             trace_s = "yes" if e["trace"]["has_trace"] else "no: " + e["trace"]["why"]
-            page_s = "not shown" if page is None else ("yes" if page else "no")
+            page_s = "page not read" if not page_read else ("not shown" if page is None else ("yes" if page else "no"))
+            door_s = "not asked" if not d.get("asked") else ("no answer" if d.get("status") is None else d.get("status"))
             rules_s = "" if rules is None else (", ".join(rules) or "none")
             lines.append(
                 f"| {e['id']} | {'yes' if e['shown_blocked'] else 'no'} | {call_s} | {trace_s} | {page_s} "
-                f"| {d.get('status') if d.get('asked') else 'not asked'} | {stop.get('stop_reason') or ''} | {rules_s} | {cmp_s} |"
+                f"| {door_s} | {stop.get('stop_reason') or ''} | {rules_s} | {cmp_s} |"
             )
         lines.append("")
     if result.get("unreadable"):
@@ -397,8 +423,12 @@ def run(args: argparse.Namespace) -> int:
         except Unscorable as exc:
             sign_in_record = {"username": SUBJECT, "signed_in": False, "error": "door URL refused", "message": str(exc)}
             unreadable.append(f"the door: {exc}")
+        except Exception as exc:  # noqa: BLE001  urlsplit raises ValueError on a URL it cannot parse, with a message that can quote it: the type alone is written
+            why = f"the door URL could not be parsed: {type(exc).__name__}"
+            sign_in_record = {"username": SUBJECT, "signed_in": False, "error": "door URL refused", "message": why}
+            unreadable.append(f"the door: {why}")
         else:
-            token, sign_in_record = sign_in(env["pool_id"], env["client_id"], env["password"])
+            token, sign_in_record = sign_in_guarded(env["pool_id"], env["client_id"], env["password"])
             if token is None:
                 unreadable.append(f"the sign-in failed: {sign_in_record.get('error')} ({sign_in_record.get('message')})")
     else:
@@ -409,7 +439,7 @@ def run(args: argparse.Namespace) -> int:
         check = checks[s["id"]]
         entry: dict[str, Any] = {"id": s["id"], "kind": s.get("kind"), **check, "page_equal": page_equal.get(s["id"])}
         if token is not None and isinstance(s.get("question"), str):
-            entry["door"] = ask_door(env["url"], token, s["question"])
+            entry["door"] = ask_door_guarded(env["url"], token, s["question"])
         else:
             entry["door"] = {"asked": False, "why": "no token" if token is None else "the served scenario has no question string"}
         entry["stop"] = stop_reading(entry["door"])
