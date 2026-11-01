@@ -1,0 +1,94 @@
+# The M05 gate (milestones/README.md row 6, F5.1).
+#
+# Reads what the break page serves (pages/api/break-it.json) and what it
+# shows (the id="scenario-<id>" blocks of pages/break-it.html), names
+# every scenario shown as blocked that carries no call record or no
+# guardrail trace naming the rule, and every page scenario the file does
+# not serve; then signs in to label-impact's identity pool as the caller
+# `pharmadelta` and asks the deployed agent each scenario's question
+# through its door, traced or not, reading the door's body for a stop and
+# the rules it names, and compares each traced scenario with the door's.
+# Writes the result as the artifact `m05-gate-<sha>`. The job fails when
+# the verdict is not GREEN. Only what this workflow writes is evidence
+# (SPEC/00 P4); a local run of the same command is not.
+#
+# What it reads, and with what: the same two hosts m03.yml reads, with the
+# same sign-in and the same call (src/m03/gate.py's sign_in and ask_door,
+# imported by src/m05/gate.py, not copied), the same secret
+# M03_DOOR_PASSWORD and the same three variables M03_DOOR_URL,
+# M03_DOOR_POOL_ID and M03_DOOR_CALLERS_CLIENT_ID. No secret and no
+# variable is added. The gate reads them from its environment and writes
+# none of them; before upload the result is grepped for the door's host
+# suffix and the pool id's prefix and the job fails on a match, so a
+# result that names either is never written as an artifact. A pull
+# request from a fork gets no secret, so that run reads UNSCORABLE unless
+# a scenario is untraced or disagreed. Never SigV4, never the runtime's
+# ARN, never the door client's secret. gate.yml (M00), m01.yml (M01),
+# m02.yml (M02), m03.yml and m03-lift.yml (M03) and m04.yml (M04) are
+# unchanged.
+
+name: m05
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m05-gate:
+    name: M05 gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      # The artifact directory exists before anything can crash, so the
+      # upload below always has a directory to read (M00 PR 3, Q3 b).
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m05-gate"
+
+      # The gate writes result.json whenever its `main` runs: UNSCORABLE with
+      # the error when a served file, the pool or the door could not be read
+      # and nothing is RED. A failure before `main` (an import error) exits 1
+      # with no file, and the upload below then fails on if-no-files-found.
+      - name: Read the served scenarios and the page; sign in as pharmadelta; ask the agent through its door; judge row 6
+        env:
+          M03_DOOR_PASSWORD: ${{ secrets.M03_DOOR_PASSWORD }}
+          M03_DOOR_URL: ${{ vars.M03_DOOR_URL }}
+          M03_DOOR_POOL_ID: ${{ vars.M03_DOOR_POOL_ID }}
+          M03_DOOR_CALLERS_CLIENT_ID: ${{ vars.M03_DOOR_CALLERS_CLIENT_ID }}
+        run: >
+          uv run python -m src.m05.gate
+          --out-dir "$RUNNER_TEMP/m05-gate"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      # The result must name no door host and no pool id (M03 Unsure 12; at
+      # M03 and M04 this grep was made by hand on the downloaded artifact).
+      # Runs whether the gate passed or failed; a match fails the job and
+      # the upload below does not run, so the file is never an artifact.
+      - name: Check the result names no door host and no pool id
+        id: redact
+        if: always()
+        run: |
+          if grep -rqE 'execute-api|us-west-2_' "$RUNNER_TEMP/m05-gate"; then
+            echo "::error::the result names the door's host or the pool id; not uploaded"
+            exit 1
+          fi
+          echo "no match"
+
+      - name: Write the result as a CI artifact
+        if: ${{ !cancelled() && steps.redact.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: m05-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/m05-gate/
+          if-no-files-found: error
+          retention-days: 90
