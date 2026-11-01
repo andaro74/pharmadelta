@@ -880,6 +880,58 @@ expected GREEN, `M01 gate` PENDING and not required, and `M03 gate` and
   four matches in the gate step's `env`.
 - `git ls-files --eol` reads `i/lf w/lf` on every file this PR touches.
 
+### Observed (CI run, 2026-11-01 UTC)
+
+The first run on this PR,
+[41267158120](https://github.com/andaro74/pharmadelta/actions/runs/41267158120),
+wrote the artifact `m05-gate-84e2d6fcbbaea340d467ec25e92d6e69e5c53f91`
+(the sha is the pull request's merge ref; the branch head was
+`d49b923`). It holds `result.json`, read with `gh run download` in this
+session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F5.1 holds: scenarios g-005, g-006 are shown as blocked with no call record or no trace naming the rule" |
+| `scenarios_untraced` | `["g-005", "g-006"]`: `call is null`, `guardrail is null` on both |
+| `scenarios_disagreed` | `[]`: both page scenarios equal the file's entries as parsed JSON, each in the block named for its id |
+| `scenarios_differing` | `[]`: nothing compared, `not_compared` "no call record" on both |
+| `unreadable` | `[]` |
+| `env_set` | all four true; no value of any in the file. The grep step passed before the upload; the downloaded file grepped again here for `execute-api` and `us-west-2_`: no match |
+| `sign_in` | `signed_in` true, status 200, `token_use` `access`, `token_username` `pharmadelta`, `expires_in` 3600, 716 ms |
+| `door[0]`, g-005's question | status 200; `request_id` `GI-NFgI7PHcEPvw=` in `apigw-requestid`; `stop_reason` `end_turn`; `refused` null; `guardrail_topics` `[]`; `error` null; `parsed` `{"table_row": null, "clause_id": null, "impacted": false, "owed": "none", "escalate": false}`; `latency_ms` 4325, 7954 ms wall; `usage` 3555 in, 237 out; one `find_label_row` call with `section` the number `5`, refused; the text is in the artifact and is copied nowhere (Unsure 22) |
+| `door[1]`, g-006's question | status 200; `request_id` `GI-OVh5qvHcEPNQ=` in `apigw-requestid`; `stop_reason` `end_turn`; `refused` null; `guardrail_topics` `[]`; `error` null; `parsed` `{"table_row": "metformin.bw", "clause_id": "314.150(b)(10)", "impacted": false, "owed": "follow-rld", "escalate": false}`; `latency_ms` 7578, 13655 ms wall; `usage` 6169 in, 441 out; two `find_label_row` calls, `5.1` refused then `"bw"` found |
+| `served[i].stop` | `read` true, `stopped` false, `rules_named` `[]`, both fields present, on both |
+| `written_by_ci` | `true`; `commit` `84e2d6f`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/29/merge`; `run_at` `2026-11-01T02:56:40+00:00`; exit 1; the `M05 gate` job failed at the gate step; the grep step and the upload step succeeded. On the same head `M00 gate` passed ([41267158149](https://github.com/andaro74/pharmadelta/actions/runs/41267158149)), `M02 gate` passed ([41267158041](https://github.com/andaro74/pharmadelta/actions/runs/41267158041)), `M01 gate` failed, not required ([41267158044](https://github.com/andaro74/pharmadelta/actions/runs/41267158044)) |
+
+Equals the expected result above on every field. The plant is still
+named as ledger row 6 expects, and the repair changed nothing on it: the
+RED is the missing call record and the missing trace, nothing else. The
+door's reading is the fourth in four CI runs to read `end_turn` and
+`guardrail_topics` `[]` on both questions, with the same `parsed` on
+each; the platform's guardrail stopped neither (Unsure 16, 18). Nothing
+the repair added appears in this result, as expected: no sign-in or
+door call failed outside M03's own `except` clauses.
+
+The `M03 gate` on the same head,
+[41267158074](https://github.com/andaro74/pharmadelta/actions/runs/41267158074),
+artifact `m03-gate-84e2d6fcbbaea340d467ec25e92d6e69e5c53f91`, read
+`GREEN`: `answers_uncalled` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`, `unreadable` `[]`; sign-in 200, 607 ms; the
+door 200, `request_id` `GI-NFhuDPHcEMVw=`, `stop_reason` `tool_use`,
+`parsed` null after three refused `find_label_row` calls with `section`
+the number `8.1` (M03 Unsure 23), `latency_ms` 4837, 13161 ms wall, 5591
+in, 279 out; "the served answer is null and the door parsed no answer";
+grepped for `execute-api` and `us-west-2_`: no match. The `M04 gate`,
+[41267158085](https://github.com/andaro74/pharmadelta/actions/runs/41267158085),
+artifact `m04-gate-84e2d6fcbbaea340d467ec25e92d6e69e5c53f91`, read
+`GREEN`: `answers_unrun` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`, `agent_disagreed` `[]`, `baseline_changed`
+false, `served_read` true, tag `m00` at `e94b76b`, `baseline_commit`
+`df860b7`, six observations at `84e2d6f`. Both are readings after their
+measurements; neither reopens row 4 or row 5 (M03 `rulings/pr4.md` 6,
+22; M04 `rulings/pr4.md` 22). Recorded here and in a comment on #29,
+not in a ledger cell.
+
 ## Unsure (PR 3)
 
 Numbering continues from PR 2's. Each needs a seat's ruling. None blocks
