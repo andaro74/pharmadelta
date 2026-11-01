@@ -364,7 +364,7 @@ def api_document(old: dict, doc: dict, entries: list[dict], data_commit: str) ->
             "platform's (SPEC/00 §2, §3; ledger row P). What a trace names is the platform's to say; this file copies it.",
         ),
         "company": old.get("company", "Ardentia Generics is fictional; its portfolio and every 'our label' statement are invented (SPEC/00 §2, §9)"),
-        "goldens_commit": old.get("goldens_commit"),
+        "goldens_commit": git("log", "-1", "--format=%h", "--", "goldens/"),
         "data_commit": data_commit,
         "lift": {
             "run_url": ci.get("run_url"),
