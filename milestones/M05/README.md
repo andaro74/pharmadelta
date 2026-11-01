@@ -1030,6 +1030,93 @@ shown: on g-006 as the answer with its row and its clause, on g-005
 verbatim under "No row found", because an answer is shown only with its
 row and its clause (SPEC/00 §11). `rulings/pr4.md` 2.
 
+### The lift path (rulings/pr2.md 13, carried at PR 3)
+
+M03's path (b), as ruled at PR 2 on reading run 41264751470: a CI run
+with `permissions: contents: read` writes the two calls and the door's
+bodies as an artifact, and a writer in `src/m05/` rebuilds the file and
+the page from it by hand, with the artifact and the run named in each
+record. Either way the call is CI's as `pharmadelta`; a local call is
+not a record (P4). No workflow of this repository writes to a branch.
+
+- `.github/workflows/m05-lift.yml`: `permissions: contents: read`. One
+  job: `uv sync --locked`, then `uv run python -m src.m05.lift call`
+  with the secret `M03_DOOR_PASSWORD` and the variables `M03_DOOR_URL`,
+  `M03_DOOR_POOL_ID`, `M03_DOOR_CALLERS_CLIENT_ID` in that step's `env`,
+  the four names `m03.yml` and `m05.yml` pass and no other; then the
+  grep step `m05.yml` has (`execute-api`, `us-west-2_`, `if: always()`,
+  fail on a match); then the artifact `m05-lift-<sha>` holding
+  `call.json`, uploaded only when the grep passed, 90 days. Runs by
+  hand (`workflow_dispatch`) and once on a push that adds or edits its
+  own file on a branch other than `main`, because a dispatch needs the
+  file on the default branch and the lift's call is made before this PR
+  merges (M03 Unsure 32's shape).
+- `src/m05/lift.py call`: reads the scenarios `pages/api/break-it.json`
+  serves, signs in and asks the door with `src/m03/gate.py`'s `sign_in`
+  and `ask_door`, wrapped as `src/m05/gate.py`'s `sign_in_guarded` and
+  `ask_door_guarded` wrap them (imported, not copied), reads each body
+  with the gate's `stop_reading` (imported), and writes `call.json`:
+  provenance (`commit`, `written_by_ci`, `ci`, `env_set` as four
+  booleans), the sign-in's record, and per scenario the call record
+  (M03's eight fields: `subject` `pharmadelta`, `issuer` `self`,
+  `door_host` the SHA-256 of the host as M03 Unsure 12 ruled,
+  `request_id` from `apigw-requestid`, `called_at` UTC, `agent`
+  `label-impact`, `agent_commit` `8cf0563`, `run_url`), the door's full
+  reading, the stop reading, the trace record (`stopped`, `rule`,
+  `request_id`, `read_from`, `written_by_ci`) as the body gives it,
+  `stopped` false and `rule` null when the guardrail did not fire, and
+  `rule` the first of `guardrail_topics` when it did (Unsure 31);
+  `blocked` true only when the guardrail stopped the question and the
+  trace names the rule (SPEC/00 §7); and `answer`, the door's `parsed`
+  in the served shape, or null. Exit 0 when every call answered 200
+  with an observation, every stop was read and every record is
+  complete; else 2 and `call.json` says why. Nothing of the URL, the
+  pool id, the client id, the password or the token is written; a
+  failure of the URL check is written by the exception's type alone
+  (PR 3's reading).
+- `src/m05/lift.py write --from <dir>`: by hand, from the downloaded
+  artifact. Refuses a `call.json` whose `written_by_ci` is false or
+  whose `ok` is false. Rebuilds `pages/api/break-it.json` and
+  `pages/break-it.html`: `blocked` what the trace says, `call` and
+  `guardrail` the records, `agent` the record, `answer` the door's
+  parsed object or null, `row` and `clause` copied from `data/` at its
+  last commit only when the table holds the `table_row` and the clauses
+  hold the `clause_id`, else null with `why_none`, `door` the status,
+  the request id header, `stop_reason`, `guardrail_topics` and `parsed`
+  (not `text`, Unsure 22), `scripted` false, no `PLANT` key; the file
+  names `data_commit` and, under `lift`, the run and the artifact. The
+  page shows each question, "Not stopped by the platform's guardrail"
+  with the stop reading (or "Stopped" with the rule, when a trace
+  names one), the answer only with its row and its clause, else "No
+  row found" with why and the `parsed` object verbatim, the call record
+  with `run_url` as a link, the trace record, the door's status and
+  stop fields, and the same object in its `id="scenario-<id>"` block.
+  No scripted banner, because nothing scripted remains (P8). The
+  injection's paragraph on g-006 stays. Deterministic, LF pinned in the
+  writer (M03 Unsure 33).
+
+Construction, not evidence (P4): before the first push, `call` with no
+environment wrote `ok` false, `written_by_ci` false, `env_set` four
+false, `calls` `[]`, exit 2, and `write` refused it. A stub `call.json`
+in the session's scratch directory, built from the door readings of run
+41268444478's `result.json` with `written_by_ci` set true by hand and
+a made-up `door_host`, rendered two pages: `write` twice into two
+directories, byte-identical, LF only; the gate on them with no
+environment read `scenarios_untraced` `[]` (neither shown as blocked,
+Unsure 17; the trace reads "lacks `rule`" and names nothing), `page
+equal` yes on both, `scenarios_disagreed` `[]`, `scenarios_differing`
+`[]`, `UNSCORABLE` for the missing environment, exit 2; its block
+pattern matched `g-005` and `g-006`. The same stub with both stops
+written as `guardrail_intervened` under a made-up rule rendered both as
+blocked with the rule named, and the gate read both traced, `UNSCORABLE`
+with "not asked (no token)" on each. A stub with `ok` false and one
+with `written_by_ci` false were refused by `write`. The rendered pages
+grepped for the six words of SPEC/00 §11, `PLANT`, `"scripted": true`,
+`class="scripted"`, `execute-api` and `us-west-2_`: no match. No
+sign-in was possible outside Actions and none was made; the stubs are
+not committed (M01 Unsure 21's reading). None of these readings decides
+anything.
+
 ## Unsure (PR 3)
 
 Numbering continues from PR 2's. Each needs a seat's ruling. None blocks

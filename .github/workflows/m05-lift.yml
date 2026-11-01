@@ -1,0 +1,90 @@
+# The M05 lift call (milestones/M05/README.md, "Close (PR 4)"; rulings/pr2.md 13).
+#
+# Sends each "Try to break it" scenario pages/api/break-it.json serves
+# through the deployed agent's door: signs in to label-impact's identity
+# pool as the caller `pharmadelta`, asks the agent each scenario's
+# question, reads the door's body for a stop and the rules it names, and
+# writes the call record, the trace record and the door's reading as the
+# artifact `m05-lift-<sha>` (call.json). It commits nothing: the pages are
+# rebuilt from that artifact by hand with `uv run python -m src.m05.lift
+# write` and committed in the pull request, which names this run. Only
+# what this workflow writes is a record (SPEC/00 P4); a local call is not.
+#
+# Reads the same four names as m05.yml and m03.yml, from the call step's
+# env only: the secret M03_DOOR_PASSWORD and the variables M03_DOOR_URL,
+# M03_DOOR_POOL_ID and M03_DOOR_CALLERS_CLIENT_ID. Writes none of them:
+# the record carries the SHA-256 of the door URL's host, never the host
+# (M03 Unsure 12). Before upload the record is grepped for the door's host
+# suffix and the pool id's prefix and the job fails on a match, as m05.yml
+# does, so a record that names either is never an artifact. Never SigV4,
+# never the runtime's ARN, never the door client's secret. `permissions`
+# stays `contents: read`: no workflow of this repository writes to a
+# branch.
+#
+# Runs by hand (workflow_dispatch), and once on a push that adds or edits
+# this file on a branch other than main, because a dispatch needs the
+# file on the default branch and the lift is made before it is there
+# (M03 Unsure 32's shape). gate.yml (M00), m01.yml (M01), m02.yml (M02),
+# m03.yml and m03-lift.yml (M03), m04.yml (M04) and m05.yml (the gate)
+# are unchanged.
+
+name: m05-lift
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [main]
+    paths: ['.github/workflows/m05-lift.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  m05-lift:
+    name: M05 lift call
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m05-lift"
+
+      # call.json is written whenever the step ran: with `ok` false and why
+      # when the environment, the sign-in or the door did not give a record.
+      - name: Sign in as pharmadelta; ask the agent each served scenario's question through its door; read the stop; write the record
+        env:
+          M03_DOOR_PASSWORD: ${{ secrets.M03_DOOR_PASSWORD }}
+          M03_DOOR_URL: ${{ vars.M03_DOOR_URL }}
+          M03_DOOR_POOL_ID: ${{ vars.M03_DOOR_POOL_ID }}
+          M03_DOOR_CALLERS_CLIENT_ID: ${{ vars.M03_DOOR_CALLERS_CLIENT_ID }}
+        run: >
+          uv run python -m src.m05.lift call
+          --out-dir "$RUNNER_TEMP/m05-lift"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      # The record must name no door host and no pool id (M03 Unsure 12).
+      # Runs whether the call passed or failed; a match fails the job and
+      # the upload below does not run, so the file is never an artifact.
+      - name: Check the record names no door host and no pool id
+        id: redact
+        if: always()
+        run: |
+          if grep -rqE 'execute-api|us-west-2_' "$RUNNER_TEMP/m05-lift"; then
+            echo "::error::the record names the door's host or the pool id; not uploaded"
+            exit 1
+          fi
+          echo "no match"
+
+      - name: Write the call record as a CI artifact
+        if: ${{ !cancelled() && steps.redact.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: m05-lift-${{ github.sha }}
+          path: ${{ runner.temp }}/m05-lift/
+          if-no-files-found: error
+          retention-days: 90
