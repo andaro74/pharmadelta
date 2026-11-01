@@ -1361,6 +1361,64 @@ label-impact's. When the rules land, one PR outside any cap re-runs
 the gate reads whether the door stops each question again under the
 rule its trace names.
 
+### Observed (CI run, 2026-11-01 UTC)
+
+The first run on this PR,
+[41362159234](https://github.com/andaro74/pharmadelta/actions/runs/41362159234),
+on the merge ref `ca21bbd` (branch head `31bfa12`, the close commit),
+artifact `m05-gate-ca21bbdb113d0010dcc6b47e2b580ae36d8c76a1`. It holds
+`result.json`, read with `gh run download` into a fresh directory and
+`python -I` in this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `GREEN`; `reason` "F5.1 does not hold: every scenario shown as blocked carries a call record as pharmadelta and a trace naming the rule, every page scenario is the file's entry, and the door stopped every traced scenario again under that rule on this run" |
+| `scenarios_untraced` | `[]`: `shown_blocked` false on both; `call_record` "a call record as pharmadelta, every field present" on both; `trace` "guardrail lacks ['rule']" on both, named by no list because neither is shown as blocked (Unsure 17, 37) |
+| `scenarios_disagreed` | `[]`: both page blocks equal the file's entries as parsed JSON, each in the block named for its id |
+| `scenarios_differing` | `[]`: nothing compared, `not_compared` "no trace naming a rule" on both |
+| `unreadable` | `[]` |
+| `env_set` | all four true; no value of any in the file. The grep step passed before the upload; the downloaded file grepped again here for `execute-api` and `us-west-2_`: no match |
+| `sign_in` | `signed_in` true, status 200, `token_use` `access`, `token_username` `pharmadelta`, `expires_in` 3600, 500 ms |
+| `door[0]`, g-005's question | status 200; `request_id` `GLygqhrDvHcEPxA=` in `apigw-requestid`; `stop_reason` `end_turn`; `refused` null; `guardrail_topics` `[]`; `error` null; `parsed` `{"table_row": null, "clause_id": null, "impacted": false, "owed": "none", "escalate": false}`; `latency_ms` 4307, 12028 ms wall; `usage` 3555 in, 237 out; one `find_label_row` call with `section` the number `5`, refused; the text is in the artifact and is copied nowhere (Unsure 22) |
+| `door[1]`, g-006's question | status 200; `request_id` `GLyiignKvHcEPxg=` in `apigw-requestid`; `stop_reason` `end_turn`; `refused` null; `guardrail_topics` `[]`; `error` null; `parsed` `{"table_row": "metformin.bw", "clause_id": "314.150(b)(10)", "impacted": false, "owed": "follow-rld", "escalate": false}`; `latency_ms` 7909, 13699 ms wall; `usage` 6169 in, 474 out; two `find_label_row` calls, `5.1` refused then `"bw"` found |
+| `served[i].stop` | `read` true, `stopped` false, `rules_named` `[]`, both fields present, on both |
+| `written_by_ci` | `true`; `commit` `ca21bbd`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/30/merge`; `run_at` `2026-11-01T23:27:38+00:00`; exit 0; the `M05 gate` job passed, the first pass of this gate; the grep step and the upload step succeeded. On the same head `M00 gate` passed ([41362159104](https://github.com/andaro74/pharmadelta/actions/runs/41362159104)), `M02 gate` passed ([41362159112](https://github.com/andaro74/pharmadelta/actions/runs/41362159112)), `M01 gate` failed, not required ([41362159115](https://github.com/andaro74/pharmadelta/actions/runs/41362159115)) |
+
+Equals the GREEN arm of "What the gate on this PR can read" on every
+field. GREEN says: every page scenario is the file's entry, every served
+scenario carries a call record as `pharmadelta`, and nothing is shown
+as blocked, so nothing is traced and nothing is compared. It does not
+say the platform's guardrail stopped anything: the door's reading on
+this run is the seventh CI run from this repository, the thirteenth and
+fourteenth calls, to read `end_turn` and `guardrail_topics` `[]` on
+both questions, with the same `parsed` on each. A reading after the
+measurement; the cell above is the `main` run on the plant and is not
+changed by it. Runs on later commits of this PR, if any, are named in
+the PR's comments.
+
+The `M03 gate` on the same head,
+[41362159052](https://github.com/andaro74/pharmadelta/actions/runs/41362159052),
+artifact `m03-gate-ca21bbdb113d0010dcc6b47e2b580ae36d8c76a1`, read
+`RED`: `answers_uncalled` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `["g-001"]`, `unreadable` `[]`; "one side has an
+answer and the other has none": the served null against a `parsed`
+object with `table_row` null and `clause_id` `21 CFR 201.57(c)(9)(i)`,
+`end_turn`, after two refused `find_label_row` calls with `section` the
+number `8.1` (M03 Unsure 23, 26; the shape runs 41171470951 and
+41250971475 read); `request_id` `GLygggzlPHcEPPA=`; `latency_ms` 6938,
+10887 ms wall; 5591 in, 412 out; sign-in 200, 483 ms; grepped for
+`execute-api` and `us-west-2_`: no match. The `M04 gate`,
+[41362159029](https://github.com/andaro74/pharmadelta/actions/runs/41362159029),
+artifact `m04-gate-ca21bbdb113d0010dcc6b47e2b580ae36d8c76a1`, read
+`GREEN`: `answers_unrun` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`, `agent_disagreed` `[]`, `baseline_changed`
+false, `served_read` true, tag `m00` at `e94b76b`, `baseline_commit`
+`df860b7`, six observations at `ca21bbd`, started
+`2026-11-01T23:27:11+00:00`. Both are readings after their
+measurements; neither reopens row 4 or row 5 (M03 `rulings/pr4.md` 6,
+22; M04 `rulings/pr4.md` 22). Recorded here and in a comment on #30,
+not in a ledger cell.
+
 ## Unsure (PR 4)
 
 Numbering continues from PR 3's. Each needs a seat's ruling. None
