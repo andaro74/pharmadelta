@@ -72,7 +72,7 @@ from src.m03.gate import (
 # The deployed agent (milestones/M03/README.md, "The deployed agent, as read at open"): label-impact at 8cf0563,
 # deployed on agentkeel m10. Its manifest admits the caller `pharmadelta` with issuer `self`.
 AGENT_REPOSITORY = "agentkeel-studio/label-impact"
-AGENT_COMMIT = "8cf0563"
+AGENT_COMMIT = "956cd87"
 AGENT_PLATFORM = "agentkeel m10"
 ISSUER = "self"
 ARTIFACT_PREFIX = "m03-lift-"
