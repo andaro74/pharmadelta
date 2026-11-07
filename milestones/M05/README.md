@@ -1501,10 +1501,15 @@ the call record that differs beyond the ids and the times.
 
 Each `question` in `call.json` equals the served entry's and the
 golden's at `3b014f1`. The platform's guardrail stopped both questions
-under the rule label-impact's `rules/` plants for each: the first CI run
-from this repository, and the thirteenth and fourteenth calls as
-`pharmadelta`, to read a stop (Unsure 16, 18 b: answered in
-label-impact, read here).
+under the rule label-impact's `rules/` plants for each. Eight CI runs of
+two calls each read `end_turn` before it (the five gate runs, the PR 4
+lift 41361477192, the PR 4 gate run 41362159234 and the `main` run
+41364043231, all read again on 2026-11-07), then the first dispatch
+42406643117 read a stop on both, the seventeenth and eighteenth calls
+as `pharmadelta`. This run is the second CI run from this repository,
+and its calls the nineteenth and twentieth, to read a stop (Unsure 16,
+18 b: answered in label-impact, read here; Unsure 47 on the commit
+message's count).
 
 ### The pages as written
 
@@ -1636,6 +1641,7 @@ changes the measurement.
 | 44 | The run on `main` after the merge is read and recorded in a comment on #31, not in a commit and not in a tag's message: `m05` is placed and no second tag is owed. | Product |
 | 45 | `usage` reads 0 tokens and `tool_calls` `[]` on each stopped call. Whether a stopped call counts against the agent's ceilings is the platform's (agentkeel SPEC/09), read here only. | Threshold Owner |
 | 46 | The ruling file names this PR as #31, the next number on this repository. | Product |
+| 47 | The message of `d9685e8` says the served run was "the first CI run from this repository to read so"; it was the second: the first dispatch 42406643117 read the same two stops 46 minutes earlier with the stale constant, and the served run's calls were the nineteenth and twentieth as `pharmadelta`, not the thirteenth and fourteenth as this section first said. The README says so (above); the message is not rewritten (Unsure 39's shape). | Product |
 
 ## Unsure (PR 4)
 

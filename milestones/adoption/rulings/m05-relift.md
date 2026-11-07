@@ -131,7 +131,7 @@ run 41413769206) and wrote `4q5ebd7qov82` version `1` to the registry;
    "Re-lift (outside the cap, 2026-11-07)" with the field table, the
    two runs side by side, the pages as written, the construction
    readings, what the gate on the PR can read, what the PR does not
-   hold, what a reader can falsify, and Unsure 40 to 46. The gate's
+   hold, what a reader can falsify, and Unsure 40 to 47. The gate's
    reading on the PR and on `main` after the merge go in comments on
    #31, not in a commit (Unsure 44); no tag is placed.
 6. **Product.** This PR is #31, the next number on this repository.
