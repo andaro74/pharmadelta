@@ -22,7 +22,7 @@ this is the same row with the open detail.
 | Seeded commit | `6cfc1eb` on `m06-pr1`: `pages/api/sign-off.json`, the reviewer sign-offs pharmadelta serves, one entry `s-001`: reviewer Regulatory Affairs, the seat `product`, held by `andaro74` as `label-impact`'s `manifest.yaml` reads at `956cd87`; a statement; `signed` true written by hand; `signature` null (no commit, no login read back, no time); `package` null (no file, no hash, no entries, no link); `scripted` true, a `PLANT` key beside them; `pages/sign-off.html`, the sign-off page, showing it as signed with nothing to download, labelled scripted, the same object embedded. No evidence package exists in the repository, and nothing in it builds one, hashes one or reads a signing commit. |
 | Expected gate output | PR 2's gate, in CI, reads every sign-off the served file serves and the page shows and names each shown as signed that carries no signing record, or no package record, or names a package file that is not in the repository (`signoffs_unsigned`), and each that the page and the file do not agree on (`signoffs_disagreed`); then, for each signed sign-off, reads from GitHub's API the commit that last changed the served file and checks its author's login is the one holding the seat shown in `label-impact`'s `manifest.yaml` at the commit the reviewer record names and that the function shown is that seat's (SPEC/00 §5), hashes the package file and compares it with the hash the signature names, and compares each entry of the package with the artifact of the CI run it names, downloaded in that run; it names each that fails any of these (`signoffs_differing`). It writes a `result.json` that is RED when any sign-off is unsigned, disagreed or differing, naming each; GREEN only when every sign-off shown as signed carries a signing record by the seat holder and a package that hashes to what was signed with every entry equal to its CI artifact, and is shown as served; UNSCORABLE when nothing is RED and the served files, GitHub's API, the manifest or an artifact could not be read. On `6cfc1eb`: RED, `signoffs_unsigned` `["s-001"]`, `signoffs_disagreed` `[]`, `signoffs_differing` `[]`. The Measured cell cites the `main` run after PR 2 merges (M01 Unsure 23, ruled at M02 PR 1). |
 | Measured | |
-| PRs used / cap | 1 / 4 |
+| PRs used / cap | 2 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -300,25 +300,368 @@ Per CLAUDE.md "Platform changes": named, never designed here.
 | M03's 1 (ruled at M03 PR 4, `rulings/pr4.md` 7) | The public API is a read API: a served file of records. The sign-off page's served file is the same kind; the one record not written by CI is the signature, which is the reviewer's own commit (Unsure 1). |
 | M05's 39, 47, 48 (`milestones/adoption/rulings/m05-count.md` 3) | A count in a commit message or a comment that a later read corrected is corrected in the README, not rewritten. This PR's messages carry no call count. |
 
+## Open detail (PR 2, 2026-11-08 UTC)
+
+PR 2 is the measure. It adds the gate that reads the plant and nothing
+that lifts it. `pages/api/sign-off.json` serves one sign-off shown as
+signed with `signature` null and `package` null at the head this PR
+measures, and `pages/sign-off.html` shows it. M06 is measured here.
+
+### What this PR holds
+
+- `src/m06/gate.py`, the gate. Python 3.14; the standard library and
+  `pyyaml`, which `pyproject.toml` already lists for the ingest;
+  `pyproject.toml` and `uv.lock` are unchanged. Nothing is imported from
+  `src/m03/` or `src/m05/`: no sign-in, no door, no secret of M03's. In
+  order:
+  1. Reads `pages/api/sign-off.json` (the `signoffs` list) and the JSON
+     in each `<script type="application/json" id="signoff-<id>">` block
+     of `pages/sign-off.html`, one object per block, with the block's own
+     id beside it.
+  2. `signoffs_unsigned`: every served sign-off shown as signed (`signed`
+     true) whose `signature` is null, is not an object, lacks a field of
+     the signature record (below) or holds it empty, or whose `over` is
+     not a SHA-256; or whose `package` is null, is not an object, lacks a
+     field of the package record or of an entry, whose `sha256` is not a
+     SHA-256, whose `written_by_ci` is not true, whose `built_by.run_url`
+     is not a run on github.com, or whose `file` is not a file under
+     `pages/` in the checkout. A read of the served file; no network.
+  3. `signoffs_disagreed`: every page sign-off whose `id` the file does
+     not serve, whose block is not named `signoff-<its id>`, or that is
+     not equal to the file's entry of that `id` as parsed JSON in
+     canonical form (sorted keys, no whitespace; M03 Unsure 15's reading).
+  4. For each sign-off that carries both records, and for no other, the
+     read-back: the commit that last changed the served file, from git;
+     that commit from GitHub's API; `label-impact`'s manifest at the
+     commit the reviewer record names; the package file's hash, its zip,
+     its entries against their sources; the file against the artifact of
+     the run that built it ("The read-back, as built").
+  5. `signoffs_differing`: every such sign-off with a difference. A read
+     that could not be made is `unreadable` and decides nothing.
+  6. Writes `result.json` and exits 0 GREEN, 1 RED, 2 UNSCORABLE.
+- `.github/workflows/m06.yml`: on every pull request, every push to
+  `main` and by hand, as `m05.yml`. `actions/checkout@v7` with
+  `fetch-depth: 0`, the first full-depth checkout in this repository,
+  because the gate asks git which commit last changed the served file
+  and a shallow checkout answers with its own head. `uv sync --locked`,
+  the artifact directory, the gate with `GITHUB_TOKEN` in its `env` and
+  nothing else; then a step that greps the result directory for a
+  token's prefix (`ghs_`, `ghp_`, `github_pat_`) and fails on a match;
+  then the artifact `m06-gate-<sha>` holding `result.json`, 90 days,
+  uploaded only when the grep step passed. `permissions` is `contents:
+  read` and `actions: read`, the second for this repository's artifacts.
+  The job fails on anything but GREEN. `gate.yml`, `m01.yml`, `m02.yml`,
+  `m03.yml`, `m03-lift.yml`, `m04.yml`, `m05.yml` and `m05-lift.yml` are
+  unchanged.
+- `result.json` records `verdict`, `signoffs_unsigned`,
+  `signoffs_disagreed`, `signoffs_differing`, `unreadable`, `commit`,
+  `dirty`, `written_by_ci`, `ci`, the API base, SPEC/00 §5's seat table
+  as the gate holds it (`seat_function`), the four records' fields, how
+  the signature is read (`signature_reading`, with `verified_required`
+  false), whether the environment held the token (`env_set`, a boolean),
+  per served sign-off its record checks, page equality and read-back
+  (`served`), the page's blocks (`page`) and every artifact listing and
+  download made (`artifacts_read`: run, artifact, statuses, `expired`,
+  `expires_at`, the files), so the file says for itself whether it is
+  evidence (P4). No token, no redirect URL.
+- `rulings/pr2.md`, and "PRs used / cap" set to 2 / 4 here and in the
+  ledger.
+
+### The read-back, as built
+
+For a sign-off that carries both records. Nothing here runs on the
+plant.
+
+| Read | From | Decides |
+|---|---|---|
+| the function shown | `reviewer.function` against SPEC/00 §5's table, held in the gate as `SEAT_FUNCTION` | differing when it is not the seat's, or the seat is not one of the seven |
+| the signing commit | `git rev-parse --is-shallow-repository`, then `git log -1 --format=%H -- pages/api/sign-off.json` | unreadable when the checkout is shallow or git names no commit |
+| the commit's record | `GET /repos/andaro74/pharmadelta/commits/<sha>`: `author.login`, `committer.login`, `commit.author.date`, `commit.verification` | differing when `author.login` is null, or is not `reviewer.login`, or not `signature.by`; unreadable when the API does not answer 200 with an object |
+| the seat's login | `GET /repos/agentkeel-studio/label-impact/contents/manifest.yaml?ref=<reviewer.seat_read_from.commit>`, base64, YAML, `seats.<seat>` | differing when it is not `reviewer.login`, or not the commit's `author.login`; unreadable when the API does not answer or the file is not YAML with `seats` |
+| the package file | SHA-256 of the bytes under `package.file` | differing when it is not `signature.over` or not `package.sha256` |
+| the package's zip | `zipfile`; its `manifest.json` as parsed JSON against `package.entries` | differing when the file is not a zip, holds no `manifest.json`, or the two are not equal in canonical form |
+| each entry | the member at `path`, hashed; then its source: `artifact` (the run's artifact listing, the archive, the file `name` in it), `repository` (`git show <commit>:<name>`), or `agent` (the contents API on label-impact at `<commit>`) | differing when the member is missing, hashes to other than `sha256`, or is not byte-equal to its source; unreadable when the artifact has expired, the archive or the API did not answer, or the commit is not in the checkout |
+| the build | `package.built_by`: the run's artifact, the file in it named as the package file | differing when the bytes are not the package file's; unreadable when it cannot be downloaded |
+| `verification.verified` | the commit's record | recorded; not required (Unsure 1, ruled) |
+
+An artifact is listed and downloaded once per run and read from memory
+after that. The archive's request answers 302 to a blob store; the gate
+does not let `urllib` follow it, fetches the `Location` itself without
+the token, and writes that URL nowhere. Bodies are capped at 64 MB. The
+artifact's `expired` and `expires_at` are recorded as listed.
+
+### The records' fields (Unsure 5, ruled)
+
+Fixed here; the lift writes them. A field present and empty is missing.
+
+- `signature`: `over` (the package file's SHA-256, 64 hex digits), `by`
+  (the login expected: the seat holder's), `method` (the sentence "the
+  last commit that changed pages/api/sign-off.json, read from GitHub's
+  API"), `read_from` (the API path the gate reads, `GET
+  /repos/andaro74/pharmadelta/commits/<sha>`). PR 1 proposed a fifth
+  field, `read_back`, holding what the gate read of the signing commit.
+  It is not in the record: the signing commit is the commit that changes
+  this file, so its own sha, login and time cannot be written into it.
+  The read-back is in the gate's `result.json`, CI-written; a page that
+  shows it shows it from that result with the run's link (SPEC/00 §11;
+  Unsure 18).
+- `package`: `file` (a path under `pages/`), `sha256`, `built_by`
+  (`run_url`, `artifact`: the CI run and artifact that wrote the file),
+  `commit` (this repository's commit the package describes), `entries`
+  (a non-empty list), `written_by_ci` (true).
+- each entry: `path` (in the zip), `sha256`, `source` (`artifact`,
+  `repository` or `agent`), `run_url` and `artifact` and `name` (for an
+  artifact source: the run on github.com, the artifact's name, the file
+  in it), `commit` and `name` (for a repository source: this repository's
+  commit and path; for an agent source: label-impact's commit and path),
+  `ledger_row` (the row the entry is evidence for, or null). Every key
+  present on every entry; null where the source does not use it.
+
+### The package's form (Unsure 6, ruled)
+
+One zip under `pages/evidence/`, named in `package.file`, fetched by its
+GitHub URL (PR 1 ruling 8). Inside, `manifest.json` equal to
+`package.entries`, and each entry at its `path`. Three sources: this
+repository's CI artifacts (the `result.json` each Measured cell cites,
+the M00 run's `observations.json`), this repository at `package.commit`
+(the ledger, SPEC/00, the goldens, the four served files), and
+`label-impact`'s repository at the agent commit the served files name
+(`manifest.yaml`). The third source needed a read the proposal did not
+name: label-impact is not in the checkout, so the gate reads it through
+the contents API, which returns content for files under 1 MB (Unsure
+23). A zip in git is accepted: it is one file, downloadable by one URL,
+and its hash is what is signed; the M02 artifact is 142 KB and the rest
+under 4 KB. Which files go in is the lift's (Unsure 16 carried); the
+gate accepts any entries whose sources it can read.
+
+### The verdict
+
+- **RED** when `signoffs_unsigned`, `signoffs_disagreed` or
+  `signoffs_differing` is non-empty. The first two are reads of the
+  served files and come before any network, so the plant reads RED
+  whatever GitHub's API says that day (M03 Unsure 4's rule).
+- **GREEN** only when every sign-off shown as signed carries both
+  records, the commit that last changed the served file is the seat
+  holder's own by `author.login` and the manifest, the function shown is
+  the seat's, the package hashes to what was signed and every entry
+  equals its source, the file is what its build wrote, every page
+  sign-off is the file's entry, and nothing was unread.
+- **UNSCORABLE** when nothing is RED and: a served file could not be
+  read or parsed, the file serves no sign-off or one id twice, or a
+  read-back could not be made (the checkout shallow, the API not
+  answering, the manifest not YAML, an artifact expired or not
+  downloadable, a commit not in the checkout, the read-back raising).
+  Never RED, never GREEN.
+- A read-back that cannot be made on a sign-off that also differs
+  leaves the RED standing: `unreadable` is recorded beside it (M05 PR 3's
+  rule, built in).
+- A sign-off shown as not signed (`signed` not true) is named by no
+  list, whatever its records (M05 Unsure 17's reading; Unsure 24).
+
+### What this PR does not hold
+
+- No lift. `git diff 6cfc1eb main -- pages/` and `git diff main --
+  pages/` are empty: the one entry carries `signature` null, `package`
+  null, `scripted` true and the `PLANT` key as at `6cfc1eb`, and the page
+  keeps its scripted banner. No file under `pages/evidence/`.
+- No edit to `src/m03/`, `src/m04/` or `src/m05/`: the gate imports
+  nothing from them. No change to `src/baseline/` (P5; `git diff m00
+  --stat -- src/baseline/` is empty), `src/gate/`, `src/ingest/`,
+  `src/m01/`, `goldens/`, `data/`, `pyproject.toml`, `uv.lock`, the
+  other eight workflows, SPEC/00, CLAUDE.md, the README, or anything
+  under `milestones/M00/` to `milestones/M05/` or `milestones/adoption/`.
+- No secret and no variable. Grep `secrets.` in
+  `.github/workflows/m06.yml`: one match, `secrets.GITHUB_TOKEN`, in the
+  gate step's `env`. Grep `vars.`: no match. Grep `M03_DOOR`,
+  `InitiateAuth`, `Bearer`, `execute-api`, `us-west-2_` and
+  `amazonaws.com/` under `src/m06/` and the workflow: one match, the
+  word `Bearer` in the gate's own `Authorization` header to GitHub's API.
+  Grep `https://` under `src/m06/`: the API base `https://api.github.com`
+  and the run URL pattern `https://github.com/`, nothing else.
+- No design of a signature. The gate reads GitHub's record of a commit
+  and label-impact's manifest as they are; it defines no field of
+  either.
+- No change to label-impact or to agentkeel. No platform item is new.
+- No "Measured" cell and no tag. Those are PR 4's.
+- No number on a page: no page changes here. No word of SPEC/00 §11's
+  six. No brand name. No treatment answer: the gate shows nothing and
+  asks no agent anything.
+
+### Construction run (not evidence, P4)
+
+Run on 2026-11-08 UTC on the branch before the first push, from the
+working tree, so `written_by_ci` is false and the tree was dirty.
+Readings, in order:
+
+| Reading | What was read |
+|---|---|
+| the gate on the real pages with no token | `RED`, `signoffs_unsigned` `["s-001"]` (`signature is null`, `package is null`), `signoffs_disagreed` `[]`, `signoffs_differing` `[]`, `unreadable` `[]`; the one page sign-off equal to the file's entry; `read_back` null, `not_read_back` "no signing record"; `artifacts_read` `[]`; `env_set` false; exit 1. `result.json` grepped for `ghs_`, `ghp_`, `github_pat_`, `execute-api` and `us-west-2_`: no match |
+| fifty-two made-up pairs of files in the session's scratch directory, every git and API read stubbed, a made-up zip of four entries (two from artifacts, one from this repository, one from label-impact), not committed | the plant: `RED`, unsigned `s-001`, nothing read back. A lifted entry with every read equal: `GREEN`, exit 0, `verified` false recorded. The commit by another login, or matched to no login; the manifest holding another login for the seat; the function not the seat's; a seat not of the seven; the signature over another hash; the record's hash differing; the file altered; an entry differing from its artifact, from this repository, from label-impact; the file not what its build wrote; the build artifact lacking the file; an entry missing from the zip; `manifest.json` not the entries; the file not a zip: each `RED`, `signoffs_differing` `["s-001"]`, with the difference named. An artifact expired; the archive answering 403; the commit's API answering 403; the manifest 404; label-impact's file 404; the checkout shallow; a repository file not in the checkout; the read-back raising; the page without a block on a lifted entry: each `UNSCORABLE`, exit 2, `unreadable` naming it, the lists empty. An expired artifact beside a commit by another login: `RED`, differing, `unreadable` beside it. The page's `signed` flipped: `signoffs_disagreed` `["s-001"]`. The page showing `s-999`: disagreed `["s-999"]`. The block misnamed: disagreed. The page without a block on the plant: `RED`, unsigned, `unreadable` names the page. A signature lacking `method`, `over` not a hash, the signature a string; the package file missing, or under `src/`; `written_by_ci` false; `entries` empty; an entry lacking `name` or with source `web`; `built_by.run_url` off github.com; the package lacking `commit`: each `RED`, `signoffs_unsigned` `["s-001"]`, nothing read back. A sign-off shown as not signed, alone: `GREEN`; beside the plant: unsigned `["s-001"]` only. Zero served, the file not JSON, one id twice: `UNSCORABLE` by the refusal path. The block pattern on the real pages: `s-001` on `sign-off.html`; nothing on `break-it.html`, `detail.html`, `side-by-side.html` |
+| the gate's own transport, with the owner's `gh auth token` in the environment of one process, on real records; the token typed nowhere and printed nowhere | `read_commit` on `6cfc1eb`: 200, `author.login` `andaro74`, `committer.login` `andaro74`, `2026-11-08T02:57:19Z`, `verified` false, reason `unsigned`; the same without a token: 200. `read_manifest_seat` on label-impact at `956cd87`: 200, blob `4d6d126…`, `seats.product` `andaro74`, seven seats. `Artifacts.get` on run 41266122812, artifact `m05-gate-8734adb…`: listing 200, `expired` false, `expires_at` 2027-01-30, archive 200 through the 302 with the token withheld, one file `result.json`, 3781 bytes zipped, `verdict` `RED` inside. `read_last_commit`: `6cfc1eb…` from a full checkout. `git show 6cfc1eb:pages/api/sign-off.json`: read. The recorded reads hold no token |
+
+No defect was found by the fifty-four readings. The stub files and the
+script live in the session's scratch directory and are not committed
+(M01 Unsure 21's reading: no test file).
+
+### Expected CI result on this PR
+
+The ledger row says: RED, `signoffs_unsigned` `["s-001"]`,
+`signoffs_disagreed` `[]`, `signoffs_differing` `[]`. The CI run on this
+PR is expected to write that, with `unreadable` `[]`, `written_by_ci`
+true, `env_set` true, `artifacts_read` `[]`, no read-back made, and the
+run URL, and to fail the `M06 gate` job (exit 1). On the same head
+`M00 gate` and `M02 gate` are expected GREEN, `M01 gate` PENDING, exit
+3, not required (M01 Unsure 14), and `M03 gate`, `M04 gate` and
+`M05 gate` whatever they read on `main` at `6a3840b` (all passed there:
+runs 42442496159, 42442496213, 42442496230): readings after their
+measurements, named in a PR comment, not in a cell (PR 1, Unsure 11).
+The CI run is the measurement; the construction run decides nothing.
+
+### Observed (CI run, 2026-11-08 UTC)
+
+The first run on this PR,
+[42491031888](https://github.com/andaro74/pharmadelta/actions/runs/42491031888),
+wrote the artifact `m06-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`
+(the sha is the pull request's merge ref, as M00's to M05's were; the
+branch head was `18d9103`). It holds `result.json`, read with `gh run
+download` into a fresh directory and `python -I` in this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F6.1 holds: sign-offs s-001 are shown as signed with no signing record or no package record naming a file in the repository" |
+| `signoffs_unsigned` | `["s-001"]`: `signature is null`, `package is null` |
+| `signoffs_disagreed` | `[]`: the one page sign-off equals the file's entry as parsed JSON, in the block named for its id |
+| `signoffs_differing` | `[]`: nothing read back, `read_back` null, `not_read_back` "no signing record" |
+| `unreadable` | `[]` |
+| `env_set` | `{"token": true}`; no value of it in the file. The workflow's grep step (`ghs_`, `ghp_`, `github_pat_`) passed before the upload; the downloaded file grepped again here for those and for `execute-api`, `us-west-2_`, `amazonaws.com/`: no match |
+| `artifacts_read` | `[]`: no listing, no download; GitHub's API was not asked anything for the plant |
+| `signature_reading.verified_required` | `false` |
+| `written_by_ci` | `true`; `commit` `8431885`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/34/merge`; `run_at` `2026-11-08T14:41:31+00:00`; exit 1; the `M06 gate` job failed at the gate step, the grep step and the upload step succeeded. The artifact is 1727 bytes zipped, `result.json` 4068 bytes, `expires_at` 2027-02-06. On the same head `M00 gate` passed ([42491031843](https://github.com/andaro74/pharmadelta/actions/runs/42491031843)), `M02 gate` passed ([42491031811](https://github.com/andaro74/pharmadelta/actions/runs/42491031811)), `M01 gate` failed, not required ([42491031845](https://github.com/andaro74/pharmadelta/actions/runs/42491031845)) |
+
+Equals the expected result above on every field the ledger row names.
+The plant is named as ledger row 7 expects: the RED is the missing
+signing record and the missing package record, nothing else. No network
+read was made, so what GitHub's API, the manifest or an artifact would
+have said that day decided nothing (M03 Unsure 4's rule).
+
+The `M03 gate` on the same head,
+[42491031831](https://github.com/andaro74/pharmadelta/actions/runs/42491031831),
+artifact `m03-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`, read
+`GREEN`: `answers_uncalled` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`, `unreadable` `[]`; sign-in 200; the door 200,
+`stop_reason` `end_turn`, `parsed` null. The `M04 gate`,
+[42491031860](https://github.com/andaro74/pharmadelta/actions/runs/42491031860),
+artifact `m04-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`, read
+`GREEN`: `answers_unrun` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`, `agent_disagreed` `[]`, `baseline_changed`
+false, `unreadable` `[]`. The `M05 gate`,
+[42491031806](https://github.com/andaro74/pharmadelta/actions/runs/42491031806),
+artifact `m05-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`, read
+`GREEN`: `scenarios_untraced` `[]`, `scenarios_disagreed` `[]`,
+`scenarios_differing` `[]`, `unreadable` `[]`; sign-in 200; the door
+stopped g-005 under `treatment-or-dosing-advice` and g-006 under
+`instruction-to-assistant-in-pasted-document`, `stop_reason`
+`guardrail_intervened` on both, as the re-lifted break page serves. All
+three are readings after their measurements; none reopens row 4, 5 or 6
+(M03 `rulings/pr4.md` 6, 22; M04 `rulings/pr4.md` 22; M05
+`rulings/pr4.md` 3). Recorded here and in a comment on #34, not in a
+ledger cell. The push that adds this section runs every gate again; the
+second `M06 gate` run is read into the same comment.
+
+### What a reader can falsify
+
+- The artifact `m06-gate-<sha>` on this PR's run holds `result.json`
+  with `verdict: RED`, `signoffs_unsigned: ["s-001"]`,
+  `signoffs_disagreed: []`, `signoffs_differing: []`, `unreadable: []`
+  and `written_by_ci: true`. Download it and read it.
+- In that `result.json`, `env_set` is one boolean; `served[0].read_back`
+  is null and `artifacts_read` is `[]`: nothing was fetched for the
+  plant. Grep it for `ghs_`, `ghp_` and `github_pat_`: no match (the
+  workflow's grep step passed, or there would be no artifact).
+- `git diff main --stat` on this PR touches `src/m06/`,
+  `.github/workflows/m06.yml`, `milestones/README.md`,
+  `milestones/M06/README.md` and `milestones/M06/rulings/pr2.md` only.
+  `git diff main -- pages/ src/m03/ src/m04/ src/m05/ src/baseline/
+  pyproject.toml uv.lock` is empty.
+- Grep `secrets.` in `.github/workflows/m06.yml`: one match,
+  `GITHUB_TOKEN`. Grep `fetch-depth: 0`: one match. Grep `actions: read`:
+  one match. Grep `from src.m0` in `src/m06/gate.py`: no match.
+- In `src/m06/gate.py`, `SIGNATURE_RECORD`, `PACKAGE_RECORD`,
+  `BUILT_BY` and `ENTRY_RECORD` hold the names above; `SEAT_FUNCTION` is
+  SPEC/00 §5's table, seven rows; `signature_record_check({"signature":
+  None})["has_record"]` is false; `PAGE_BLOCK` matches the one block of
+  `pages/sign-off.html` and nothing in the three other pages.
+
+### After this PR goes RED
+
+The plant is lifted by the one change named under "The false state": a
+package built by this repository's CI from the sources above and written
+as an artifact, its zip committed under `pages/evidence/`; then the seat
+holder's own commit that fills `signature` and `package` with the records
+above, sets `scripted` false, removes the `PLANT` key and rebuilds the
+page from the file. Which PR carries the lift is ruled on reading this
+PR's CI run, as M03's, M04's and M05's were at PR 2. Proposed: PR 4, by
+M03's path (b) with one difference: the package is written by a CI run
+with `permissions: contents: read` and committed by hand, and the
+signing commit is the reviewer's own, by hand, because a commit by CI is
+not a reviewer's signature (Unsure 1, 15). PR 3, if the cold review of
+this PR finds anything, repairs and does not lift; if it finds nothing,
+PR 3 is skipped. Ruled in `rulings/pr2.md` on reading the run.
+
+**Ruled at PR 2, on reading run 42491031888 (Product).** The lift is
+carried by PR 4, as M00's to M05's were, by M03's path (b) with one
+difference: a CI run with `permissions: contents: read` builds the
+package from the sources under "The package's form" and writes it as an
+artifact; the zip is committed under `pages/evidence/` by hand with its
+hash; then the seat holder's own commit, by hand, fills `signature` and
+`package`, sets `scripted` false, removes the `PLANT` key and rebuilds
+the page from the file, so the commit that last changed the served file
+is the reviewer's (Unsure 1, 15). PR 3, if the cold review of #34 finds
+anything, repairs and does not lift; if it finds nothing, PR 3 is
+skipped. The Measured cell takes the `main` run after #34 merges (M01
+Unsure 23, ruled at M02 PR 1), which reads as run 42491031888 did on the
+three lists: the plant makes no network read. Which files the package
+carries is Unsure 16, fixed in the lift PR's first commit before any
+page is written (`rulings/pr2.md` 17).
+
+## Unsure (PR 2)
+
+Numbering continues from PR 1's. Each needs a seat's ruling. None blocks
+the measurement.
+
+| # | Item | Seat |
+|---|---|---|
+| 17 | The ruling file names this PR as #34, the next number on this repository after #33. | Product |
+| 18 | The signature record has no `read_back` field (PR 1 proposed one): the signing commit's own sha, login and time cannot be in the file that commit changes. The read-back is in the gate's `result.json`. If the lifted page shows who signed and when, it shows it from a CI result with the run's link, as SPEC/00 §11 asks of a number; the record itself carries `by` (expected) and the hash. Built so. | Tool Owner, Engineering |
+| 19 | The gate reads `author.login`, not `committer.login`, and records both. Merges here are merge commits, so the commit that last changed the served file is the branch commit and both logins are the author's; a squash merge would keep the author and make the committer `web-flow`. `author.login` is GitHub's match of the commit's email to an account, which anyone can set in `git config`; `verified` is recorded and not required (Unsure 1, ruled). Whether the gate should also require `committer.login` equal to the author's. Proposed: not at M06; recorded. | Security |
+| 20 | The build artifact (`package.built_by`) expires 90 days after its run, like the entries' artifacts (Unsure 7). After that the gate cannot read whether the package file is what CI wrote, and reads `unreadable`; the committed zip and its hash in the signing commit are then the only record. Proposed: as Unsure 7, recorded with the expiry in `artifacts_read`. | Engineering, Product |
+| 21 | The grep step before upload matches `ghs_`, `ghp_` and `github_pat_`, the prefixes of an Actions token, a classic token and a fine-grained token. Hex digests and logins cannot contain them. The token is written by no code path; the step is a second fence. Whether the prefix list is complete is Security's. | Security |
+| 22 | `fetch-depth: 0` is the first full-depth checkout in this repository's workflows. On a pull request the checkout is the merge ref; `git log -1 -- pages/api/sign-off.json` names the branch commit that last changed the file, not the merge commit, because a clean merge changes no file. A conflict merge would name the merge commit, authored by the merger. Recorded. | Engineering |
+| 23 | The entry source `agent` reads `label-impact`'s repository through the contents API, which returns `content` only for files under 1 MB; `manifest.yaml` is under 2 KB. A larger file reads `unreadable`. The source was added at PR 2 because PR 1's proposed package carries that manifest and label-impact is not in the checkout. | Engineering |
+| 24 | A served sign-off shown as not signed (`signed` not true) is named by no list, whatever its records: the row's words name "each shown as signed" (M05 Unsure 17's reading). Built so; construction reading: alone, GREEN. | Product |
+| 25 | `SEAT_FUNCTION` is SPEC/00 §5's table copied into the gate. A seat not among the seven reads differing; a function other than the seat's reads differing. If §5 changes, the gate changes with it. Pharmacovigilance and Legal cannot be a signature by this check (SPEC/00 §5; CLAUDE.md). | Product, Rule Owner |
+| 26 | The gate finds the package file in the build artifact by its basename (`Path(package.file).name`). The lift's CI run must name the zip inside its artifact as it is committed. Recorded for the lift. | Engineering |
+| 27 | One served file, one last commit. Every sign-off in `pages/api/sign-off.json` is read against the same commit, the one that last changed the file. A second sign-off added later by a second login would make the first read differing, since the last commit would not be the first signer's. With one person holding all seven seats (R1) every login coincides and this does not arise; it is a limit of reading (a) with one file, recorded. Per-sign-off files are not built here. | Product, Tool Owner |
+
 ## Unsure (PR 1)
 
 Each needs a seat's ruling. None blocks the plant.
 
 | # | Item | Seat |
 |---|---|---|
-| 1 | What a signature is: (a) the reviewer's own commit that changes `pages/api/sign-off.json`, read back from GitHub's API as the commit that last changed the file, `author.login` the seat's login; (b) a signed tag; (c) a platform control, which SPEC/00 §5 rules out. Proposed: (a). Under (a), whether the gate must also read `commit.verification.verified` true: commits on this repository are unsigned today, and `author.login` is GitHub's match of the commit's email to an account, which anyone can set in `git config`. Proposed: `verified` is recorded as read and not required at M06; if Security wants it required, the owner signs commits first and the gate changes at PR 2. The plant is false under every reading. | Security, Product |
+| 1 | What a signature is: (a) the reviewer's own commit that changes `pages/api/sign-off.json`, read back from GitHub's API as the commit that last changed the file, `author.login` the seat's login; (b) a signed tag; (c) a platform control, which SPEC/00 §5 rules out. Proposed: (a). Under (a), whether the gate must also read `commit.verification.verified` true: commits on this repository are unsigned today, and `author.login` is GitHub's match of the commit's email to an account, which anyone can set in `git config`. Proposed: `verified` is recorded as read and not required at M06; if Security wants it required, the owner signs commits first and the gate changes at PR 2. The plant is false under every reading. **Ruled at PR 2** (`rulings/pr2.md` 3): (a), as built; `verified` is recorded as read and not required; the commit's `author.login` must be the seat's login in the manifest at the commit the record names, `reviewer.login` and `signature.by`; the plant is unsigned under every reading. Unsure 19 records the author, committer and email-match limits. | Security, Product |
 | 2 | M05's Unsure 2, carried here by name (`milestones/M05/rulings/pr4.md` 15). GitHub Pages is not enabled (404 on 2026-11-08 UTC; `has_pages` false). **Ruled at this PR** (`rulings/pr1.md` 8): "downloadable" means a file in this public repository fetched by its GitHub URL; "public" means readable in the repository, as since M03; the milestone does not depend on Pages; enabling it is the owner's setting and is carried to no further milestone by name. | Product, Security |
 | 3 | M05's Unsure 3, carried here by name (`milestones/M05/rulings/pr4.md` 16). `M00 gate` is the one required check, `strict` true, no rulesets (read 2026-11-08 UTC). **Ruled at this PR** (`rulings/pr1.md` 9): no Measured cell depends on a required check; the M02 to M05 gates stay as they are; whether `M06 gate` joins is recorded at PR 4 for the record; the setting is the owner's and is carried to no further milestone by name. | Security, Product |
-| 4 | Which seat reviews. Proposed: `product`, shown as Regulatory Affairs (SPEC/00 §5). Whether other seats may add their own sign-offs, each with its seat and login, is open; Pharmacovigilance and Legal hold no seat and may be shown as consulted, never as a signature (SPEC/00 §5; CLAUDE.md). | Product |
-| 5 | Names proposed here and fixed at PR 2: the files `pages/sign-off.html` and `pages/api/sign-off.json`; the served key `signoffs`; the entry fields `reviewer`, `statement`, `signed`, `signature`, `package`; the records' fields under "Carried to PR 2"; the gate's lists `signoffs_unsigned`, `signoffs_disagreed`, `signoffs_differing`. | Tool Owner, Engineering |
-| 6 | The package's form and contents: one zip under `pages/evidence/` plus a `manifest.json` of entries, each with its SHA-256 and the run and artifact it came from, holding the files listed under "Carried to PR 2". Whether a zip in git is acceptable (the M02 artifact is 142 KB; the rest are under 3 KB each) or the package should be one JSON file. Proposed: the zip; fixed at PR 2 or at the lift. | Tool Owner, Product, Data Owner |
-| 7 | CI artifacts expire after 90 days. The runs the Measured cells cite are from 2026-10-10 (row 0), 2026-10-10 (row 1), 2026-10-11 (row 2), 2026-10-31 (rows 4, 5) and 2026-11-01 (row 6); the first expire about 2027-01-08. After that the gate cannot compare a package entry with its artifact and reads `unreadable`; the package is then the only copy. Proposed: the gate compares what it can download and names the rest under `unreadable`, which is UNSCORABLE only when nothing is RED; the package records each artifact's expiry date. | Engineering, Product |
-| 8 | The gate reads GitHub's API with `GITHUB_TOKEN` (`contents: read`, `actions: read`) and downloads artifacts of this repository. No secret of the door is read. Whether `actions: read` on a pull request from a fork is a concern: this repository takes no fork PRs. | Security, Engineering |
-| 9 | The statement's wording: "Reviewed: the evidence package named under `package` is the evidence milestones/README.md cites for its rows at the commit the package names, as read on the day of the signature." It avoids SPEC/00 §11's six words and claims a reading, not a state. Proposed: as written; fixed before the signing commit. | Product, Rule Owner |
-| 10 | One person holds all seven seats (R1) and authors every PR, so the reviewer reviews their own work and the page says so. Whether the page needs more than that sentence, such as a second reviewer who holds no seat, which SPEC/00 §5 forbids as a signature. Proposed: the sentence is enough; the sign-off's worth is that CI can read it back, not that the reviewer is independent. | Product, Security |
-| 11 | The M03, M04 and M05 gates run on this PR, read their own files by path and do not read the new files. Their readings are after their measurements and are named in the PR body or a comment, not in a cell. Proposed: recorded. | Product, Engineering |
-| 12 | The ruling file names this PR as #33, the next number after #32 (the M05 count PR, opened first). If #32 is not opened first, the number is wrong by one and is corrected at PR 2. | Product |
-| 13 | Numbers on the plant page: `s-001`, SPEC/00's section numbers, "seven" seats (SPEC/00 §5's) and the manifest's commit `956cd87`. None is a measured result (M03's 7). | Product |
-| 14 | The reviewer's seat is copied from `label-impact`'s manifest at `956cd87` by hand. If the manifest changes the seat's login before the lift, the record names the commit it read and the gate reads the manifest at that commit; a stale read is a `signoffs_differing` finding, not a repair here. | Product, Data Owner |
-| 15 | The lift's writer rebuilds the page from the served file, as M03's and M05's do; but the signing commit is the reviewer's own, made by hand, so the page in that commit is written by a hand-run writer. The page's content is a copy of records, not evidence; the evidence is the artifacts the package names and the gate's run (P4). Whether a hand-run writer is acceptable for the page in the signing commit. Proposed: yes, with the gate reading page and file equal as parsed JSON. | Engineering, Product |
-| 16 | Whether the package carries the ordinary assistant's results (the baseline's observations, M04's served file) beside the agent's. Proposed: yes, as listed; every number in the package is a CI-written result or a copy of data. | Product, Threshold Owner |
+| 4 | Which seat reviews. Proposed: `product`, shown as Regulatory Affairs (SPEC/00 §5). Whether other seats may add their own sign-offs, each with its seat and login, is open; Pharmacovigilance and Legal hold no seat and may be shown as consulted, never as a signature (SPEC/00 §5; CLAUDE.md). **Ruled at PR 2** (`rulings/pr2.md` 7): `product`, shown as Regulatory Affairs; any of the seven seats may add a sign-off with its own seat and login, and the gate reads each against SPEC/00 §5's table; a seat not of the seven reads differing, so Pharmacovigilance and Legal cannot sign (Unsure 25, 27). | Product |
+| 5 | Names proposed here and fixed at PR 2: the files `pages/sign-off.html` and `pages/api/sign-off.json`; the served key `signoffs`; the entry fields `reviewer`, `statement`, `signed`, `signature`, `package`; the records' fields under "Carried to PR 2"; the gate's lists `signoffs_unsigned`, `signoffs_disagreed`, `signoffs_differing`. **Ruled at PR 2** (`rulings/pr2.md` 4): fixed as built, with the records' fields under "The records' fields"; `read_back` dropped from the signature record (Unsure 18); `unreadable` and `written_by_ci` beside the three lists. | Tool Owner, Engineering |
+| 6 | The package's form and contents: one zip under `pages/evidence/` plus a `manifest.json` of entries, each with its SHA-256 and the run and artifact it came from, holding the files listed under "Carried to PR 2". Whether a zip in git is acceptable (the M02 artifact is 142 KB; the rest are under 3 KB each) or the package should be one JSON file. Proposed: the zip; fixed at PR 2 or at the lift. **Ruled at PR 2** (`rulings/pr2.md` 5): the zip under `pages/evidence/`, `manifest.json` inside equal to the record's `entries`, three sources (artifact, repository, agent); a zip in git accepted; which files go in is fixed at the lift (16). | Tool Owner, Product, Data Owner |
+| 7 | CI artifacts expire after 90 days. The runs the Measured cells cite are from 2026-10-10 (row 0), 2026-10-10 (row 1), 2026-10-11 (row 2), 2026-10-31 (rows 4, 5) and 2026-11-01 (row 6); the first expire about 2027-01-08. After that the gate cannot compare a package entry with its artifact and reads `unreadable`; the package is then the only copy. Proposed: the gate compares what it can download and names the rest under `unreadable`, which is UNSCORABLE only when nothing is RED; the package records each artifact's expiry date. **Ruled at PR 2** (`rulings/pr2.md` 6): as proposed; the expiry is recorded in the gate's result (`artifacts_read[].expires_at`), not in the record; the build artifact expires too (Unsure 20). | Engineering, Product |
+| 8 | The gate reads GitHub's API with `GITHUB_TOKEN` (`contents: read`, `actions: read`) and downloads artifacts of this repository. No secret of the door is read. Whether `actions: read` on a pull request from a fork is a concern: this repository takes no fork PRs. **Ruled at PR 2** (`rulings/pr2.md` 2): `GITHUB_TOKEN` in the gate step's `env`, `contents: read` and `actions: read`, no door secret or variable; the token is withheld from the blob store's redirect and grepped for before upload (Unsure 21); this repository takes no fork PRs, and a fork's token is read-only in any case. | Security, Engineering |
+| 9 | The statement's wording: "Reviewed: the evidence package named under `package` is the evidence milestones/README.md cites for its rows at the commit the package names, as read on the day of the signature." It avoids SPEC/00 §11's six words and claims a reading, not a state. Proposed: as written; fixed before the signing commit. **Carried at PR 2** (`rulings/pr2.md` 14): the statement is unchanged here, since no page changes; fixed before the signing commit. | Product, Rule Owner |
+| 10 | One person holds all seven seats (R1) and authors every PR, so the reviewer reviews their own work and the page says so. Whether the page needs more than that sentence, such as a second reviewer who holds no seat, which SPEC/00 §5 forbids as a signature. Proposed: the sentence is enough; the sign-off's worth is that CI can read it back, not that the reviewer is independent. **Carried at PR 2** (`rulings/pr2.md` 14): unchanged; the gate reads one login for every seat, as the manifest holds. | Product, Security |
+| 11 | The M03, M04 and M05 gates run on this PR, read their own files by path and do not read the new files. Their readings are after their measurements and are named in the PR body or a comment, not in a cell. Proposed: recorded. **Ruled at PR 2** (`rulings/pr2.md` 8): recorded in a comment on the PR and under "Observed". | Product, Engineering |
+| 12 | The ruling file names this PR as #33, the next number after #32 (the M05 count PR, opened first). If #32 is not opened first, the number is wrong by one and is corrected at PR 2. **Ruled at PR 2** (`rulings/pr2.md` 9): #32 was the count PR and #33 this milestone's PR 1, as the two ruling files wrote; neither `pr:` line changes. | Product |
+| 13 | Numbers on the plant page: `s-001`, SPEC/00's section numbers, "seven" seats (SPEC/00 §5's) and the manifest's commit `956cd87`. None is a measured result (M03's 7). **Ruled at PR 2** (`rulings/pr2.md` 10): no page changes here; the numbers stand as read at PR 1. | Product |
+| 14 | The reviewer's seat is copied from `label-impact`'s manifest at `956cd87` by hand. If the manifest changes the seat's login before the lift, the record names the commit it read and the gate reads the manifest at that commit; a stale read is a `signoffs_differing` finding, not a repair here. **Ruled at PR 2** (`rulings/pr2.md` 11): as built, the gate reads the manifest at the commit the record names and compares that login with the commit's author; it does not read `main`'s manifest. A change of the seat's login is read at the lift, when the record is written. | Product, Data Owner |
+| 15 | The lift's writer rebuilds the page from the served file, as M03's and M05's do; but the signing commit is the reviewer's own, made by hand, so the page in that commit is written by a hand-run writer. The page's content is a copy of records, not evidence; the evidence is the artifacts the package names and the gate's run (P4). Whether a hand-run writer is acceptable for the page in the signing commit. Proposed: yes, with the gate reading page and file equal as parsed JSON. **Carried at PR 2** (`rulings/pr2.md` 14): to the lift PR; the gate reads page and file equal as parsed JSON whichever writer produced the page. | Engineering, Product |
+| 16 | Whether the package carries the ordinary assistant's results (the baseline's observations, M04's served file) beside the agent's. Proposed: yes, as listed; every number in the package is a CI-written result or a copy of data. **Carried at PR 2** (`rulings/pr2.md` 14): to the lift PR; the gate accepts any entries whose sources it can read. | Product, Threshold Owner |
