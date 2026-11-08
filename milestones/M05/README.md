@@ -1501,15 +1501,18 @@ the call record that differs beyond the ids and the times.
 
 Each `question` in `call.json` equals the served entry's and the
 golden's at `3b014f1`. The platform's guardrail stopped both questions
-under the rule label-impact's `rules/` plants for each. Eight CI runs of
-two calls each read `end_turn` before it (the five gate runs, the PR 4
-lift 41361477192, the PR 4 gate run 41362159234 and the `main` run
-41364043231, all read again on 2026-11-07), then the first dispatch
-42406643117 read a stop on both, the seventeenth and eighteenth calls
-as `pharmadelta`. This run is the second CI run from this repository,
-and its calls the nineteenth and twentieth, to read a stop (Unsure 16,
-18 b: answered in label-impact, read here; Unsure 47 on the commit
-message's count).
+under the rule label-impact's `rules/` plants for each. Ten CI runs of
+two calls each read `end_turn` before it (the six gate runs row 6's
+finding counts, 41264751470, 41265001644, 41266122812, 41267158120,
+41267294057 and 41268444478; the PR 4 lift 41361477192; the two PR 4
+gate runs 41362159234 and 41362407988; and the `main` run 41364043231;
+every one downloaded and read on 2026-11-07, the second comment on
+#31), then the first dispatch 42406643117 read a stop on both, the
+twenty-first and twenty-second calls as `pharmadelta`. This run is the
+second CI run from this repository, and its calls the twenty-third and
+twenty-fourth, to read a stop (Unsure 16, 18 b: answered in
+label-impact, read here; Unsure 47 on the commit message's count;
+Unsure 48 on this paragraph's own count at #31, corrected in #32).
 
 ### The pages as written
 
@@ -1641,7 +1644,8 @@ changes the measurement.
 | 44 | The run on `main` after the merge is read and recorded in a comment on #31, not in a commit and not in a tag's message: `m05` is placed and no second tag is owed. | Product |
 | 45 | `usage` reads 0 tokens and `tool_calls` `[]` on each stopped call. Whether a stopped call counts against the agent's ceilings is the platform's (agentkeel SPEC/09), read here only. | Threshold Owner |
 | 46 | The ruling file names this PR as #31, the next number on this repository. | Product |
-| 47 | The message of `d9685e8` says the served run was "the first CI run from this repository to read so"; it was the second: the first dispatch 42406643117 read the same two stops 46 minutes earlier with the stale constant, and the served run's calls were the nineteenth and twentieth as `pharmadelta`, not the thirteenth and fourteenth as this section first said. The README says so (above); the message is not rewritten (Unsure 39's shape). | Product |
+| 47 | The message of `d9685e8` says the served run was "the first CI run from this repository to read so"; it was the second: the first dispatch 42406643117 read the same two stops 46 minutes earlier with the stale constant, and the served run's calls were the twenty-third and twenty-fourth as `pharmadelta`, not the thirteenth and fourteenth as this section first said, nor the nineteenth and twentieth as #31 then wrote (Unsure 48). The README says so (above); the message is not rewritten (Unsure 39's shape). | Product |
+| 48 | The count in "The re-lift call" and in Unsure 47 at #31 was low by four: two gate runs on second pushes, 41265001644 (#28 at `d9af4bd`) and 41362407988 (#30 at `8d66c21`), were not counted. Read from every m05 artifact, fifteen runs, on 2026-11-07 (the second comment on #31): thirty calls as `pharmadelta`, twenty `end_turn` on ten runs, ten stopped on five; the `main` run after #31, 42417261373, made the twenty-ninth and thirtieth. Corrected in #32, outside any cap (`milestones/adoption/rulings/m05-count.md`); the messages of `d9685e8` and `1065863` and the first comment on #31 are not rewritten (Unsure 39's shape). No cell, state or page changes. | Product |
 
 ## Unsure (PR 4)
 
