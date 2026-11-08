@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pharmadelta: reviewer sign-off</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #1a1a1a; background: #fff; }
+  .signoff { border: 1px solid #ccc; padding: 0 1rem 1rem; margin: 1.5rem 0; }
+  .scripted { border: 3px solid #b00020; padding: 0.75rem 1rem; background: #fff4f4; }
+  .scripted strong { color: #b00020; }
+  .none { border: 3px solid #8a6d00; padding: 0.75rem 1rem; background: #fffbe6; }
+  .none strong { color: #8a6d00; }
+  table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1rem; }
+  th, td { border: 1px solid #bbb; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; font-size: 0.95rem; }
+  th[scope=row] { width: 11rem; font-weight: normal; color: #444; }
+  blockquote { border-left: 4px solid #999; margin: 0.5rem 0; padding: 0.25rem 1rem; }
+  pre { white-space: pre-wrap; word-break: break-word; font-size: 0.85rem; background: #f6f6f6; padding: 0.5rem; }
+  footer { margin-top: 2rem; font-size: 0.9rem; color: #444; }
+  code { font-family: Consolas, monospace; }
+</style>
+</head>
+<body>
+<header>
+  <p><strong>pharmadelta</strong> · reviewer sign-off</p>
+  <p>pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.
+     The company, Ardentia Generics, is fictional; its portfolio and every “our label” statement are invented.
+     The labels are real public-domain labels of old off-patent generics, read from DailyMed.</p>
+  <p>This page holds the reviewer sign-off and the evidence package: who reviewed the evidence behind this demo's
+     ledger (<code>milestones/README.md</code>), under which seat, and what they signed; and the package a reader
+     downloads to read the same evidence. The detail page <a href="detail.html">detail.html</a>, the side-by-side page
+     <a href="side-by-side.html">side-by-side.html</a> and the break page <a href="break-it.html">break-it.html</a> show
+     the answers and the stops that evidence is about. This page copies <code>api/sign-off.json</code>.</p>
+  <p>The sign-off is built in this repository's website layer. It is not an agentkeel seat and not a platform control,
+     and the platform does not read it (SPEC/00 §5). The agent is <code>label-impact</code>, a tenant of agentkeel; its
+     seven seats are read from its <code>manifest.yaml</code>. One person holds all seven seats on this project
+     (agentkeel ruling R1, ADR-0001), so the reviewer is the author of every pull request in this repository.
+     Pharmacovigilance and Legal hold no seat and never appear here as a signature (SPEC/00 §5).</p>
+</header>
+
+<div class="scripted" role="note">
+  <p><strong>Scripted. Nothing below was signed and there is nothing to download.</strong> This sign-off is written by
+     hand (SPEC/00 P8). No commit by the seat holder signed anything: <code>signature</code> is null. No evidence package
+     exists in this repository: <code>package</code> is null. The page shows the false state ledger row 7 opens with
+     (<code>milestones/M06/README.md</code>). The claim this page is for, a reviewer sign-off and a downloadable
+     evidence package, is false in this state.</p>
+</div>
+
+<h1>Reviewer sign-off</h1>
+<p>A sign-off is one seat holder's statement that an evidence package is the evidence the ledger cites, signed in a way
+   this repository's CI can read back. A package is a file a reader downloads, holding CI-written results and the files
+   they are about, each named with the run that wrote it. Neither exists on this page yet.</p>
+
+<section class="signoff" id="s-001">
+<h2>Sign-off <code>s-001</code></h2>
+<h3>The reviewer</h3>
+<p><strong>Regulatory Affairs</strong>, the seat <code>product</code>, held by <code>andaro74</code> as
+   <code>agentkeel-studio/label-impact</code>'s <code>manifest.yaml</code> reads at <code>956cd87</code>
+   (<code>seats.product</code>). The function shown is the one SPEC/00 §5 maps to this seat.</p>
+<h3>The statement</h3>
+<blockquote><p>Reviewed: the evidence package named under `package` is the evidence milestones/README.md cites for its rows at the commit the package names, as read on the day of the signature.</p></blockquote>
+<h3>The signature</h3>
+<div class="none" role="note">
+  <p><strong>None.</strong> <code>signed</code> is <code>true</code> by hand; <code>signature</code> is null. No commit by
+     <code>andaro74</code> signed a package, so there is no commit, no login read back and no time to show.</p>
+</div>
+<h3>The evidence package</h3>
+<div class="none" role="note">
+  <p><strong>None.</strong> <code>package</code> is null. No package file is in this repository, so there is no name, no
+     hash, no list of entries, and no link. Download the evidence package: nothing to download.</p>
+</div>
+<h3>Where this came from</h3>
+<p>Nowhere yet. Every record below is null or written by hand, and the entry says so under <code>PLANT</code>.</p>
+<table>
+  <tbody>
+    <tr><th scope="row">reviewer.function</th><td><code>Regulatory Affairs</code></td></tr>
+    <tr><th scope="row">reviewer.seat</th><td><code>product</code></td></tr>
+    <tr><th scope="row">reviewer.login</th><td><code>andaro74</code>, read from <code>agentkeel-studio/label-impact</code> <code>manifest.yaml</code> at <code>956cd87</code></td></tr>
+    <tr><th scope="row">signed</th><td><code>true</code>, by hand</td></tr>
+    <tr><th scope="row">signature</th><td><code>null</code></td></tr>
+    <tr><th scope="row">package</th><td><code>null</code></td></tr>
+    <tr><th scope="row">scripted</th><td><code>true</code></td></tr>
+  </tbody>
+</table>
+<h3>The same entry, as the file serves it</h3>
+<p>The object below is this sign-off's entry in <code>api/sign-off.json</code>, the same JSON value the file holds. A reader
+   of the page reads it from here.</p>
+<script type="application/json" id="signoff-s-001">
+{
+  "id": "s-001",
+  "reviewer": {
+    "function": "Regulatory Affairs",
+    "seat": "product",
+    "login": "andaro74",
+    "seat_read_from": {
+      "repository": "agentkeel-studio/label-impact",
+      "path": "manifest.yaml",
+      "commit": "956cd87",
+      "key": "seats.product"
+    }
+  },
+  "statement": "Reviewed: the evidence package named under `package` is the evidence milestones/README.md cites for its rows at the commit the package names, as read on the day of the signature.",
+  "signed": true,
+  "signature": null,
+  "package": null,
+  "scripted": true,
+  "PLANT": "M06 PR 1 (milestones/M06/README.md): `signed` is true by hand. No commit by the seat holder signed anything (`signature` null) and no evidence package exists to download (`package` null). The claim of ledger row 7 is false in this state; PR 2's gate must name s-001 under signoffs_unsigned."
+}
+</script>
+<pre>{
+  &quot;id&quot;: &quot;s-001&quot;,
+  &quot;reviewer&quot;: {
+    &quot;function&quot;: &quot;Regulatory Affairs&quot;,
+    &quot;seat&quot;: &quot;product&quot;,
+    &quot;login&quot;: &quot;andaro74&quot;,
+    &quot;seat_read_from&quot;: {
+      &quot;repository&quot;: &quot;agentkeel-studio/label-impact&quot;,
+      &quot;path&quot;: &quot;manifest.yaml&quot;,
+      &quot;commit&quot;: &quot;956cd87&quot;,
+      &quot;key&quot;: &quot;seats.product&quot;
+    }
+  },
+  &quot;statement&quot;: &quot;Reviewed: the evidence package named under `package` is the evidence milestones/README.md cites for its rows at the commit the package names, as read on the day of the signature.&quot;,
+  &quot;signed&quot;: true,
+  &quot;signature&quot;: null,
+  &quot;package&quot;: null,
+  &quot;scripted&quot;: true,
+  &quot;PLANT&quot;: &quot;M06 PR 1 (milestones/M06/README.md): `signed` is true by hand. No commit by the seat holder signed anything (`signature` null) and no evidence package exists to download (`package` null). The claim of ledger row 7 is false in this state; PR 2&#x27;s gate must name s-001 under signoffs_unsigned.&quot;
+}</pre>
+</section>
+
+<footer>
+  <p>This demo produces the evidence a validation would need. It is not medical information: the agent assesses
+     regulatory impact on labeling and never answers a treatment question (SPEC/00 §2). The authority for what this demo
+     claims is <code>SPEC/00-overview.md</code>; what was measured is in <code>milestones/README.md</code>. No number on
+     this page is a measured result: the sign-off's id is this file's, the seat count is SPEC/00 §5's, and the commit named
+     under the reviewer is the manifest's own.</p>
+</footer>
+</body>
+</html>
