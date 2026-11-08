@@ -517,6 +517,57 @@ runs 42442496159, 42442496213, 42442496230): readings after their
 measurements, named in a PR comment, not in a cell (PR 1, Unsure 11).
 The CI run is the measurement; the construction run decides nothing.
 
+### Observed (CI run, 2026-11-08 UTC)
+
+The first run on this PR,
+[42491031888](https://github.com/andaro74/pharmadelta/actions/runs/42491031888),
+wrote the artifact `m06-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`
+(the sha is the pull request's merge ref, as M00's to M05's were; the
+branch head was `18d9103`). It holds `result.json`, read with `gh run
+download` into a fresh directory and `python -I` in this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F6.1 holds: sign-offs s-001 are shown as signed with no signing record or no package record naming a file in the repository" |
+| `signoffs_unsigned` | `["s-001"]`: `signature is null`, `package is null` |
+| `signoffs_disagreed` | `[]`: the one page sign-off equals the file's entry as parsed JSON, in the block named for its id |
+| `signoffs_differing` | `[]`: nothing read back, `read_back` null, `not_read_back` "no signing record" |
+| `unreadable` | `[]` |
+| `env_set` | `{"token": true}`; no value of it in the file. The workflow's grep step (`ghs_`, `ghp_`, `github_pat_`) passed before the upload; the downloaded file grepped again here for those and for `execute-api`, `us-west-2_`, `amazonaws.com/`: no match |
+| `artifacts_read` | `[]`: no listing, no download; GitHub's API was not asked anything for the plant |
+| `signature_reading.verified_required` | `false` |
+| `written_by_ci` | `true`; `commit` `8431885`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/34/merge`; `run_at` `2026-11-08T14:41:31+00:00`; exit 1; the `M06 gate` job failed at the gate step, the grep step and the upload step succeeded. The artifact is 1727 bytes zipped, `result.json` 4068 bytes, `expires_at` 2027-02-06. On the same head `M00 gate` passed ([42491031843](https://github.com/andaro74/pharmadelta/actions/runs/42491031843)), `M02 gate` passed ([42491031811](https://github.com/andaro74/pharmadelta/actions/runs/42491031811)), `M01 gate` failed, not required ([42491031845](https://github.com/andaro74/pharmadelta/actions/runs/42491031845)) |
+
+Equals the expected result above on every field the ledger row names.
+The plant is named as ledger row 7 expects: the RED is the missing
+signing record and the missing package record, nothing else. No network
+read was made, so what GitHub's API, the manifest or an artifact would
+have said that day decided nothing (M03 Unsure 4's rule).
+
+The `M03 gate` on the same head,
+[42491031831](https://github.com/andaro74/pharmadelta/actions/runs/42491031831),
+artifact `m03-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`, read
+`GREEN`: `answers_uncalled` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`, `unreadable` `[]`; sign-in 200; the door 200,
+`stop_reason` `end_turn`, `parsed` null. The `M04 gate`,
+[42491031860](https://github.com/andaro74/pharmadelta/actions/runs/42491031860),
+artifact `m04-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`, read
+`GREEN`: `answers_unrun` `[]`, `answers_disagreed` `[]`,
+`answers_differing` `[]`, `agent_disagreed` `[]`, `baseline_changed`
+false, `unreadable` `[]`. The `M05 gate`,
+[42491031806](https://github.com/andaro74/pharmadelta/actions/runs/42491031806),
+artifact `m05-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`, read
+`GREEN`: `scenarios_untraced` `[]`, `scenarios_disagreed` `[]`,
+`scenarios_differing` `[]`, `unreadable` `[]`; sign-in 200; the door
+stopped g-005 under `treatment-or-dosing-advice` and g-006 under
+`instruction-to-assistant-in-pasted-document`, `stop_reason`
+`guardrail_intervened` on both, as the re-lifted break page serves. All
+three are readings after their measurements; none reopens row 4, 5 or 6
+(M03 `rulings/pr4.md` 6, 22; M04 `rulings/pr4.md` 22; M05
+`rulings/pr4.md` 3). Recorded here and in a comment on #34, not in a
+ledger cell. The push that adds this section runs every gate again; the
+second `M06 gate` run is read into the same comment.
+
 ### What a reader can falsify
 
 - The artifact `m06-gate-<sha>` on this PR's run holds `result.json`
@@ -556,6 +607,22 @@ signing commit is the reviewer's own, by hand, because a commit by CI is
 not a reviewer's signature (Unsure 1, 15). PR 3, if the cold review of
 this PR finds anything, repairs and does not lift; if it finds nothing,
 PR 3 is skipped. Ruled in `rulings/pr2.md` on reading the run.
+
+**Ruled at PR 2, on reading run 42491031888 (Product).** The lift is
+carried by PR 4, as M00's to M05's were, by M03's path (b) with one
+difference: a CI run with `permissions: contents: read` builds the
+package from the sources under "The package's form" and writes it as an
+artifact; the zip is committed under `pages/evidence/` by hand with its
+hash; then the seat holder's own commit, by hand, fills `signature` and
+`package`, sets `scripted` false, removes the `PLANT` key and rebuilds
+the page from the file, so the commit that last changed the served file
+is the reviewer's (Unsure 1, 15). PR 3, if the cold review of #34 finds
+anything, repairs and does not lift; if it finds nothing, PR 3 is
+skipped. The Measured cell takes the `main` run after #34 merges (M01
+Unsure 23, ruled at M02 PR 1), which reads as run 42491031888 did on the
+three lists: the plant makes no network read. Which files the package
+carries is Unsure 16, fixed in the lift PR's first commit before any
+page is written (`rulings/pr2.md` 17).
 
 ## Unsure (PR 2)
 

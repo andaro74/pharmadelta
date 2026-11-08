@@ -192,6 +192,24 @@ Nothing in this PR lifts the plant, and nothing under `pages/` changes.
     rule, built in from the start). A sign-off shown as not signed is
     named by no list (Unsure 24).
 
+17. **Product, on reading run 42491031888.** The run wrote RED,
+    `signoffs_unsigned` `["s-001"]`, `signoffs_disagreed` `[]`,
+    `signoffs_differing` `[]`, `unreadable` `[]`, `written_by_ci` true,
+    on the merge ref `8431885`; the plant is named as the row expects.
+    `artifacts_read` is `[]` and `read_back` is null: the gate asked
+    GitHub's API nothing for the plant, as M03 Unsure 4's rule asks. The
+    grep step passed and the artifact was written; the downloaded result
+    holds no token prefix and no door string. The lift is carried by PR
+    4 by M03's path (b), the package built by a CI run and committed by
+    hand, the signing commit the reviewer's own by hand (README, "After
+    this PR goes RED"). PR 3, if the cold review of #34 finds anything,
+    repairs and does not lift; if it finds nothing, PR 3 is skipped. The
+    Measured cell takes the `main` run after #34 merges. Which files the
+    package carries (Unsure 16) is fixed in the lift PR's first commit,
+    before any page is written. The `M03 gate`, `M04 gate` and `M05 gate`
+    on the same head read GREEN, readings after their measurements,
+    recorded in the README and in a comment on #34.
+
 ## What a reader can falsify
 
 Listed in `milestones/M06/README.md`, "What a reader can falsify" under
@@ -200,7 +218,7 @@ PR 2.
 ## What this ruling does not settle
 
 The items under Unsure (PR 2) in `milestones/M06/README.md`, 17 to 27,
-each with its seat, and PR 1's 9, 10, 15 and 16, carried. What matters
+each with its seat (17 ruled above), and PR 1's 9, 10, 15 and 16, carried. What matters
 most for the close: whether `committer.login` or `verified` should be
 required (19), the one-file-one-commit limit when a second seat signs
 (27), what the lift's CI run names its zip (26), and which files the
