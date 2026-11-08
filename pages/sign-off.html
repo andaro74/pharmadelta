@@ -9,6 +9,8 @@
   .signoff { border: 1px solid #ccc; padding: 0 1rem 1rem; margin: 1.5rem 0; }
   .scripted { border: 3px solid #b00020; padding: 0.75rem 1rem; background: #fff4f4; }
   .scripted strong { color: #b00020; }
+  .layer { border: 3px solid #1a5e20; padding: 0.75rem 1rem; background: #f1f8f1; }
+  .layer strong { color: #1a5e20; }
   .none { border: 3px solid #8a6d00; padding: 0.75rem 1rem; background: #fffbe6; }
   .none strong { color: #8a6d00; }
   table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1rem; }
@@ -17,7 +19,7 @@
   blockquote { border-left: 4px solid #999; margin: 0.5rem 0; padding: 0.25rem 1rem; }
   pre { white-space: pre-wrap; word-break: break-word; font-size: 0.85rem; background: #f6f6f6; padding: 0.5rem; }
   footer { margin-top: 2rem; font-size: 0.9rem; color: #444; }
-  code { font-family: Consolas, monospace; }
+  code { font-family: Consolas, monospace; word-break: break-all; }
 </style>
 </head>
 <body>
@@ -31,55 +33,92 @@
      downloads to read the same evidence. The detail page <a href="detail.html">detail.html</a>, the side-by-side page
      <a href="side-by-side.html">side-by-side.html</a> and the break page <a href="break-it.html">break-it.html</a> show
      the answers and the stops that evidence is about. This page copies <code>api/sign-off.json</code>.</p>
-  <p>The sign-off is built in this repository's website layer. It is not an agentkeel seat and not a platform control,
-     and the platform does not read it (SPEC/00 §5). The agent is <code>label-impact</code>, a tenant of agentkeel; its
-     seven seats are read from its <code>manifest.yaml</code>. One person holds all seven seats on this project
-     (agentkeel ruling R1, ADR-0001), so the reviewer is the author of every pull request in this repository.
-     Pharmacovigilance and Legal hold no seat and never appear here as a signature (SPEC/00 §5).</p>
+  <p>The package was built by this repository's CI: <a href="https://github.com/andaro74/pharmadelta/actions/runs/42504215645">https://github.com/andaro74/pharmadelta/actions/runs/42504215645</a>, artifact <code>m06-package-226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9</code>; this file and this
+     page were written from that artifact and the committed zip by <code>src/m06/page.py</code>, and the signing commit is the seat
+     holder's own. Whether that commit is the seat holder's, and whether the package is what CI wrote with every entry equal to its
+     source, is read back by the M06 gate on every CI run (<a href="https://github.com/andaro74/pharmadelta/actions/workflows/m06.yml">m06.yml runs</a>); this page claims neither.</p>
 </header>
 
-<div class="scripted" role="note">
-  <p><strong>Scripted. Nothing below was signed and there is nothing to download.</strong> This sign-off is written by
-     hand (SPEC/00 P8). No commit by the seat holder signed anything: <code>signature</code> is null. No evidence package
-     exists in this repository: <code>package</code> is null. The page shows the false state ledger row 7 opens with
-     (<code>milestones/M06/README.md</code>). The claim this page is for, a reviewer sign-off and a downloadable
-     evidence package, is false in this state.</p>
+<div class="layer" role="note">
+  <p><strong>Built in this repository's website layer.</strong> The sign-off is not an agentkeel seat and not a platform control, and the
+     platform does not read it (SPEC/00 §5). The agent is <code>label-impact</code>, a tenant of agentkeel; its seven seats are read from
+     its <code>manifest.yaml</code>. One person holds all seven seats on this project (agentkeel ruling R1, ADR-0001), so the reviewer
+     is the author of every pull request in this repository and reviews their own work; the sign-off's worth is that this repository's
+     CI can read it back, not that the reviewer is independent (M06 Unsure 10). Pharmacovigilance and Legal hold no seat and never
+     appear here as a signature (SPEC/00 §5).</p>
 </div>
 
 <h1>Reviewer sign-off</h1>
 <p>A sign-off is one seat holder's statement that an evidence package is the evidence the ledger cites, signed in a way
-   this repository's CI can read back. A package is a file a reader downloads, holding CI-written results and the files
-   they are about, each named with the run that wrote it. Neither exists on this page yet.</p>
+   this repository's CI can read back: the seat holder's own commit that last changed <code>api/sign-off.json</code>, over the
+   SHA-256 of a package file in this repository. A package is a zip a reader downloads, holding CI-written results and the
+   files they are about, each named with the run that wrote it or the commit it is at.</p>
 
 <section class="signoff" id="s-001">
 <h2>Sign-off <code>s-001</code></h2>
 <h3>The reviewer</h3>
-<p><strong>Regulatory Affairs</strong>, the seat <code>product</code>, held by <code>andaro74</code> as
-   <code>agentkeel-studio/label-impact</code>'s <code>manifest.yaml</code> reads at <code>956cd87</code>
-   (<code>seats.product</code>). The function shown is the one SPEC/00 §5 maps to this seat.</p>
+<p><strong>Regulatory Affairs</strong>, the seat <code>product</code>, held by <code>andaro74</code> as agentkeel-studio/label-impact's <code>manifest.yaml</code> reads at <code>956cd87</code> (<code>seats.product</code>). The function shown is the one SPEC/00 §5 maps to this seat.</p>
 <h3>The statement</h3>
-<blockquote><p>Reviewed: the evidence package named under `package` is the evidence milestones/README.md cites for its rows at the commit the package names, as read on the day of the signature.</p></blockquote>
+<blockquote><p>Reviewed: the evidence package named under `package` holds the CI-written results milestones/README.md cites in its Measured cells for rows 0, 1, 2, 4, 5 and 6, with the ledger, SPEC/00, the goldens and the four served files at the commit the package names and label-impact&#x27;s manifest at the agent commits the served files name, as read on the day of the signature.</p></blockquote>
 <h3>The signature</h3>
-<div class="none" role="note">
-  <p><strong>None.</strong> <code>signed</code> is <code>true</code> by hand; <code>signature</code> is null. No commit by
-     <code>andaro74</code> signed a package, so there is no commit, no login read back and no time to show.</p>
-</div>
+<p>The signature is a commit: the one that last changed <code>api/sign-off.json</code>, made by the seat holder from their own
+   terminal. The record names the hash signed and the login expected. Whether that commit's author is <code>andaro74</code>, when it
+   was made and what GitHub says of its verification are read back by the M06 gate on every CI run (<a href="https://github.com/andaro74/pharmadelta/actions/workflows/m06.yml">m06.yml runs</a>)
+   and written in that run's <code>result.json</code>; this page copies none of it, because the commit that writes this page cannot
+   name itself (M06 Unsure 18). The gate's run is the read-back; this page is the record.</p>
+<table>
+  <tbody>
+    <tr><th scope="row">signature.over</th><td><code>2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e</code>, the SHA-256 of the package file</td></tr>
+    <tr><th scope="row">signature.by</th><td><code>andaro74</code>, the login the seat holder's commit must be authored by</td></tr>
+    <tr><th scope="row">signature.method</th><td>the last commit that changed pages/api/sign-off.json, read from GitHub&#x27;s API</td></tr>
+    <tr><th scope="row">signature.read_from</th><td><code>GET /repos/andaro74/pharmadelta/commits/&lt;sha&gt;</code></td></tr>
+  </tbody>
+</table>
 <h3>The evidence package</h3>
-<div class="none" role="note">
-  <p><strong>None.</strong> <code>package</code> is null. No package file is in this repository, so there is no name, no
-     hash, no list of entries, and no link. Download the evidence package: nothing to download.</p>
-</div>
+<p><strong>Download the evidence package:</strong> <a href="https://github.com/andaro74/pharmadelta/blob/3e56b0772c0c24533772e40dd01584ebf04f4f8b/pages/evidence/m06-evidence.zip">m06-evidence.zip</a> (the file view at the commit that added it,
+   <code>3e56b07</code>; <a href="https://github.com/andaro74/pharmadelta/raw/3e56b0772c0c24533772e40dd01584ebf04f4f8b/pages/evidence/m06-evidence.zip">the raw file</a>). Its SHA-256 is <code>2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e</code>; compare after downloading. The zip holds
+   <code>manifest.json</code>, the list of entries below, and each entry at its path. It was built by this repository's CI,
+   <a href="https://github.com/andaro74/pharmadelta/actions/runs/42504215645">https://github.com/andaro74/pharmadelta/actions/runs/42504215645</a>, as the artifact <code>m06-package-226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9</code>, from this repository at
+   <code>226ad89</code>, and committed byte for byte. The M06 gate compares the committed file with that artifact's and each
+   entry with its source on every CI run; what it read is in that run's result, linked above.</p>
+<table>
+  <thead><tr><th>Path in the zip</th><th>Source</th><th>Ledger row</th><th>SHA-256</th></tr></thead>
+  <tbody>
+    <tr><td><code>agent/label-impact/8cf056345196aa28be30d05ee1e1b8bd0690d67c/manifest.yaml</code></td><td>agent: <a href="https://github.com/agentkeel-studio/label-impact/blob/8cf056345196aa28be30d05ee1e1b8bd0690d67c/manifest.yaml">manifest.yaml</a> of agentkeel-studio/label-impact at <code>8cf0563</code></td><td></td><td><code>1ad2a0bb08e6fb2fb35de571098543fde0e92953d8c7e206207fde80c39fb97b</code></td></tr>
+    <tr><td><code>agent/label-impact/956cd875c8e8200da2183ad401597cc559540b24/manifest.yaml</code></td><td>agent: <a href="https://github.com/agentkeel-studio/label-impact/blob/956cd875c8e8200da2183ad401597cc559540b24/manifest.yaml">manifest.yaml</a> of agentkeel-studio/label-impact at <code>956cd87</code></td><td></td><td><code>5148a9b6c5c261ce92cdfd7d58191df1fe3b7b6f93186e89f89470ad16db7978</code></td></tr>
+    <tr><td><code>artifacts/m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed/observations.json</code></td><td>artifact: <a href="https://github.com/andaro74/pharmadelta/actions/runs/38058191295">the run</a>, artifact <code>m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed</code>, file <code>observations.json</code></td><td><code>0</code></td><td><code>7b5350a65a102909b6d9b8bc572cf151b26ba463429a6745724ef9cd5e595837</code></td></tr>
+    <tr><td><code>artifacts/m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed/result.json</code></td><td>artifact: <a href="https://github.com/andaro74/pharmadelta/actions/runs/38058191295">the run</a>, artifact <code>m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed</code>, file <code>result.json</code></td><td><code>0</code></td><td><code>d66dce960098885f2899abf33ff3ac7a59b4b1c26a1e391b0f6a608556b62e76</code></td></tr>
+    <tr><td><code>artifacts/m01-gate-223de2d13d518ce23327373cfff9775a49c24e0f/result.json</code></td><td>artifact: <a href="https://github.com/andaro74/pharmadelta/actions/runs/38077129178">the run</a>, artifact <code>m01-gate-223de2d13d518ce23327373cfff9775a49c24e0f</code>, file <code>result.json</code></td><td><code>1</code></td><td><code>b30bf449e4817d989efced4242fcafcb29650680438650afa021e07e51e1b14a</code></td></tr>
+    <tr><td><code>artifacts/m01-gate-8cdd851e8f4c02da3eb61307c2452010bc10ba84/result.json</code></td><td>artifact: <a href="https://github.com/andaro74/pharmadelta/actions/runs/38097865560">the run</a>, artifact <code>m01-gate-8cdd851e8f4c02da3eb61307c2452010bc10ba84</code>, file <code>result.json</code></td><td><code>1</code></td><td><code>4225248ae1cb52c05d3a75e4cad5457f6394f3426d415d7006271068af7451c1</code></td></tr>
+    <tr><td><code>artifacts/m02-gate-e8c3690d3877f8603620f3cb56c9104e530ec824/result.json</code></td><td>artifact: <a href="https://github.com/andaro74/pharmadelta/actions/runs/38154731153">the run</a>, artifact <code>m02-gate-e8c3690d3877f8603620f3cb56c9104e530ec824</code>, file <code>result.json</code></td><td><code>2</code></td><td><code>cce68bcfdfb2216940b82cc8466d7c955c06b5a9b96c3bf59188799403858729</code></td></tr>
+    <tr><td><code>artifacts/m03-gate-0b8d2ec7598b61c30f861a3f2114c2a13e89ad71/result.json</code></td><td>artifact: <a href="https://github.com/andaro74/pharmadelta/actions/runs/41171470951">the run</a>, artifact <code>m03-gate-0b8d2ec7598b61c30f861a3f2114c2a13e89ad71</code>, file <code>result.json</code></td><td><code>4</code></td><td><code>78b703e0044037bf02a614af18aef65563266d48bb63f0cb48b724184df46634</code></td></tr>
+    <tr><td><code>artifacts/m04-gate-4d926760c985e973bdd5d35f1c76f0db47660808/result.json</code></td><td>artifact: <a href="https://github.com/andaro74/pharmadelta/actions/runs/41234548875">the run</a>, artifact <code>m04-gate-4d926760c985e973bdd5d35f1c76f0db47660808</code>, file <code>result.json</code></td><td><code>5</code></td><td><code>88355ef7c391423500e8d7acb23db0ccdd91f5f8cc28bf69c4f9708ec64770d5</code></td></tr>
+    <tr><td><code>artifacts/m05-gate-8734adbd4d77c84bc98c0d423bb04bb1dbc2d4bd/result.json</code></td><td>artifact: <a href="https://github.com/andaro74/pharmadelta/actions/runs/41266122812">the run</a>, artifact <code>m05-gate-8734adbd4d77c84bc98c0d423bb04bb1dbc2d4bd</code>, file <code>result.json</code></td><td><code>6</code></td><td><code>321941a341bd08543ac1838f0dd4844090ee52af0f60b53dba886cc9ef61d44c</code></td></tr>
+    <tr><td><code>repository/SPEC/00-overview.md</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/SPEC/00-overview.md">SPEC/00-overview.md</a> at <code>226ad89</code></td><td></td><td><code>2d44b6b02abeccc98e8813a08ee5d9cb3ef3c4b73086cd4b356e8d3b20351d96</code></td></tr>
+    <tr><td><code>repository/goldens/g-001.yaml</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/goldens/g-001.yaml">goldens/g-001.yaml</a> at <code>226ad89</code></td><td></td><td><code>75bf094f1039a8cbde97a5beafbf5d9e79062d9c9e11d3ce3fd04bf39f83faa5</code></td></tr>
+    <tr><td><code>repository/goldens/g-002.yaml</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/goldens/g-002.yaml">goldens/g-002.yaml</a> at <code>226ad89</code></td><td></td><td><code>373a59b8a636b377af275fc7c220a4d739e864266ca5bba50c17c883fdc01e18</code></td></tr>
+    <tr><td><code>repository/goldens/g-003.yaml</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/goldens/g-003.yaml">goldens/g-003.yaml</a> at <code>226ad89</code></td><td></td><td><code>a19b533516dd1880e0d83ae0989ec079a9ac3ae2e262718a82bfb71c8e571189</code></td></tr>
+    <tr><td><code>repository/goldens/g-004.yaml</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/goldens/g-004.yaml">goldens/g-004.yaml</a> at <code>226ad89</code></td><td></td><td><code>50f6bceee4866c25637e6859ca091c41b56697c179abca10135ee4e0b6c5881a</code></td></tr>
+    <tr><td><code>repository/goldens/g-005.yaml</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/goldens/g-005.yaml">goldens/g-005.yaml</a> at <code>226ad89</code></td><td></td><td><code>1841b8a7d05cb1838d7191895d60c91747f5e047a8b3b1d90738d6c45ad96303</code></td></tr>
+    <tr><td><code>repository/goldens/g-006.yaml</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/goldens/g-006.yaml">goldens/g-006.yaml</a> at <code>226ad89</code></td><td></td><td><code>bee341e5c45ed7d3f312c0c81c730def9d089bd90b4b231c7f4b296acf47e4f7</code></td></tr>
+    <tr><td><code>repository/milestones/README.md</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/milestones/README.md">milestones/README.md</a> at <code>226ad89</code></td><td></td><td><code>e9e3eee52d9151a92ca0bf84e75c8158bf7276d38cfb6da90fa718f8320e459a</code></td></tr>
+    <tr><td><code>repository/pages/api/answers.json</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/pages/api/answers.json">pages/api/answers.json</a> at <code>226ad89</code></td><td></td><td><code>436584f77f53442cf83405b728a32b0429dffe551ff67b5dcc5751fe0e79d2a3</code></td></tr>
+    <tr><td><code>repository/pages/api/baseline.json</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/pages/api/baseline.json">pages/api/baseline.json</a> at <code>226ad89</code></td><td></td><td><code>17252e3ac76139dfc6e732cad4b6cc8b2fadbd79a04610bfd1e0757fc5a6a1d8</code></td></tr>
+    <tr><td><code>repository/pages/api/break-it.json</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/pages/api/break-it.json">pages/api/break-it.json</a> at <code>226ad89</code></td><td></td><td><code>0b508a080aefab0d3bb7483147cd27fa70f9b27970767a218bf62b5bc17a6cba</code></td></tr>
+    <tr><td><code>repository/pages/api/sign-off.json</code></td><td>repository: <a href="https://github.com/andaro74/pharmadelta/blob/226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9/pages/api/sign-off.json">pages/api/sign-off.json</a> at <code>226ad89</code></td><td></td><td><code>fe34f820b80f000d13f846de5c312b9c9cdbe58550e25b46522e0037fed153e2</code></td></tr>
+  </tbody>
+</table>
+<p>Sources: <code>artifact</code>, a CI-written result: the file of that name in the artifact of the run linked, downloaded in the build run; <code>repository</code>, this repository&#x27;s file at the build&#x27;s commit; <code>agent</code>, label-impact&#x27;s file at the agent commit the served files name, read through GitHub&#x27;s contents API. A ledger row is the row of <code>milestones/README.md</code> the entry is evidence for; the ledger inside the package is as at the build's commit, and row 7's own measurement is what this package is signed for, not what it holds.</p>
 <h3>Where this came from</h3>
-<p>Nowhere yet. Every record below is null or written by hand, and the entry says so under <code>PLANT</code>.</p>
 <table>
   <tbody>
     <tr><th scope="row">reviewer.function</th><td><code>Regulatory Affairs</code></td></tr>
     <tr><th scope="row">reviewer.seat</th><td><code>product</code></td></tr>
-    <tr><th scope="row">reviewer.login</th><td><code>andaro74</code>, read from <code>agentkeel-studio/label-impact</code> <code>manifest.yaml</code> at <code>956cd87</code></td></tr>
-    <tr><th scope="row">signed</th><td><code>true</code>, by hand</td></tr>
-    <tr><th scope="row">signature</th><td><code>null</code></td></tr>
-    <tr><th scope="row">package</th><td><code>null</code></td></tr>
-    <tr><th scope="row">scripted</th><td><code>true</code></td></tr>
+    <tr><th scope="row">reviewer.login</th><td><code>andaro74</code>, read from agentkeel-studio/label-impact <code>manifest.yaml</code> at <code>956cd87</code> (<code>seats.product</code>)</td></tr>
+    <tr><th scope="row">signed</th><td><code>true</code></td></tr>
+    <tr><th scope="row">signature</th><td>over <code>2a3e3760f8fe…</code>, by <code>andaro74</code></td></tr>
+    <tr><th scope="row">package</th><td><code>pages/evidence/m06-evidence.zip</code>, 22 entries, built by <a href="https://github.com/andaro74/pharmadelta/actions/runs/42504215645">https://github.com/andaro74/pharmadelta/actions/runs/42504215645</a></td></tr>
+    <tr><th scope="row">scripted</th><td><code>false</code></td></tr>
   </tbody>
 </table>
 <h3>The same entry, as the file serves it</h3>
@@ -99,12 +138,247 @@
       "key": "seats.product"
     }
   },
-  "statement": "Reviewed: the evidence package named under `package` is the evidence milestones/README.md cites for its rows at the commit the package names, as read on the day of the signature.",
+  "statement": "Reviewed: the evidence package named under `package` holds the CI-written results milestones/README.md cites in its Measured cells for rows 0, 1, 2, 4, 5 and 6, with the ledger, SPEC/00, the goldens and the four served files at the commit the package names and label-impact's manifest at the agent commits the served files name, as read on the day of the signature.",
   "signed": true,
-  "signature": null,
-  "package": null,
-  "scripted": true,
-  "PLANT": "M06 PR 1 (milestones/M06/README.md): `signed` is true by hand. No commit by the seat holder signed anything (`signature` null) and no evidence package exists to download (`package` null). The claim of ledger row 7 is false in this state; PR 2's gate must name s-001 under signoffs_unsigned."
+  "signature": {
+    "over": "2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e",
+    "by": "andaro74",
+    "method": "the last commit that changed pages/api/sign-off.json, read from GitHub's API",
+    "read_from": "GET /repos/andaro74/pharmadelta/commits/<sha>"
+  },
+  "package": {
+    "file": "pages/evidence/m06-evidence.zip",
+    "sha256": "2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e",
+    "built_by": {
+      "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/42504215645",
+      "artifact": "m06-package-226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9"
+    },
+    "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+    "entries": [
+      {
+        "path": "agent/label-impact/8cf056345196aa28be30d05ee1e1b8bd0690d67c/manifest.yaml",
+        "sha256": "1ad2a0bb08e6fb2fb35de571098543fde0e92953d8c7e206207fde80c39fb97b",
+        "source": "agent",
+        "run_url": null,
+        "artifact": null,
+        "name": "manifest.yaml",
+        "commit": "8cf056345196aa28be30d05ee1e1b8bd0690d67c",
+        "ledger_row": null
+      },
+      {
+        "path": "agent/label-impact/956cd875c8e8200da2183ad401597cc559540b24/manifest.yaml",
+        "sha256": "5148a9b6c5c261ce92cdfd7d58191df1fe3b7b6f93186e89f89470ad16db7978",
+        "source": "agent",
+        "run_url": null,
+        "artifact": null,
+        "name": "manifest.yaml",
+        "commit": "956cd875c8e8200da2183ad401597cc559540b24",
+        "ledger_row": null
+      },
+      {
+        "path": "artifacts/m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed/observations.json",
+        "sha256": "7b5350a65a102909b6d9b8bc572cf151b26ba463429a6745724ef9cd5e595837",
+        "source": "artifact",
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/38058191295",
+        "artifact": "m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed",
+        "name": "observations.json",
+        "commit": null,
+        "ledger_row": 0
+      },
+      {
+        "path": "artifacts/m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed/result.json",
+        "sha256": "d66dce960098885f2899abf33ff3ac7a59b4b1c26a1e391b0f6a608556b62e76",
+        "source": "artifact",
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/38058191295",
+        "artifact": "m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed",
+        "name": "result.json",
+        "commit": null,
+        "ledger_row": 0
+      },
+      {
+        "path": "artifacts/m01-gate-223de2d13d518ce23327373cfff9775a49c24e0f/result.json",
+        "sha256": "b30bf449e4817d989efced4242fcafcb29650680438650afa021e07e51e1b14a",
+        "source": "artifact",
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/38077129178",
+        "artifact": "m01-gate-223de2d13d518ce23327373cfff9775a49c24e0f",
+        "name": "result.json",
+        "commit": null,
+        "ledger_row": 1
+      },
+      {
+        "path": "artifacts/m01-gate-8cdd851e8f4c02da3eb61307c2452010bc10ba84/result.json",
+        "sha256": "4225248ae1cb52c05d3a75e4cad5457f6394f3426d415d7006271068af7451c1",
+        "source": "artifact",
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/38097865560",
+        "artifact": "m01-gate-8cdd851e8f4c02da3eb61307c2452010bc10ba84",
+        "name": "result.json",
+        "commit": null,
+        "ledger_row": 1
+      },
+      {
+        "path": "artifacts/m02-gate-e8c3690d3877f8603620f3cb56c9104e530ec824/result.json",
+        "sha256": "cce68bcfdfb2216940b82cc8466d7c955c06b5a9b96c3bf59188799403858729",
+        "source": "artifact",
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/38154731153",
+        "artifact": "m02-gate-e8c3690d3877f8603620f3cb56c9104e530ec824",
+        "name": "result.json",
+        "commit": null,
+        "ledger_row": 2
+      },
+      {
+        "path": "artifacts/m03-gate-0b8d2ec7598b61c30f861a3f2114c2a13e89ad71/result.json",
+        "sha256": "78b703e0044037bf02a614af18aef65563266d48bb63f0cb48b724184df46634",
+        "source": "artifact",
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41171470951",
+        "artifact": "m03-gate-0b8d2ec7598b61c30f861a3f2114c2a13e89ad71",
+        "name": "result.json",
+        "commit": null,
+        "ledger_row": 4
+      },
+      {
+        "path": "artifacts/m04-gate-4d926760c985e973bdd5d35f1c76f0db47660808/result.json",
+        "sha256": "88355ef7c391423500e8d7acb23db0ccdd91f5f8cc28bf69c4f9708ec64770d5",
+        "source": "artifact",
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41234548875",
+        "artifact": "m04-gate-4d926760c985e973bdd5d35f1c76f0db47660808",
+        "name": "result.json",
+        "commit": null,
+        "ledger_row": 5
+      },
+      {
+        "path": "artifacts/m05-gate-8734adbd4d77c84bc98c0d423bb04bb1dbc2d4bd/result.json",
+        "sha256": "321941a341bd08543ac1838f0dd4844090ee52af0f60b53dba886cc9ef61d44c",
+        "source": "artifact",
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41266122812",
+        "artifact": "m05-gate-8734adbd4d77c84bc98c0d423bb04bb1dbc2d4bd",
+        "name": "result.json",
+        "commit": null,
+        "ledger_row": 6
+      },
+      {
+        "path": "repository/SPEC/00-overview.md",
+        "sha256": "2d44b6b02abeccc98e8813a08ee5d9cb3ef3c4b73086cd4b356e8d3b20351d96",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "SPEC/00-overview.md",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/goldens/g-001.yaml",
+        "sha256": "75bf094f1039a8cbde97a5beafbf5d9e79062d9c9e11d3ce3fd04bf39f83faa5",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "goldens/g-001.yaml",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/goldens/g-002.yaml",
+        "sha256": "373a59b8a636b377af275fc7c220a4d739e864266ca5bba50c17c883fdc01e18",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "goldens/g-002.yaml",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/goldens/g-003.yaml",
+        "sha256": "a19b533516dd1880e0d83ae0989ec079a9ac3ae2e262718a82bfb71c8e571189",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "goldens/g-003.yaml",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/goldens/g-004.yaml",
+        "sha256": "50f6bceee4866c25637e6859ca091c41b56697c179abca10135ee4e0b6c5881a",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "goldens/g-004.yaml",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/goldens/g-005.yaml",
+        "sha256": "1841b8a7d05cb1838d7191895d60c91747f5e047a8b3b1d90738d6c45ad96303",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "goldens/g-005.yaml",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/goldens/g-006.yaml",
+        "sha256": "bee341e5c45ed7d3f312c0c81c730def9d089bd90b4b231c7f4b296acf47e4f7",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "goldens/g-006.yaml",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/milestones/README.md",
+        "sha256": "e9e3eee52d9151a92ca0bf84e75c8158bf7276d38cfb6da90fa718f8320e459a",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "milestones/README.md",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/pages/api/answers.json",
+        "sha256": "436584f77f53442cf83405b728a32b0429dffe551ff67b5dcc5751fe0e79d2a3",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "pages/api/answers.json",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/pages/api/baseline.json",
+        "sha256": "17252e3ac76139dfc6e732cad4b6cc8b2fadbd79a04610bfd1e0757fc5a6a1d8",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "pages/api/baseline.json",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/pages/api/break-it.json",
+        "sha256": "0b508a080aefab0d3bb7483147cd27fa70f9b27970767a218bf62b5bc17a6cba",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "pages/api/break-it.json",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      },
+      {
+        "path": "repository/pages/api/sign-off.json",
+        "sha256": "fe34f820b80f000d13f846de5c312b9c9cdbe58550e25b46522e0037fed153e2",
+        "source": "repository",
+        "run_url": null,
+        "artifact": null,
+        "name": "pages/api/sign-off.json",
+        "commit": "226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9",
+        "ledger_row": null
+      }
+    ],
+    "written_by_ci": true
+  },
+  "scripted": false
 }
 </script>
 <pre>{
@@ -120,12 +394,247 @@
       &quot;key&quot;: &quot;seats.product&quot;
     }
   },
-  &quot;statement&quot;: &quot;Reviewed: the evidence package named under `package` is the evidence milestones/README.md cites for its rows at the commit the package names, as read on the day of the signature.&quot;,
+  &quot;statement&quot;: &quot;Reviewed: the evidence package named under `package` holds the CI-written results milestones/README.md cites in its Measured cells for rows 0, 1, 2, 4, 5 and 6, with the ledger, SPEC/00, the goldens and the four served files at the commit the package names and label-impact&#x27;s manifest at the agent commits the served files name, as read on the day of the signature.&quot;,
   &quot;signed&quot;: true,
-  &quot;signature&quot;: null,
-  &quot;package&quot;: null,
-  &quot;scripted&quot;: true,
-  &quot;PLANT&quot;: &quot;M06 PR 1 (milestones/M06/README.md): `signed` is true by hand. No commit by the seat holder signed anything (`signature` null) and no evidence package exists to download (`package` null). The claim of ledger row 7 is false in this state; PR 2&#x27;s gate must name s-001 under signoffs_unsigned.&quot;
+  &quot;signature&quot;: {
+    &quot;over&quot;: &quot;2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e&quot;,
+    &quot;by&quot;: &quot;andaro74&quot;,
+    &quot;method&quot;: &quot;the last commit that changed pages/api/sign-off.json, read from GitHub&#x27;s API&quot;,
+    &quot;read_from&quot;: &quot;GET /repos/andaro74/pharmadelta/commits/&lt;sha&gt;&quot;
+  },
+  &quot;package&quot;: {
+    &quot;file&quot;: &quot;pages/evidence/m06-evidence.zip&quot;,
+    &quot;sha256&quot;: &quot;2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e&quot;,
+    &quot;built_by&quot;: {
+      &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/42504215645&quot;,
+      &quot;artifact&quot;: &quot;m06-package-226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;
+    },
+    &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+    &quot;entries&quot;: [
+      {
+        &quot;path&quot;: &quot;agent/label-impact/8cf056345196aa28be30d05ee1e1b8bd0690d67c/manifest.yaml&quot;,
+        &quot;sha256&quot;: &quot;1ad2a0bb08e6fb2fb35de571098543fde0e92953d8c7e206207fde80c39fb97b&quot;,
+        &quot;source&quot;: &quot;agent&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;manifest.yaml&quot;,
+        &quot;commit&quot;: &quot;8cf056345196aa28be30d05ee1e1b8bd0690d67c&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;agent/label-impact/956cd875c8e8200da2183ad401597cc559540b24/manifest.yaml&quot;,
+        &quot;sha256&quot;: &quot;5148a9b6c5c261ce92cdfd7d58191df1fe3b7b6f93186e89f89470ad16db7978&quot;,
+        &quot;source&quot;: &quot;agent&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;manifest.yaml&quot;,
+        &quot;commit&quot;: &quot;956cd875c8e8200da2183ad401597cc559540b24&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;artifacts/m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed/observations.json&quot;,
+        &quot;sha256&quot;: &quot;7b5350a65a102909b6d9b8bc572cf151b26ba463429a6745724ef9cd5e595837&quot;,
+        &quot;source&quot;: &quot;artifact&quot;,
+        &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/38058191295&quot;,
+        &quot;artifact&quot;: &quot;m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed&quot;,
+        &quot;name&quot;: &quot;observations.json&quot;,
+        &quot;commit&quot;: null,
+        &quot;ledger_row&quot;: 0
+      },
+      {
+        &quot;path&quot;: &quot;artifacts/m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed/result.json&quot;,
+        &quot;sha256&quot;: &quot;d66dce960098885f2899abf33ff3ac7a59b4b1c26a1e391b0f6a608556b62e76&quot;,
+        &quot;source&quot;: &quot;artifact&quot;,
+        &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/38058191295&quot;,
+        &quot;artifact&quot;: &quot;m00-gate-47788c0a0b84854145e82e5fc70c9b22a87ab4ed&quot;,
+        &quot;name&quot;: &quot;result.json&quot;,
+        &quot;commit&quot;: null,
+        &quot;ledger_row&quot;: 0
+      },
+      {
+        &quot;path&quot;: &quot;artifacts/m01-gate-223de2d13d518ce23327373cfff9775a49c24e0f/result.json&quot;,
+        &quot;sha256&quot;: &quot;b30bf449e4817d989efced4242fcafcb29650680438650afa021e07e51e1b14a&quot;,
+        &quot;source&quot;: &quot;artifact&quot;,
+        &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/38077129178&quot;,
+        &quot;artifact&quot;: &quot;m01-gate-223de2d13d518ce23327373cfff9775a49c24e0f&quot;,
+        &quot;name&quot;: &quot;result.json&quot;,
+        &quot;commit&quot;: null,
+        &quot;ledger_row&quot;: 1
+      },
+      {
+        &quot;path&quot;: &quot;artifacts/m01-gate-8cdd851e8f4c02da3eb61307c2452010bc10ba84/result.json&quot;,
+        &quot;sha256&quot;: &quot;4225248ae1cb52c05d3a75e4cad5457f6394f3426d415d7006271068af7451c1&quot;,
+        &quot;source&quot;: &quot;artifact&quot;,
+        &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/38097865560&quot;,
+        &quot;artifact&quot;: &quot;m01-gate-8cdd851e8f4c02da3eb61307c2452010bc10ba84&quot;,
+        &quot;name&quot;: &quot;result.json&quot;,
+        &quot;commit&quot;: null,
+        &quot;ledger_row&quot;: 1
+      },
+      {
+        &quot;path&quot;: &quot;artifacts/m02-gate-e8c3690d3877f8603620f3cb56c9104e530ec824/result.json&quot;,
+        &quot;sha256&quot;: &quot;cce68bcfdfb2216940b82cc8466d7c955c06b5a9b96c3bf59188799403858729&quot;,
+        &quot;source&quot;: &quot;artifact&quot;,
+        &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/38154731153&quot;,
+        &quot;artifact&quot;: &quot;m02-gate-e8c3690d3877f8603620f3cb56c9104e530ec824&quot;,
+        &quot;name&quot;: &quot;result.json&quot;,
+        &quot;commit&quot;: null,
+        &quot;ledger_row&quot;: 2
+      },
+      {
+        &quot;path&quot;: &quot;artifacts/m03-gate-0b8d2ec7598b61c30f861a3f2114c2a13e89ad71/result.json&quot;,
+        &quot;sha256&quot;: &quot;78b703e0044037bf02a614af18aef65563266d48bb63f0cb48b724184df46634&quot;,
+        &quot;source&quot;: &quot;artifact&quot;,
+        &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/41171470951&quot;,
+        &quot;artifact&quot;: &quot;m03-gate-0b8d2ec7598b61c30f861a3f2114c2a13e89ad71&quot;,
+        &quot;name&quot;: &quot;result.json&quot;,
+        &quot;commit&quot;: null,
+        &quot;ledger_row&quot;: 4
+      },
+      {
+        &quot;path&quot;: &quot;artifacts/m04-gate-4d926760c985e973bdd5d35f1c76f0db47660808/result.json&quot;,
+        &quot;sha256&quot;: &quot;88355ef7c391423500e8d7acb23db0ccdd91f5f8cc28bf69c4f9708ec64770d5&quot;,
+        &quot;source&quot;: &quot;artifact&quot;,
+        &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/41234548875&quot;,
+        &quot;artifact&quot;: &quot;m04-gate-4d926760c985e973bdd5d35f1c76f0db47660808&quot;,
+        &quot;name&quot;: &quot;result.json&quot;,
+        &quot;commit&quot;: null,
+        &quot;ledger_row&quot;: 5
+      },
+      {
+        &quot;path&quot;: &quot;artifacts/m05-gate-8734adbd4d77c84bc98c0d423bb04bb1dbc2d4bd/result.json&quot;,
+        &quot;sha256&quot;: &quot;321941a341bd08543ac1838f0dd4844090ee52af0f60b53dba886cc9ef61d44c&quot;,
+        &quot;source&quot;: &quot;artifact&quot;,
+        &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/41266122812&quot;,
+        &quot;artifact&quot;: &quot;m05-gate-8734adbd4d77c84bc98c0d423bb04bb1dbc2d4bd&quot;,
+        &quot;name&quot;: &quot;result.json&quot;,
+        &quot;commit&quot;: null,
+        &quot;ledger_row&quot;: 6
+      },
+      {
+        &quot;path&quot;: &quot;repository/SPEC/00-overview.md&quot;,
+        &quot;sha256&quot;: &quot;2d44b6b02abeccc98e8813a08ee5d9cb3ef3c4b73086cd4b356e8d3b20351d96&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;SPEC/00-overview.md&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/goldens/g-001.yaml&quot;,
+        &quot;sha256&quot;: &quot;75bf094f1039a8cbde97a5beafbf5d9e79062d9c9e11d3ce3fd04bf39f83faa5&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;goldens/g-001.yaml&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/goldens/g-002.yaml&quot;,
+        &quot;sha256&quot;: &quot;373a59b8a636b377af275fc7c220a4d739e864266ca5bba50c17c883fdc01e18&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;goldens/g-002.yaml&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/goldens/g-003.yaml&quot;,
+        &quot;sha256&quot;: &quot;a19b533516dd1880e0d83ae0989ec079a9ac3ae2e262718a82bfb71c8e571189&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;goldens/g-003.yaml&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/goldens/g-004.yaml&quot;,
+        &quot;sha256&quot;: &quot;50f6bceee4866c25637e6859ca091c41b56697c179abca10135ee4e0b6c5881a&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;goldens/g-004.yaml&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/goldens/g-005.yaml&quot;,
+        &quot;sha256&quot;: &quot;1841b8a7d05cb1838d7191895d60c91747f5e047a8b3b1d90738d6c45ad96303&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;goldens/g-005.yaml&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/goldens/g-006.yaml&quot;,
+        &quot;sha256&quot;: &quot;bee341e5c45ed7d3f312c0c81c730def9d089bd90b4b231c7f4b296acf47e4f7&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;goldens/g-006.yaml&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/milestones/README.md&quot;,
+        &quot;sha256&quot;: &quot;e9e3eee52d9151a92ca0bf84e75c8158bf7276d38cfb6da90fa718f8320e459a&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;milestones/README.md&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/pages/api/answers.json&quot;,
+        &quot;sha256&quot;: &quot;436584f77f53442cf83405b728a32b0429dffe551ff67b5dcc5751fe0e79d2a3&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;pages/api/answers.json&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/pages/api/baseline.json&quot;,
+        &quot;sha256&quot;: &quot;17252e3ac76139dfc6e732cad4b6cc8b2fadbd79a04610bfd1e0757fc5a6a1d8&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;pages/api/baseline.json&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/pages/api/break-it.json&quot;,
+        &quot;sha256&quot;: &quot;0b508a080aefab0d3bb7483147cd27fa70f9b27970767a218bf62b5bc17a6cba&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;pages/api/break-it.json&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      },
+      {
+        &quot;path&quot;: &quot;repository/pages/api/sign-off.json&quot;,
+        &quot;sha256&quot;: &quot;fe34f820b80f000d13f846de5c312b9c9cdbe58550e25b46522e0037fed153e2&quot;,
+        &quot;source&quot;: &quot;repository&quot;,
+        &quot;run_url&quot;: null,
+        &quot;artifact&quot;: null,
+        &quot;name&quot;: &quot;pages/api/sign-off.json&quot;,
+        &quot;commit&quot;: &quot;226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9&quot;,
+        &quot;ledger_row&quot;: null
+      }
+    ],
+    &quot;written_by_ci&quot;: true
+  },
+  &quot;scripted&quot;: false
 }</pre>
 </section>
 
@@ -133,8 +642,8 @@
   <p>This demo produces the evidence a validation would need. It is not medical information: the agent assesses
      regulatory impact on labeling and never answers a treatment question (SPEC/00 §2). The authority for what this demo
      claims is <code>SPEC/00-overview.md</code>; what was measured is in <code>milestones/README.md</code>. No number on
-     this page is a measured result: the sign-off's id is this file's, the seat count is SPEC/00 §5's, and the commit named
-     under the reviewer is the manifest's own.</p>
+     this page is a measured result: the hashes, commits, run ids and row numbers are the records' own, the runs are
+     linked, and the seat count is SPEC/00 §5's. What CI read back of this sign-off is in the M06 gate's runs, linked above.</p>
 </footer>
 </body>
 </html>

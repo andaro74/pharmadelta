@@ -21,9 +21,9 @@ this is the same row with the open detail.
 | Falsifiers | F6.1 a sign-off the sign-off page shows as signed was not a seat holder's over a downloadable evidence package, as this repository's CI can read back: it carries no signing record, or the commit that last changed the served file was not authored by the login that holds the seat shown in `label-impact`'s `manifest.yaml`, or the function shown is not that seat's (SPEC/00 §5); or it carries no package record, or the package file it names is not in the repository, or that file's SHA-256 differs from the one the signature names, or an entry of the package is not the CI-written result the run and artifact it names wrote; or the page shows a sign-off the served file does not serve. |
 | Seeded commit | `6cfc1eb` on `m06-pr1`: `pages/api/sign-off.json`, the reviewer sign-offs pharmadelta serves, one entry `s-001`: reviewer Regulatory Affairs, the seat `product`, held by `andaro74` as `label-impact`'s `manifest.yaml` reads at `956cd87`; a statement; `signed` true written by hand; `signature` null (no commit, no login read back, no time); `package` null (no file, no hash, no entries, no link); `scripted` true, a `PLANT` key beside them; `pages/sign-off.html`, the sign-off page, showing it as signed with nothing to download, labelled scripted, the same object embedded. No evidence package exists in the repository, and nothing in it builds one, hashes one or reads a signing commit. |
 | Expected gate output | PR 2's gate, in CI, reads every sign-off the served file serves and the page shows and names each shown as signed that carries no signing record, or no package record, or names a package file that is not in the repository (`signoffs_unsigned`), and each that the page and the file do not agree on (`signoffs_disagreed`); then, for each signed sign-off, reads from GitHub's API the commit that last changed the served file and checks its author's login is the one holding the seat shown in `label-impact`'s `manifest.yaml` at the commit the reviewer record names and that the function shown is that seat's (SPEC/00 §5), hashes the package file and compares it with the hash the signature names, and compares each entry of the package with the artifact of the CI run it names, downloaded in that run; it names each that fails any of these (`signoffs_differing`). It writes a `result.json` that is RED when any sign-off is unsigned, disagreed or differing, naming each; GREEN only when every sign-off shown as signed carries a signing record by the seat holder and a package that hashes to what was signed with every entry equal to its CI artifact, and is shown as served; UNSCORABLE when nothing is RED and the served files, GitHub's API, the manifest or an artifact could not be read. On `6cfc1eb`: RED, `signoffs_unsigned` `["s-001"]`, `signoffs_disagreed` `[]`, `signoffs_differing` `[]`. The Measured cell cites the `main` run after PR 2 merges (M01 Unsure 23, ruled at M02 PR 1). |
-| Measured | |
-| PRs used / cap | 3 / 4 |
-| State | OPEN |
+| Measured | RED, `signoffs_unsigned` `["s-001"]`, `signoffs_disagreed` `[]`, `signoffs_differing` `[]`, `unreadable` `[]`, `written_by_ci` true, on `main` at `e175d77`: [run 42495856254](https://github.com/andaro74/pharmadelta/actions/runs/42495856254), artifact `m06-gate-e175d772bd32ce9e148f79b868b72a2dcfa8b24f`. The PR run on #34 at merge ref `8431885`, [run 42491031888](https://github.com/andaro74/pharmadelta/actions/runs/42491031888), artifact `m06-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`, read the same on every field the row names. Equals the expected output. The lift (M03's path (b), `milestones/M06/rulings/pr2.md` 17): the package built by [run 42504215645](https://github.com/andaro74/pharmadelta/actions/runs/42504215645) as artifact `m06-package-226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9` and committed byte for byte at `3e56b07`; the seat holder's own signing commit `37352ef`; the run on PR #36 at merge ref `15fef71`, [run 42524408048](https://github.com/andaro74/pharmadelta/actions/runs/42524408048), artifact `m06-gate-15fef71e0c10aecf7a774d99ab3ea99c1f4da82c`, read GREEN, every list `[]`, `unreadable` `[]`, the signing commit's author `andaro74`, the seat's login `andaro74`, the hash equal, 22 of 22 entries equal to their sources; a reading after the measurement. |
+| PRs used / cap | 4 / 4 |
+| State | GREEN |
 
 ## The false state (P1, P2)
 
@@ -866,6 +866,430 @@ read `GREEN` with every list `[]`, readings after their measurements,
 named in a comment on #35 and not in a cell (Unsure 11, ruled at PR 2).
 The push that adds this section runs every gate again; the second
 `M06 gate` run is read into the same comment.
+
+## Close (PR 4, 2026-11-08 UTC)
+
+PR 4 closes the milestone at the cap, 4 / 4. It carries the lift by
+M03's path (b), as `rulings/pr2.md` 17 ruled: a CI run builds the
+evidence package and writes it as an artifact; the zip is committed
+under `pages/evidence/` by hand, byte for byte; then the seat holder's
+own commit, made from their terminal and not by the session or by CI,
+fills `signature` and `package` in `pages/api/sign-off.json`, sets
+`scripted` false, removes the `PLANT` key and rebuilds the page from
+the file. It fills the "Measured" cell from a CI-written result, writes
+the row's state, rules or carries by name every open Unsure item of PR
+1 to PR 3, adds `rulings/pr4.md`, and is followed by the tag `m06` on
+its merge commit after the run on `main` is read. Nothing here decides
+the row: the `main` run after #34 merged, 42495856254, is the
+measurement, read again at this PR before the cell is written. The
+gate, `src/m06/gate.py` and `m06.yml`, is not changed.
+
+### Precondition, read at open
+
+#35 merged at `194a6ab` on 2026-11-08 UTC; `main` holds `47d9c3c` and
+`d198b6f` and `src/m06/gate.py` as repaired. Tags `m00` `e94b76b`,
+`m01` `c60599e`, `m02` `ab72b9d`, `m03` `9932776`, `m04` `3905c10`,
+`m05` `71770aa`; no `m06` tag. Row 7 OPEN at 3 / 4. The `main` run
+after #35 merged,
+[42502413422](https://github.com/andaro74/pharmadelta/actions/runs/42502413422)
+on `194a6ab` (push), had completed: downloaded with `gh run download`
+into a fresh directory before any edit and read with `python -I`,
+artifact `m06-gate-194a6ab0581560f44d0ce9d3f1e4963d0a24b6b3` (1722
+bytes zipped, `result.json` 4058 bytes, `expires_at`
+2027-02-06T16:56:26Z): `RED`, `signoffs_unsigned` `["s-001"]`,
+`signoffs_disagreed` `[]`, `signoffs_differing` `[]`, `unreadable` `[]`,
+`written_by_ci` true, `read_back` null, `artifacts_read` `[]`, `env_set`
+`{"token": true}`, `run_at` `2026-11-08T16:56:34+00:00`; grepped for
+`ghs_`, `ghp_`, `github_pat_`, `execute-api`, `us-west-2_` and
+`amazonaws.com/`: no match. The same as runs 42491031888, 42495856254
+and 42500055895 on every field the row names; a reading after the
+measurement. The plant stood: `git diff 6cfc1eb main -- pages/` was
+empty. The Measured cell's source, run 42495856254, and the PR run
+42491031888 were downloaded again the same way and read the same (the
+table under "Measured", below). The artifacts the cells of rows 0, 1,
+2, 4, 5 and 6 cite were listed through the API: none expired, the
+earliest expiry 2027-01-08T14:04:46Z (row 0's). `main`'s required
+checks: `M00 gate` alone, `strict` true (Unsure 3).
+
+### Unsure 16, ruled before the lift (Product, Threshold Owner, Data Owner)
+
+Ruled in the first commit of this PR, before any page was written
+(`rulings/pr2.md` 17; `rulings/pr4.md` 1). The package carries, each
+entry at its `path` in the zip with every field of the gate's
+`ENTRY_RECORD`, null where unused:
+
+| Source | Entries | `commit` / `run_url` | `ledger_row` |
+|---|---|---|---|
+| `artifact` | `artifacts/<artifact>/result.json` of the CI run each "Measured" cell cites: row 0 [38058191295](https://github.com/andaro74/pharmadelta/actions/runs/38058191295) (`m00-gate-47788c0…`), with that run's `observations.json`, the baseline's report on scenarios 5 and 6 (M05 Unsure 12); row 1 [38077129178](https://github.com/andaro74/pharmadelta/actions/runs/38077129178) (`m01-gate-223de2d…`, the artifact the cell names) and [38097865560](https://github.com/andaro74/pharmadelta/actions/runs/38097865560) (`m01-gate-8cdd851…`, the `main` run the cell names beside it); row 2 [38154731153](https://github.com/andaro74/pharmadelta/actions/runs/38154731153) (`m02-gate-e8c3690…`); row 4 [41171470951](https://github.com/andaro74/pharmadelta/actions/runs/41171470951) (`m03-gate-0b8d2ec…`); row 5 [41234548875](https://github.com/andaro74/pharmadelta/actions/runs/41234548875) (`m04-gate-4d92676…`); row 6 [41266122812](https://github.com/andaro74/pharmadelta/actions/runs/41266122812) (`m05-gate-8734adb…`). Nine files. Each downloaded in the build run through the API as the gate downloads it | the run; `commit` null | 0, 0, 1, 1, 2, 4, 5, 6 |
+| `repository` | `repository/milestones/README.md`, `repository/SPEC/00-overview.md`, `repository/goldens/g-001.yaml` to `g-006.yaml`, `repository/pages/api/answers.json`, `baseline.json`, `break-it.json`, `sign-off.json`: twelve files, read from the checkout with `git show <sha>:<path>` | the build run's commit, 40 hex digits, the same as `package.commit` (Unsure 29) | null |
+| `agent` | `agent/label-impact/<sha>/manifest.yaml` at each agent commit the served files name: `8cf0563` (`answers.json`, `agent.commit`) and `956cd87` (`break-it.json`, `agent.commit`; `sign-off.json`, `reviewer.seat_read_from.commit`), the short sha each file names resolved to the full one through `GET /repos/agentkeel-studio/label-impact/commits/<sha>`, the file read through the contents API as the gate reads it (Unsure 23) | the agent's commit, 40 hex digits | null |
+
+Plus `manifest.json`, the entries as a list, equal to `package.entries`.
+Twenty-two entries, twenty-three members with `manifest.json`. The ordinary assistant's results are in: the M00
+run's `observations.json` and `result.json` (the baseline over the
+goldens, scored), the M04 run's `result.json` (the baseline run the
+side-by-side page's record names, compared), and `baseline.json`, the
+served file (Unsure 16's question: yes). Every number in the package is
+a CI-written result or a copy of data. Not in: the M02 artifact's
+`sources/` (the eCFR and DailyMed responses, 140 KB; the cell cites the
+`result.json`, and the sources stay in the artifact until it expires),
+the M04 run's `observations.json` (its `result.json` carries the
+comparison; the observations are the baseline's own run, which the M00
+entry already shows on the same goldens), `data/` (copied into the
+served files' `row` and `clause` where an answer is shown;
+`data/table.json` and `data/clauses.json` are what the M02 gate
+compares, and its `result.json` is in), and any `m06-gate` result (row
+7's own measurement is what this package is signed for, not what it
+holds). The served files are as at the build's commit, which precedes
+the signing commit by construction: `sign-off.json` inside the package
+is the plant's entry with `signature` null, and the ledger inside it has
+row 7's "Measured" cell empty. A signature cannot be inside the package
+it signs over; the package is what was reviewed, and the signature and
+the cell are written after it (Unsure 34).
+
+The zip is `pages/evidence/m06-evidence.zip` (`package.file`), the
+basename `m06-evidence.zip` inside the artifact `m06-package-<sha>`
+(Unsure 26, 36). It is deterministic: entries sorted by path, one fixed
+timestamp, deflated at one level, so a reader with the same sources
+writes the same bytes. The build writes no zip when any source could
+not be read or any member holds a token's prefix or the door's host or
+pool prefix; `build.json` beside it says why.
+
+### Unsure 9, ruled before the lift (Product, Rule Owner)
+
+The statement PR 1 proposed named "the evidence milestones/README.md
+cites for its rows". The package carries row 7's own evidence for no
+row, and the cells of rows 0, 1, 2, 4, 5 and 6 only; the statement
+names them. Fixed, in the first commit, before the signing commit:
+
+> Reviewed: the evidence package named under `package` holds the
+> CI-written results milestones/README.md cites in its Measured cells
+> for rows 0, 1, 2, 4, 5 and 6, with the ledger, SPEC/00, the goldens
+> and the four served files at the commit the package names and
+> label-impact's manifest at the agent commits the served files name,
+> as read on the day of the signature.
+
+It claims a reading, not a state; it carries none of SPEC/00 §11's six
+words; it answers no question (`rulings/pr4.md` 2).
+
+### The lift path (rulings/pr2.md 17)
+
+M03's path (b), with the difference PR 2 ruled: the package is written
+by a CI run with no write permission and committed by hand, and the
+signing commit is the reviewer's own, by hand, because a commit by CI is
+not a reviewer's signature (Unsure 1, 15).
+
+- `.github/workflows/m06-lift.yml`: `permissions` `contents: read` and
+  `actions: read`. One job: `actions/checkout@v7`, `uv sync --locked`,
+  the artifact directory, then `uv run python -m src.m06.build` with
+  `GITHUB_TOKEN` in that step's `env` and nothing else (no secret and no
+  variable of M03's; grep `secrets.`: one match, `GITHUB_TOKEN`; grep
+  `vars.`: none); then a step that greps the JSON records for a token's
+  prefix (`ghs_`, `ghp_`, `github_pat_`) and fails on a match; then the
+  artifact `m06-package-<sha>` holding the zip and `build.json`, 90
+  days, uploaded only when the grep passed. Runs by hand
+  (`workflow_dispatch`) and once on a push that adds or edits its own
+  file on a branch other than `main`, because a dispatch needs the file
+  on the default branch and the package is built before it is there,
+  M03 Unsure 32's shape as `m03-lift.yml` and `m05-lift.yml` (Unsure
+  33).
+- `src/m06/build.py`: imports the gate's `Artifacts`, `api_json`,
+  `read_agent_file`, `git`, `git_bytes`, `sha256_hex`, `ci_context`
+  and `write_json` and copies none of them, so the build reads each
+  source by the same code the gate reads it back with. Refuses to build
+  when the checkout's `HEAD` is not the run's `GITHUB_SHA` or the tree
+  is dirty: the package describes one commit. Downloads each cited
+  artifact (the listing, then the archive through its 302 without the
+  token), reads the repository files with `git show <sha>:<path>` and
+  the goldens by `git ls-tree` at that sha, resolves the agent commits
+  the served files name and reads the manifest at each, checks every
+  member against the forbidden patterns, writes the zip and
+  `build.json` (provenance, `ok`, `why`, `package` with `sha256`,
+  `bytes`, `commit`, `built_by`, `written_by_ci`, the `entries`,
+  `artifacts_read` with each `expires_at`, `agent_commits` as resolved,
+  `env_set` one boolean). Exit 0 when the zip was written, 2 otherwise.
+  Outside CI it writes `written_by_ci` false, and that zip is not
+  committed (P4).
+- `src/m06/page.py`: by hand, in the signing commit. Rebuilds
+  `pages/sign-off.html` from `pages/api/sign-off.json`,
+  deterministically, LF pinned (M03 Unsure 33), the records shown as
+  the file holds them, the download link by the zip's GitHub URL at the
+  commit that added it, no read-back claim and no measured number
+  (Unsure 15, 18, 37). The gate reads page and file equal as parsed
+  JSON whichever writer produced the page.
+- The signing commit: the seat holder's own, run from their terminal.
+  `pages/api/sign-off.json` with `signature` (`over` the zip's SHA-256,
+  `by` `andaro74`, `method` the sentence fixed at PR 2, `read_from` the
+  API path), `package` (`file`, `sha256`, `built_by`, `commit`,
+  `entries` equal to the zip's `manifest.json`, `written_by_ci` true),
+  `scripted` false, no `PLANT` key, the statement as fixed above, and
+  the page rebuilt from it. After it nothing changes the served file:
+  the commit that last changed it stays the reviewer's.
+
+### The build (CI runs 42504215645 and 42503988551, not the Measured cell)
+
+The first commit of this PR, `226ad89`, was pushed on 2026-11-08 UTC.
+The push ran `m06-lift.yml` once, as its `push` trigger says
+([42503988551](https://github.com/andaro74/pharmadelta/actions/runs/42503988551),
+17:14:50Z, success). Then `gh workflow run m06-lift.yml --ref m06-pr4`
+was tried for Unsure 33 and accepted: GitHub ran the dispatch on the
+branch before the file was on `main`
+([42504215645](https://github.com/andaro74/pharmadelta/actions/runs/42504215645),
+`workflow_dispatch`, 17:17:31Z, success). Both ran at `226ad89`. Both
+artifacts were downloaded with `gh run download` into fresh directories
+and read with `python -I`; the two zips are byte-identical
+(`cmp` equal, one SHA-256). The dispatch run is the one the record
+names, since the close asked for a dispatch; the push run is named
+here beside it.
+
+| Field | Run 42504215645 (`package.built_by`) |
+|---|---|
+| artifact | `m06-package-226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9`, id 13626414153, 53226 bytes zipped, `expires_at` 2027-02-06T17:17:32Z (the push run's: id 13627035673, 53221 bytes zipped, `expires_at` 2027-02-06T17:14:50Z) |
+| `build.json` | `ok` true, `written_by_ci` true, `commit` `226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9`, `dirty` false, `event` `workflow_dispatch`, `ref` `refs/heads/m06-pr4`, `run_at` `2026-11-08T17:17:41+00:00`, `env_set` `{"token": true}`, `failures` `[]`; 18248 bytes. Grepped for `ghs_`, `ghp_`, `github_pat_`, `execute-api`, `us-west-2_`, `blob.core` and `sig=`: no match |
+| `m06-evidence.zip` | 51837 bytes, SHA-256 `2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e`, equal to `build.json`'s `package.sha256`; 23 members: `manifest.json` and 22 entries; `manifest.json` equal to `build.json`'s `entries` as canonical JSON; every entry's bytes hash to its `sha256`; every entry carries the eight fields of `ENTRY_RECORD` in order; every `repository` entry's `commit` is `226ad89…`, the run's sha |
+| `artifacts_read` | seven artifacts, each listed 200 and downloaded 200, none expired: `m00-gate-47788c0…` (expires 2027-01-08T14:04:46Z), `m01-gate-223de2d…` (2027-01-08T18:46:23Z), `m01-gate-8cdd851…` (2027-01-09T00:16:26Z), `m02-gate-e8c3690…` (2027-01-09T16:15:55Z), `m03-gate-0b8d2ec…` (2027-01-29T05:09:45Z), `m04-gate-4d92676…` (2027-01-29T19:30:36Z), `m05-gate-8734adb…` (2027-01-30T02:39:54Z); the nine files taken hash as the same artifacts did when downloaded by hand at open |
+| `agent_commits` | `8cf0563` → `8cf056345196aa28be30d05ee1e1b8bd0690d67c` (named by `answers.json`), `956cd87` → `956cd875c8e8200da2183ad401597cc559540b24` (named by `break-it.json` and `sign-off.json`), both 200 |
+| the job | every step succeeded; the grep step read "no match"; the upload wrote the two files |
+
+Construction, not evidence (P4): the build run from a clean worktree at
+`226ad89` on this machine, with the owner's token in one process's
+environment, wrote a zip whose 23 members are byte-identical to the CI
+zip's and whose archive bytes are not: Windows Python's `zlib` is
+zlib-ng and Ubuntu's is zlib, and the two deflate the same bytes
+differently. The zip is deterministic given one zlib; the committed
+bytes are the artifact's, never a local build's, and a reader who
+rebuilds compares members and hashes, not archive bytes (Unsure 38).
+
+### The zip, committed
+
+The second commit of this PR adds `pages/evidence/m06-evidence.zip`,
+the file of the dispatch run's artifact copied byte for byte: SHA-256
+`2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e`,
+51837 bytes, checked after `git add` against the blob git stores (`git
+show :pages/evidence/m06-evidence.zip | sha256sum`), which `.gitattributes`
+leaves unconverted (`git ls-files --eol` reads `-text`). Nothing else
+under `pages/` changes in that commit; `pages/api/sign-off.json` still
+serves the plant.
+
+### The signing commit (`37352ef`)
+
+The fourth commit of this PR is the seat holder's own, made from their
+terminal on 2026-11-08 at 21:13:49Z and not by the session or by CI,
+with the two files `src/m06/page.py` had written in the working tree:
+`pages/api/sign-off.json` and `pages/sign-off.html`, nothing else
+(`git show --stat 37352ef`: two files). GitHub's API reads the commit
+with `author.login` `andaro74` and `committer.login` `andaro74`,
+`verification.verified` false, reason `unsigned`, one parent `8b95193`
+(Unsure 40). In the served file: `signature` `over`
+`2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e`,
+`by` `andaro74`, `method` the sentence fixed at PR 2, `read_from` `GET
+/repos/andaro74/pharmadelta/commits/<sha>`; `package` `file`
+`pages/evidence/m06-evidence.zip`, `sha256` the same hash, `built_by`
+run 42504215645 and artifact `m06-package-226ad89…`, `commit`
+`226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9`, `entries` the 22 records
+equal to the zip's `manifest.json`, `written_by_ci` true; `scripted`
+false; no `PLANT` key; the statement as fixed above; `lift` naming the
+run and the artifact. The page is the writer's output from that file:
+the reviewer, the statement, the signature record with no read-back
+claim, the package record with the download link by the zip's GitHub
+URL at `3e56b07` and each entry linked to its source, the same object in
+its `id="signoff-s-001"` block, the banner saying the sign-off is built
+in this repository's website layer, not an agentkeel seat or a platform
+control, and that one person holds all seven seats. No number on the
+page is anything but a hash, a size or a count read from the file. It
+produces the evidence a validation would need. Since this commit nothing
+has changed the served file: `git log -1 --format=%H --
+pages/api/sign-off.json` reads `37352ef…` at the close commit.
+
+### Observed (CI run on this PR, 2026-11-08 UTC; not the Measured cell)
+
+PR #36 opened at 21:16Z on head `37352ef`. Its `M06 gate` run,
+[42524408048](https://github.com/andaro74/pharmadelta/actions/runs/42524408048) (`pull_request`, merge ref `15fef71`), was
+downloaded with `gh run download` into a fresh directory and read with
+`python -I`: artifact `m06-gate-15fef71e0c10aecf7a774d99ab3ea99c1f4da82c`
+(id 13634712284, 5079 bytes zipped, `result.json` 24912 bytes,
+`expires_at` 2027-02-06T21:16:59Z). Grepped for `ghs_`, `ghp_`,
+`github_pat_`, `execute-api`, `us-west-2_` and `amazonaws.com/`: no
+match.
+
+| Field | Read |
+|---|---|
+| `verdict` | `GREEN`; the gate step, the grep step and the upload succeeded; exit 0 |
+| `signoffs_unsigned`, `signoffs_disagreed`, `signoffs_differing`, `unreadable` | `[]`, `[]`, `[]`, `[]` |
+| `written_by_ci`, `env_set` | true, `{"token": true}` |
+| `run_at`, `commit` | `2026-11-08T21:17:14+00:00`, `15fef71e0c10aecf7a774d99ab3ea99c1f4da82c` |
+| `served[0]` | `s-001`, `shown_signed` true, `signature_record.has_record` true, `package_record.has_record` true ("22 entries, every field present"), `signed` true, `page_equal` true |
+| `read_back.function` | seat `product`, shown `Regulatory Affairs`, expected `Regulatory Affairs`, equal |
+| `read_back.last_commit` | `37352ef713af56758316b565287195c3b339ecd2` from `git log -1 --format=%H -- pages/api/sign-off.json` (the branch commit, not the merge ref: Unsure 22) |
+| `read_back.commit` | 200, `author_login` `andaro74`, `committer_login` `andaro74`, `authored_at` `2026-11-08T21:13:49Z`, `verified` false (`unsigned`), one parent `8b95193…` |
+| `read_back.manifest` | 200 at `ref=956cd87`, blob `4d6d126…`, seat `product` → login `andaro74`; all seven seats `andaro74` |
+| `read_back.package_file` | 51837 bytes, `sha256` equal to `signed_over` and to `recorded`, `2a3e3760…1699e` |
+| `read_back.package_zip` | `is_zip` true, 23 files |
+| `read_back.entries` | 22, every `in_package` true, every `sha256_equal` true, every `source_read.read` true (two `agent` entries 200, twelve `repository` entries by `git show`, eight `artifact` entries found in their downloaded artifacts), every `equal` true |
+| `read_back.built_by` | run 42504215645, artifact `m06-package-226ad89…`, file `m06-evidence.zip`, read, found, equal |
+| `read_back.differences`, `read_back.not_read`, `read_back.equal` | `[]`, `[]`, true |
+| `artifacts_read` | eight: the seven gate artifacts of rows 0, 1 (two), 2, 4, 5, 6 and the build artifact, each listed 200 and downloaded 200, none expired; the earliest `expires_at` 2027-01-08T14:04:46Z (row 0), the build artifact's 2027-02-06T17:17:32Z |
+
+Every field the close expected. The read-back paths (`read_last_commit`,
+`read_commit`, `read_manifest_seat`, the artifact listing and download
+with the workflow's token, the redirect leg) ran in CI for the first
+time on this run (Unsure 30, 41). This is a reading after the
+measurement and decides nothing about the row; the cell cites run
+42495856254.
+
+### The other gates on this PR's head (not a cell)
+
+Read the same way, recorded here and in a comment on #36, not in any
+cell (M03 `rulings/pr4.md` 6, 22; M04 `rulings/pr4.md` 22; M05
+`rulings/pr4.md` 3; M06 Unsure 11, ruled).
+
+| Gate | Run | Read |
+|---|---|---|
+| `M00 gate` | [42524407962](https://github.com/andaro74/pharmadelta/actions/runs/42524407962) | the job succeeded |
+| `M01 gate` | [42524407973](https://github.com/andaro74/pharmadelta/actions/runs/42524407973) | `PENDING`, exit 3, as on every run since M01 PR 4: no deploy run of agentkeel's naming label-impact among the 100 read, the registry unread; not required |
+| `M02 gate` | [42524408109](https://github.com/andaro74/pharmadelta/actions/runs/42524408109) | the job succeeded |
+| `M03 gate` | [42524407941](https://github.com/andaro74/pharmadelta/actions/runs/42524407941) | `RED`, `answers_uncalled` `[]`, `answers_disagreed` `[]`, `answers_differing` `["g-001"]`, `unreadable` `[]`; sign-in 200; the door 200, `stop_reason` `end_turn`, `guardrail_topics` `[]`, the same two `find_label_row` tool errors on section `8.1` as every call since M03 (M03 Unsure 23), and this time a `parsed` object with `table_row` null, a clause and `impacted` false, where the served answer is null: "one side has an answer and the other has none". The `main` run after #35, [42502413323](https://github.com/andaro74/pharmadelta/actions/runs/42502413323), read `parsed` null on the same tool errors and GREEN. Nothing in this PR touches `pages/api/answers.json`, the agent or its door; the door's answer to g-001 varies between calls. A reading after row 4's measurement; row 4's cell stands (Unsure 42) |
+| `M04 gate` | [42524408003](https://github.com/andaro74/pharmadelta/actions/runs/42524408003) | `GREEN`: `answers_unrun` `[]`, `answers_disagreed` `[]`, `answers_differing` `[]`, `agent_disagreed` `[]`, `baseline_changed` false, `unreadable` `[]` |
+| `M05 gate` | [42524407953](https://github.com/andaro74/pharmadelta/actions/runs/42524407953) | `GREEN`: `scenarios_untraced` `[]`, `scenarios_disagreed` `[]`, `scenarios_differing` `[]`, `unreadable` `[]`; the door stopped g-005 under `treatment-or-dosing-advice` and g-006 under `instruction-to-assistant-in-pasted-document`, `stop_reason` `guardrail_intervened` on both |
+
+### The two runs, read again at PR 4
+
+Before the cell was written, the Measured cell's source and the PR run
+beside it were downloaded again with `gh run download` into fresh
+directories and read with `python -I`; both grepped for a token's prefix
+and the door's strings: no match.
+
+| Field | Run 42495856254 (`main`, after #34) | Run 42491031888 (PR #34) |
+|---|---|---|
+| artifact | `m06-gate-e175d772bd32ce9e148f79b868b72a2dcfa8b24f`, id 13622994136, 1726 bytes zipped, `result.json` 4058 bytes, `expires_at` 2027-02-06T15:38:48Z | `m06-gate-8431885faa0353ebf43d56ea244df4bb98ca8c6b`, id 13621551969, 1727 bytes zipped, `result.json` 4069 bytes, `expires_at` 2027-02-06T14:41:21Z |
+| `verdict` | `RED` | `RED` |
+| `signoffs_unsigned` | `["s-001"]` | `["s-001"]` |
+| `signoffs_disagreed`, `signoffs_differing`, `unreadable` | `[]`, `[]`, `[]` | `[]`, `[]`, `[]` |
+| `written_by_ci`, `env_set` | true, `{"token": true}` | true, `{"token": true}` |
+| `read_back`, `artifacts_read` | null, `[]` | null, `[]` |
+| `commit`, `ref`, `event`, `run_at` | `e175d77…`, `refs/heads/main`, `push`, `2026-11-08T15:38:56+00:00` | `8431885…`, `refs/pull/34/merge`, `pull_request`, `2026-11-08T14:41:31+00:00` |
+
+### Measured
+
+The cell cites the run on `main` after #34 merged, 42495856254 on
+`e175d77` (M01 Unsure 23, ruled at M02 PR 1; `rulings/pr2.md` 17;
+`rulings/pr3.md` 12), with the PR run 42491031888 named beside it as the
+one read at the time. It is written in the ledger's words, as rows 0 to
+6 are. The cell equals the expected gate output written at open, so
+under the ledger's rule row 7 is GREEN and "PRs used / cap" is 4 / 4.
+The cell then names the lift as rows 4 to 6 name theirs: the build run
+and its artifact, the zip's commit, the signing commit, and the PR run
+that read the lifted state GREEN, each a reading after the measurement
+that decides nothing. No finding: the lift read as the close expected.
+The M03 gate's reading on this head is row 4's matter and is recorded
+above and under Unsure 42, not in row 7's cell.
+
+### What the gate on this PR can read after the close commit
+
+The close commit changes `milestones/README.md`,
+`milestones/M06/README.md` and `milestones/M06/rulings/pr4.md` and
+nothing under `pages/`, so the commit that last changed
+`pages/api/sign-off.json` stays `37352ef`, the reviewer's. The `M06
+gate` run on the new head is expected to read as 42524408048 did:
+GREEN, every list `[]`, the same read-back, when GitHub's API and the
+eight artifacts answer; `UNSCORABLE` with the lists `[]` when one does
+not (Unsure 30). Either is a reading after the measurement, recorded in
+a comment on #36 and not here. The `M03 gate` may read RED or GREEN
+again on g-001 as the door answers (Unsure 42); the `M00`, `M02`, `M04`
+and `M05` gates are expected as above and the `M01 gate` PENDING, none
+required.
+
+### Rulings carried
+
+Ruled or carried by name in `rulings/pr4.md`: PR 1's 2, 3, 9, 10, 15,
+16; PR 2's 18, 20, 23, 24, 25; PR 3's 29, 30, 31, 32; PR 4's 33 to 42.
+Unsure 3: `M06 gate` is not made a required check in this PR; `M00
+gate` stays the one required context, `strict` true, no rulesets (read
+2026-11-08 UTC at the close); recorded for the record, the owner's
+setting, carried to no milestone. Unsure 2: GitHub Pages stays not
+enabled; "downloadable" is the zip's GitHub URL on the page (PR 1's
+ruling). Label-impact's own items stay its: the tool that refuses
+section `8.1` as a number (M03 Unsure 23) and the two break rules (M05's
+platform item, answered at label-impact `410f9a8` and read as stopping
+both on every run since).
+
+### What this PR does not hold
+
+- No change to `src/m06/gate.py`, `.github/workflows/m06.yml`,
+  `src/m03/`, `src/m04/`, `src/m05/`, `src/baseline/` (P5), `goldens/`,
+  `pyproject.toml` or `uv.lock`.
+- No change to `pages/api/sign-off.json` or `pages/sign-off.html` after
+  `37352ef`; no change to any other served file or page.
+- No required-check change, no Pages setting, no tag: the tag `m06` is
+  placed by the owner on the merge commit after the `main` run is read.
+- No door host, pool id, client id, door text or token in any file,
+  artifact, page or comment; the build's and the gate's artifacts were
+  grepped before they were cited.
+- No number on the page that is not read from the served file; no
+  read-back claim on the page (Unsure 18); no signature by a function
+  without a seat; no word of SPEC/00 §11's six about the sign-off.
+- No design of a platform control: the sign-off is this repository's
+  website layer and says so.
+
+### What a reader can falsify
+
+- `git diff 194a6ab..<head> --stat` touches `.github/workflows/m06-lift.yml`,
+  `src/m06/build.py`, `src/m06/page.py`, `pages/evidence/m06-evidence.zip`,
+  `pages/api/sign-off.json`, `pages/sign-off.html`,
+  `milestones/README.md`, `milestones/M06/README.md` and
+  `milestones/M06/rulings/pr4.md` only; `git diff 194a6ab..<head> --
+  src/m06/gate.py .github/workflows/m06.yml src/m03 src/m04 src/m05
+  src/baseline goldens pyproject.toml uv.lock` is empty.
+- `git log -1 --format='%H %an %ae' -- pages/api/sign-off.json` on the
+  head reads `37352ef… andaro74 andaro74@gmail.com`; `gh api
+  repos/andaro74/pharmadelta/commits/37352ef` reads `author.login`
+  `andaro74` and two files.
+- `sha256sum pages/evidence/m06-evidence.zip` reads `2a3e3760…1699e`;
+  `python -I -c "import zipfile,json; z=zipfile.ZipFile('pages/evidence/m06-evidence.zip'); print(len(z.namelist()))"`
+  reads 23; the zip's `manifest.json` equals `package.entries` in the
+  served file as canonical JSON; each member's SHA-256 is its entry's.
+- The artifact of run 42504215645 holds a `m06-evidence.zip` with the
+  same SHA-256, and its `build.json` reads `written_by_ci` true at
+  `226ad89…`.
+- The artifact of run 42524408048 reads as the table under "Observed"
+  says; the artifact of run 42495856254 reads as the table under "The
+  two runs" says. Download them and read them.
+- `uv run python -m src.m06.page write` on the head leaves
+  `pages/sign-off.html` unchanged (`git status --short` empty).
+- `gh api repos/andaro74/pharmadelta/branches/main/protection/required_status_checks`
+  reads `M00 gate` alone, `strict` true.
+
+### After this PR
+
+The owner merges #36 with a merge commit, not a squash (Unsure 19: a
+squash would make the committer `web-flow`). The `main` run of `m06.yml`
+on the merge commit is downloaded with `gh run download` and read with
+`python -I`, and recorded in a comment on #36; it is expected GREEN and
+decides nothing (the cell is written). Then `git tag m06 <merge commit>`
+and `git push origin m06` by the owner. M06 is closed at 4 / 4. A fifth
+PR on this milestone is a RED close with its finding as the result and
+is not proposed. What is owed outside the cap: nothing in this
+repository; label-impact's tool refusing `8.1` as a number (M03 Unsure
+23) stays label-impact's, and the owner's settings (Pages, required
+checks) stay the owner's.
+
+## Unsure (PR 4)
+
+Numbering continues from PR 3's. Each needs a seat's ruling. None blocks
+the close, whose measurement is run 42495856254.
+
+| # | Item | Seat |
+|---|---|---|
+| 33 | `m06-lift.yml` runs on `workflow_dispatch` and once on a push that adds or edits its own file on a branch other than `main`, as `m03-lift.yml` and `m05-lift.yml` do (M03 Unsure 32). The close was asked for a dispatch-only workflow; a dispatch of a workflow file that is not on the default branch is refused by GitHub, so the first build is the push's. Whether a dispatch on this branch is accepted before the file is on `main` is tried at the push and recorded. **Read at the push:** accepted; run 42504215645 is the dispatch's, made before the file was on `main`, and the push's run 42503988551 wrote the same zip. The push trigger was not needed for the dispatch and stays as `m03-lift.yml` and `m05-lift.yml` have it; it cost one run. Ruled at `rulings/pr4.md`. | Engineering, Security |
+| 34 | The package carries `pages/api/sign-off.json` and `milestones/README.md` as at the build's commit: the plant's entry with `signature` null, and row 7's cell empty. A signature cannot be inside the package it signs over. Recorded; the statement names what the package holds. | Product |
+| 35 | Row 1's cell cites two runs; both `result.json` files are in the package (the PR run's artifact the cell names, and the `main` run's beside it). Rows 2, 4, 5 and 6 name a PR run beside the `main` run too, as "read the same"; only the `main` run's artifact, the cell's source, is taken for those. Row 1 is the one row whose named artifact is the PR run's. | Product |
+| 36 | The zip's basename is `m06-evidence.zip`, one name for the milestone; a later re-build (as M05's re-lift) would replace the file and the signature would have to be made again. A name carrying the build's sha was not chosen: the record carries `package.commit` and the hash. | Tool Owner, Product |
+| 37 | The download link on the page is the zip's GitHub URL at the commit that added it (the file view and the raw file), pinned by sha, with the SHA-256 beside it; `main`'s URL would move. The page writer reads that commit with `git log -1 -- <file>`. | Product, Security |
+| 38 | The zip's archive bytes depend on the zlib that deflates them: the CI zip and a local build at the same commit hold byte-identical members and differ as archives (zlib-ng on Windows, zlib on Ubuntu). The record's hash is the CI artifact's, the committed bytes are the artifact's, and the gate compares the committed file with the artifact's file; a local rebuild compares members and hashes. Whether the build should store members uncompressed, so that any zlib gives one archive, is a change outside this cap. | Engineering, Tool Owner |
+| 39 | The ruling file names this PR as #36, the next number on this repository after #35. **Read at open:** #36. | Product |
+| 40 | The signing commit `37352ef` is not GPG-signed (`verification.verified` false, reason `unsigned`), as every commit on this repository; `author.login` is GitHub's match of the commit's email to the account `andaro74`. Recorded as read and not required at M06 (Unsure 1 and 19, ruled). If Security later requires it, the owner signs commits first and the gate changes outside this cap. | Security |
+| 41 | The gate's read-back paths ran in CI for the first time on run 42524408048 (Unsure 30): every read answered 200. The eight artifacts the gate compares expire from 2027-01-08T14:04:46Z (row 0's) to 2027-02-06T17:17:32Z (the build's) (Unsure 7, 20); after the first expiry a run reads `unreadable` on that entry and `UNSCORABLE` when nothing is RED, and the committed zip, its hash and the signing commit are the record. No re-build is planned; one would need a new signature (Unsure 36). | Engineering, Product |
+| 42 | On this PR's head the `M03 gate` read `RED`, `answers_differing` `["g-001"]`: the door answered g-001 with a `parsed` object (`table_row` null, a clause, `impacted` false) after the same two tool errors every call has shown since M03 (the tool refuses section `8.1` as a number, M03 Unsure 23), where the served answer is null; the `main` run after #35 read `parsed` null on the same errors and GREEN. The door's answer to g-001 varies between calls. Nothing in this PR touches `pages/api/answers.json`, the agent or its door; row 4's cell cites its `main` run and stands. Recorded in the comment on #36 and here, in no cell. Whether row 4's served answer should be re-lifted when label-impact fixes the tool is a PR outside any cap, as M05's re-lift was. | Product, Rule Owner, Tool Owner |
 
 ## Unsure (PR 3)
 
