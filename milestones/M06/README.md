@@ -828,6 +828,45 @@ and `M03 gate`, `M04 gate` and `M05 gate` whatever they read: readings
 after their measurements, named in a PR comment, not in a cell (Unsure
 11, ruled at PR 2).
 
+### Observed (CI run on this PR, 2026-11-08 UTC)
+
+The first run on this PR,
+[42500055895](https://github.com/andaro74/pharmadelta/actions/runs/42500055895),
+on the merge ref `6844f9f` (the branch head was `47d9c3c`), wrote the
+artifact `m06-gate-6844f9f922e3403010f0cc447499ebb9da6b2cd6` (1729 bytes
+zipped, `result.json` 4069 bytes, `expires_at` 2027-02-06T16:28:26Z),
+read with `gh run download` into a fresh directory and `python -I` in
+this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F6.1 holds: sign-offs s-001 are shown as signed with no signing record or no package record naming a file in the repository" |
+| `signoffs_unsigned` | `["s-001"]`: `signature is null`, `package is null` |
+| `signoffs_disagreed` | `[]`: the one page sign-off equals the file's entry as parsed JSON, in the block named for its id |
+| `signoffs_differing` | `[]`: `read_back` null, `not_read_back` "no signing record" |
+| `unreadable` | `[]`; `page.read` true |
+| `env_set` | `{"token": true}`; `artifacts_read` `[]`: no listing, no download, no redirect leg |
+| `written_by_ci` | `true`; `commit` `6844f9f`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/35/merge`; `run_at` `2026-11-08T16:28:35+00:00`; exit 1; the gate step failed, the grep step and the upload step passed. The downloaded file grepped here for `ghs_`, `ghp_`, `github_pat_`, `execute-api`, `us-west-2_` and `amazonaws.com/`: no match |
+
+Equals the expected result above and runs 42491031888, 42491298504 and
+42495856254 on every field the ledger row names. The repair changed no
+reading on the plant. On the same head `M00 gate` passed
+([42500055880](https://github.com/andaro74/pharmadelta/actions/runs/42500055880)),
+`M02 gate` passed
+([42500055875](https://github.com/andaro74/pharmadelta/actions/runs/42500055875)),
+`M01 gate` failed, not required
+([42500055836](https://github.com/andaro74/pharmadelta/actions/runs/42500055836)).
+The `M03 gate`
+([42500055839](https://github.com/andaro74/pharmadelta/actions/runs/42500055839)),
+`M04 gate`
+([42500055922](https://github.com/andaro74/pharmadelta/actions/runs/42500055922))
+and `M05 gate`
+([42500055924](https://github.com/andaro74/pharmadelta/actions/runs/42500055924))
+read `GREEN` with every list `[]`, readings after their measurements,
+named in a comment on #35 and not in a cell (Unsure 11, ruled at PR 2).
+The push that adds this section runs every gate again; the second
+`M06 gate` run is read into the same comment.
+
 ## Unsure (PR 3)
 
 Numbering continues from PR 2's. Each needs a seat's ruling. None blocks
