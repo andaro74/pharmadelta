@@ -1,0 +1,29 @@
+{
+  "what": "The reviewer sign-off pharmadelta serves: one entry per sign-off, each a seat holder's review of a downloadable evidence package, with the record of the signature and the record of the package it signed (milestones/M06/README.md). The sign-off is built in this repository's website layer; it is not an agentkeel seat and not a platform control, and the platform does not read it (SPEC/00 §5). A number in this file is a seat's, SPEC/00's or a record's own, never a measured result.",
+  "agent": "label-impact, agentkeel-studio/label-impact, the deployed agent (SPEC/00 §3, §6); its seven seats are read from its manifest.yaml",
+  "company": "Ardentia Generics is fictional; its portfolio and every 'our label' statement are invented (SPEC/00 §2, §9)",
+  "seats": "one person holds all seven seats on this project (agentkeel ruling R1, ADR-0001), so the reviewer is the author of every pull request in this repository; every page that shows a seat says so (SPEC/00 §5). Pharmacovigilance and Legal hold no seat and never appear as a signature.",
+  "lift": null,
+  "signoffs": [
+    {
+      "id": "s-001",
+      "reviewer": {
+        "function": "Regulatory Affairs",
+        "seat": "product",
+        "login": "andaro74",
+        "seat_read_from": {
+          "repository": "agentkeel-studio/label-impact",
+          "path": "manifest.yaml",
+          "commit": "956cd87",
+          "key": "seats.product"
+        }
+      },
+      "statement": "Reviewed: the evidence package named under `package` is the evidence milestones/README.md cites for its rows at the commit the package names, as read on the day of the signature.",
+      "signed": true,
+      "signature": null,
+      "package": null,
+      "scripted": true,
+      "PLANT": "M06 PR 1 (milestones/M06/README.md): `signed` is true by hand. No commit by the seat holder signed anything (`signature` null) and no evidence package exists to download (`package` null). The claim of ledger row 7 is false in this state; PR 2's gate must name s-001 under signoffs_unsigned."
+    }
+  ]
+}
