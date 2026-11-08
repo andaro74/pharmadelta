@@ -1,0 +1,94 @@
+# The M06 package build (milestones/M06/README.md, "Close (PR 4)"; rulings/pr2.md 17).
+#
+# Builds the evidence package pages/api/sign-off.json names: downloads the
+# result.json of the CI run each "Measured" cell of the ledger cites (rows
+# 0, 1, 2, 4, 5, 6) and the M00 run's observations.json through GitHub's
+# API, reads the ledger, SPEC/00, the goldens and the four served files
+# from the checkout at this run's commit, reads label-impact's manifest at
+# the agent commits the served files name through the contents API, and
+# writes one zip with its manifest.json as the artifact `m06-package-<sha>`,
+# the zip inside named by the basename it is committed under (Unsure 26).
+# It commits nothing: the zip is committed byte for byte under
+# pages/evidence/ by hand, and the seat holder's own commit then names it
+# in pages/api/sign-off.json; the M06 gate (m06.yml) compares the committed
+# file with this artifact's and each entry with its source. Only what this
+# workflow writes is a record (SPEC/00 P4); a local build is not.
+#
+# What it reads, and with what: GitHub's API with the workflow's own
+# GITHUB_TOKEN, in the build step's env and nowhere else, `contents: read`
+# for label-impact's manifest and `actions: read` for this repository's
+# artifacts. No secret and no variable of M03's: no door, no pool, no
+# sign-in. The archive's 302 to the blob store is fetched without the
+# token and its URL is written nowhere. Before upload the records are
+# grepped for a token's prefix and the job fails on a match (the zip's
+# members were checked for the same inside the build, which writes no zip
+# on a match). `permissions` grants no write: no workflow of this
+# repository writes to a branch.
+#
+# Runs by hand (workflow_dispatch), and once on a push that adds or edits
+# this file on a branch other than main, because a dispatch needs the file
+# on the default branch and the package is built before it is there (M03
+# Unsure 32's shape, as m03-lift.yml and m05-lift.yml). gate.yml (M00),
+# m01.yml (M01), m02.yml (M02), m03.yml and m03-lift.yml (M03), m04.yml
+# (M04), m05.yml and m05-lift.yml (M05) and m06.yml (the gate) are
+# unchanged.
+
+name: m06-lift
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [main]
+    paths: ['.github/workflows/m06-lift.yml']
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  m06-build:
+    name: M06 package build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m06-package"
+
+      # build.json is written whenever the step ran: with `ok` false and why
+      # when a source could not be read, and then no zip.
+      - name: Download the cited artifacts; read the repository at this commit and label-impact's manifest; write the package and its record
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          uv run python -m src.m06.build
+          --out-dir "$RUNNER_TEMP/m06-package"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      # The records must hold no token (M06 Unsure 8, 21). The zip is binary
+      # and its members were checked inside the build; the JSON records are
+      # grepped here. Runs whether the build passed or failed; a match fails
+      # the job and the upload below does not run.
+      - name: Check the records hold no token
+        id: redact
+        if: always()
+        run: |
+          if grep -rqE --include='*.json' 'ghs_[A-Za-z0-9]|ghp_[A-Za-z0-9]|github_pat_' "$RUNNER_TEMP/m06-package"; then
+            echo "::error::a record holds a token; not uploaded"
+            exit 1
+          fi
+          echo "no match"
+
+      - name: Write the package and its record as a CI artifact
+        if: ${{ !cancelled() && steps.redact.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: m06-package-${{ github.sha }}
+          path: ${{ runner.temp }}/m06-package/
+          if-no-files-found: error
+          retention-days: 90
