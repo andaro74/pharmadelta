@@ -22,7 +22,7 @@ this is the same row with the open detail.
 | Seeded commit | `6cfc1eb` on `m06-pr1`: `pages/api/sign-off.json`, the reviewer sign-offs pharmadelta serves, one entry `s-001`: reviewer Regulatory Affairs, the seat `product`, held by `andaro74` as `label-impact`'s `manifest.yaml` reads at `956cd87`; a statement; `signed` true written by hand; `signature` null (no commit, no login read back, no time); `package` null (no file, no hash, no entries, no link); `scripted` true, a `PLANT` key beside them; `pages/sign-off.html`, the sign-off page, showing it as signed with nothing to download, labelled scripted, the same object embedded. No evidence package exists in the repository, and nothing in it builds one, hashes one or reads a signing commit. |
 | Expected gate output | PR 2's gate, in CI, reads every sign-off the served file serves and the page shows and names each shown as signed that carries no signing record, or no package record, or names a package file that is not in the repository (`signoffs_unsigned`), and each that the page and the file do not agree on (`signoffs_disagreed`); then, for each signed sign-off, reads from GitHub's API the commit that last changed the served file and checks its author's login is the one holding the seat shown in `label-impact`'s `manifest.yaml` at the commit the reviewer record names and that the function shown is that seat's (SPEC/00 §5), hashes the package file and compares it with the hash the signature names, and compares each entry of the package with the artifact of the CI run it names, downloaded in that run; it names each that fails any of these (`signoffs_differing`). It writes a `result.json` that is RED when any sign-off is unsigned, disagreed or differing, naming each; GREEN only when every sign-off shown as signed carries a signing record by the seat holder and a package that hashes to what was signed with every entry equal to its CI artifact, and is shown as served; UNSCORABLE when nothing is RED and the served files, GitHub's API, the manifest or an artifact could not be read. On `6cfc1eb`: RED, `signoffs_unsigned` `["s-001"]`, `signoffs_disagreed` `[]`, `signoffs_differing` `[]`. The Measured cell cites the `main` run after PR 2 merges (M01 Unsure 23, ruled at M02 PR 1). |
 | Measured | |
-| PRs used / cap | 2 / 4 |
+| PRs used / cap | 3 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -623,6 +623,262 @@ Unsure 23, ruled at M02 PR 1), which reads as run 42491031888 did on the
 three lists: the plant makes no network read. Which files the package
 carries is Unsure 16, fixed in the lift PR's first commit before any
 page is written (`rulings/pr2.md` 17).
+
+## Open detail (PR 3, 2026-11-08 UTC)
+
+PR 3 is the repair. It holds what the cold review of #34 found in
+`src/m06/gate.py`, and nothing that lifts the plant: `pages/` is
+unchanged, `pages/api/sign-off.json` still serves `s-001` with
+`signature` null and `package` null, and the gate on this PR must read
+RED with the same lists as #34's runs. Nothing here decides the row: the
+`main` run after #34 merged is the measurement, read first in this
+session, and PR 4 fills the "Measured" cell from it.
+
+### The `main` run after #34 (the Measured cell's source, M01 Unsure 23)
+
+Run [42495856254](https://github.com/andaro74/pharmadelta/actions/runs/42495856254),
+`push` on `main` at `e175d77` (the merge commit of #34), conclusion
+failure, wrote the artifact
+`m06-gate-e175d772bd32ce9e148f79b868b72a2dcfa8b24f` (1726 bytes zipped,
+`result.json` 4058 bytes, `expires_at` 2027-02-06T15:38:48Z). Read with
+`gh run download` into a fresh directory and `python -I` in this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F6.1 holds: sign-offs s-001 are shown as signed with no signing record or no package record naming a file in the repository" |
+| `signoffs_unsigned` | `["s-001"]`: `signature is null`, `package is null` |
+| `signoffs_disagreed` | `[]`: the one page sign-off equals the file's entry as parsed JSON, in the block named for its id |
+| `signoffs_differing` | `[]`: `read_back` null, `not_read_back` "no signing record" |
+| `unreadable` | `[]` |
+| `written_by_ci` | `true`; `commit` `e175d772bd32ce9e148f79b868b72a2dcfa8b24f`, `dirty` false; `event` `push`, `ref` `refs/heads/main`, `run_attempt` 1; `run_at` `2026-11-08T15:38:56+00:00` |
+| `env_set` | `{"token": true}`; `artifacts_read` `[]`; `signature_reading.verified_required` false |
+| the job | the gate step failed (exit 1), the grep step passed ("no match"), the upload step passed. The downloaded file grepped here for `ghs_`, `ghp_`, `github_pat_`, `execute-api`, `us-west-2_` and `amazonaws.com/`: no match |
+
+Equals the PR runs 42491031888 (merge ref `8431885`) and 42491298504 on
+every field the ledger row names. The Measured cell at PR 4 cites this
+run and this artifact, with the PR run named beside it.
+
+### Cold review of #34
+
+`src/m06/gate.py` and `.github/workflows/m06.yml` read as a reader who
+did not write them, against F6.1 and the row's expected output, in this
+order: the three record checks and whether a field the lift must write
+can be missing without reading unsigned; `read_back`'s `differences` and
+`not_read` lists and whether anything after the served file was read can
+raise instead of being recorded (M05 PR 3's rule); `http_get`'s redirect
+handling; `read_last_commit` on a pull request's merge ref;
+`package_file`'s path check; the `Artifacts` cache and the 64 MB cap; the
+summary table on a lifted entry; the grep step's patterns; every field of
+`result.json` that could hold a token or a redirect URL. Each candidate
+was confirmed with made-up inputs in the session's scratch directory
+before it was called a defect (construction, not evidence, P4; nothing
+committed). Four defects and one hardening.
+
+**Defect 1 (the verdict path).** `read_back` could raise after it had
+recorded a difference. Four reads inside it were not guarded: the zip's
+`manifest.json` (`zf.read`), each entry's member (`zf.read`), the build
+artifact's member (`Artifacts.file`) and the package file's bytes
+(`path.read_bytes`). A member with a bad CRC raises
+`zipfile.BadZipFile`; an unsupported compression `NotImplementedError`;
+an encrypted member `RuntimeError`; a corrupt stream `zlib.error`. The
+exception left `read_back`, and `run()`'s handler replaced the whole
+read-back with a record whose `differences` is `[]`, so a difference
+found before the raise (the seat not one of the seven, the function not
+the seat's, the author's login not the seat holder's, the hash not what
+was signed) was dropped: the sign-off left `signoffs_differing`, and the
+verdict was UNSCORABLE where `rulings/pr2.md` 16 says RED comes first.
+Confirmed: a lifted entry with the seat `legal` and a package whose
+member `a.json` has a bad CRC, the API unroutable: `UNSCORABLE`,
+`signoffs_differing` `[]`, `unreadable` naming the raise, exit 2.
+
+**Defect 2 (the verdict path).** `read_page` caught `OSError` only. A
+page that is not UTF-8 raised `UnicodeDecodeError` (a `ValueError`) past
+`run()`'s `except Unscorable` into `main`'s handler: UNSCORABLE with no
+lists, exit 2, on the plant itself, after the served file had been read.
+`read_served` catches `ValueError`; the page's reader did not. The page
+holds "§", so a save in cp1252 is enough. Confirmed: the real served file
+and `pages/sign-off.html` re-encoded in cp1252: `UNSCORABLE`,
+`error.type` `UnicodeDecodeError`, no `signoffs_unsigned`.
+
+**Defect 3 (a label).** The step summary's "package hash" column read
+"equal" when the read-back record held no `package_file` (the record
+`run()` writes on a raise): `None == None == None`. `result.json` was
+right; the summary was not. Confirmed on Defect 1's stub: the row read
+`equal` under "package hash" with nothing hashed.
+
+**Defect 4 (what `result.json` could hold).** `http_get` wrote
+`str(exc)[:120]` for every exception on every leg. On the redirect leg,
+the blob store's, urllib's own messages quote the URL they refuse: a
+relative `Location` raises `ValueError: unknown url type: '<url>'` and
+one with a control character `http.client.InvalidURL: ... '<url>'`, and
+that URL is the signed redirect. The message reached
+`artifacts_read[].why`, `unreadable`, `result.json`, the step summary and
+the job log, and the grep step's three prefixes do not match it. The same
+function also returned the response's headers on every leg, `Location`
+among them on a 3xx; no caller read them. A relative `Location` was not
+resolved against the request's URL, so it read `unreadable`. GitHub's
+redirect is absolute and well formed, and no run has taken this path: it
+is what the file could hold, which Unsure 8 and 21 asked. Confirmed:
+`urllib.request.Request("/blob/path?sig=…")` raises
+`ValueError("unknown url type: '/blob/path?sig=…'")`, the text the old
+leg wrote.
+
+**Hardening 5.** `read_repository_file` ran `git show <commit>:<name>`
+with any non-empty `commit` the entry named: a branch name is a moving
+target the record calls a commit, and a string beginning `-` reaches git
+as an option. `read_agent_file` already required 7 to 40 hex digits. No
+served entry exists, so no verdict could have turned on it.
+
+Read and found nothing: the three record checks name a sign-off unsigned
+when any field of `SIGNATURE_RECORD`, `PACKAGE_RECORD`, `BUILT_BY` or
+`ENTRY_RECORD` is absent, null or empty, a hash is not 64 hex digits,
+`written_by_ci` is not true, a run URL is off github.com, a source is
+not one of three, or the file is not under `pages/` in the checkout
+(absolute paths, `..` and a symlink out of `pages/` resolve outside and
+read None); `package.commit` is checked present and read back by nothing
+(Unsure 29). `read_last_commit` on a merge ref reads as Unsure 22
+records. The `Artifacts` cache lists and downloads once per run and
+artifact, records `expired` and `expires_at` as listed, and a body over
+64 MB is a `ValueError` recorded by type. The grep step's prefixes are
+Unsure 21's; a GitHub login cannot hold `_` and a hex digest cannot hold
+`ghs_`, so a match can only be a token or a package entry's path (Unsure
+31). `env_set` is one boolean. `m06.yml` is unchanged by this PR.
+
+### The repair
+
+`src/m06/gate.py` only. In order:
+
+- `read_page` catches `(OSError, ValueError)` and raises `Unscorable`,
+  as `read_served` does; `run()` records it under `unreadable` and the
+  lists stand (Defect 2).
+- `zip_member(zf, member)` reads one member and returns its bytes or why
+  it could not be read, by the exception's type and message. The zip's
+  `manifest.json`, each entry's member and the build artifact's member go
+  through it; a member that cannot be read is `not_read` for that entry
+  (`equal` null), never a raise (Defect 1).
+- The package file's `read_bytes` is guarded: a file that was in the
+  checkout when the record was checked and cannot be read now is a read
+  not made, recorded under `not_read`, and the hash, zip and build
+  comparisons that need its bytes are skipped (Defect 1).
+- `read_back` is now a wrapper around `_read_back`: the `differences`
+  and `not_read` lists are created outside the call, so a raise inside
+  it is appended to `not_read` and the differences found before it stand.
+  `run()` keeps its own `except` as a last fence (Defect 1).
+- `http_get` returns no headers on any leg; a `Location` is resolved with
+  `urllib.parse.urljoin` against the request's URL before the redirect
+  leg; on the redirect leg (`follow` false) an exception is recorded by
+  its type alone. The API leg keeps the type and a short message, since
+  the API URL holds no token and no redirect (Defect 4).
+- `read_repository_file` requires 7 to 40 hex digits for `commit`, as
+  `read_agent_file` does, and reads `unreadable` otherwise (Hardening 5).
+- The summary's "package hash" column reads "not read" when the
+  read-back holds no hash (Defect 3).
+- The module docstring says what is guarded.
+
+No change to the lists' names, the records' fields, `SEAT_FUNCTION`, the
+verdict's shape, the exit codes, the workflow or the artifact's name.
+`import urllib.parse` is the one new import; it is the standard library.
+`pyproject.toml` and `uv.lock` are unchanged.
+
+### What this PR does not hold
+
+- No lift. `git diff main -- pages/` is empty; no file under
+  `pages/evidence/`; `signature` null, `package` null, `scripted` true
+  and the `PLANT` key stand at `6cfc1eb`'s values.
+- No change to `.github/workflows/m06.yml` or any other workflow, to
+  `src/m03/`, `src/m04/`, `src/m05/`, `src/baseline/` (P5; `git diff m00
+  --stat -- src/baseline/` is empty), `src/gate/`, `src/ingest/`,
+  `src/m01/`, `goldens/`, `data/`, SPEC/00, CLAUDE.md, the README, or
+  anything under `milestones/M00/` to `milestones/M05/` or
+  `milestones/adoption/`.
+- No secret, no variable, no door string. Grep `M03_DOOR`,
+  `InitiateAuth`, `execute-api`, `us-west-2_` and `amazonaws.com/` under
+  `src/m06/`: no match; `Bearer` once, the gate's own header to GitHub's
+  API, as at PR 2.
+- No "Measured" cell and no tag. Those are PR 4's.
+- No page change, so no number on a page. No word of SPEC/00 §11's six.
+  No brand name. No treatment answer.
+
+### Construction readings on this PR (not evidence, P4)
+
+Run on 2026-11-08 UTC from the working tree, before the push. The stub
+files and scripts live in the session's scratch directory and are not
+committed (M01 Unsure 21's reading).
+
+| Reading | Before the repair | After the repair |
+|---|---|---|
+| the gate on the real pages, no token | `RED`, `signoffs_unsigned` `["s-001"]`, the other lists `[]`, `read_back` null, `artifacts_read` `[]`, exit 1 | the same: `RED`, `["s-001"]`, `[]`, `[]`, `[]`, `read_back` null, `artifacts_read` `[]`, `env_set` `{"token": false}`, exit 1; grepped for `ghs_`, `ghp_`, `github_pat_`, `execute-api`, `us-west-2_`, `amazonaws`: no match |
+| the real served file, the page re-encoded cp1252 (Defect 2) | `UNSCORABLE`, `error.type` `UnicodeDecodeError`, no lists, exit 2 | `RED`, `signoffs_unsigned` `["s-001"]`, `unreadable` naming the page and `UnicodeDecodeError`, `page.read` false, exit 1 |
+| a lifted entry, seat `legal`, a zip member with a bad CRC, the API unroutable (Defects 1, 3) | `UNSCORABLE`, `signoffs_differing` `[]`, `unreadable` `["s-001: the read-back raised BadZipFile: Bad CRC-32 for file 'a.json'"]`, exit 2; the summary's hash column `equal` | `RED`, `signoffs_differing` `["s-001"]`, two differences (the seat not of the seven; `manifest.json` not the entries), `unreadable` four items beside it (git, the manifest's API, the member's bad CRC, the build's API), the entry `equal` null with its `why`, exit 1 |
+| the summary on a read-back record with no hash (Defect 3) | "package hash" `equal` | "package hash" `not read` |
+| `http_get` against a local server answering 302 three ways, a made-up `ghs_` string as the token (Defect 4) | a relative `Location` raised `ValueError` whose text quotes the URL | relative `Location`: 200 through `urljoin`; `Location` with a control character: `error` `InvalidURL` alone; absolute `Location`: 200; the target saw no `Authorization` header on any leg; no returned field holds `sig=`, the URL or `ghs_` |
+
+### Expected CI result on this PR
+
+The ledger row says: RED, `signoffs_unsigned` `["s-001"]`,
+`signoffs_disagreed` `[]`, `signoffs_differing` `[]`. The CI run on this
+PR is expected to write that, with `unreadable` `[]`, `written_by_ci`
+true, `env_set` `{"token": true}`, `artifacts_read` `[]`, `read_back`
+null, and to fail the `M06 gate` job (exit 1), as runs 42491031888,
+42491298504 and 42495856254 did. The repaired paths run on the plant for
+no input: the plant carries no record, so nothing is read back and no
+redirect is followed. On the same head `M00 gate` and `M02 gate` are
+expected GREEN, `M01 gate` PENDING, exit 3, not required (M01 Unsure 14),
+and `M03 gate`, `M04 gate` and `M05 gate` whatever they read: readings
+after their measurements, named in a PR comment, not in a cell (Unsure
+11, ruled at PR 2).
+
+### Observed (CI run on this PR, 2026-11-08 UTC)
+
+The first run on this PR,
+[42500055895](https://github.com/andaro74/pharmadelta/actions/runs/42500055895),
+on the merge ref `6844f9f` (the branch head was `47d9c3c`), wrote the
+artifact `m06-gate-6844f9f922e3403010f0cc447499ebb9da6b2cd6` (1729 bytes
+zipped, `result.json` 4069 bytes, `expires_at` 2027-02-06T16:28:26Z),
+read with `gh run download` into a fresh directory and `python -I` in
+this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F6.1 holds: sign-offs s-001 are shown as signed with no signing record or no package record naming a file in the repository" |
+| `signoffs_unsigned` | `["s-001"]`: `signature is null`, `package is null` |
+| `signoffs_disagreed` | `[]`: the one page sign-off equals the file's entry as parsed JSON, in the block named for its id |
+| `signoffs_differing` | `[]`: `read_back` null, `not_read_back` "no signing record" |
+| `unreadable` | `[]`; `page.read` true |
+| `env_set` | `{"token": true}`; `artifacts_read` `[]`: no listing, no download, no redirect leg |
+| `written_by_ci` | `true`; `commit` `6844f9f`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/35/merge`; `run_at` `2026-11-08T16:28:35+00:00`; exit 1; the gate step failed, the grep step and the upload step passed. The downloaded file grepped here for `ghs_`, `ghp_`, `github_pat_`, `execute-api`, `us-west-2_` and `amazonaws.com/`: no match |
+
+Equals the expected result above and runs 42491031888, 42491298504 and
+42495856254 on every field the ledger row names. The repair changed no
+reading on the plant. On the same head `M00 gate` passed
+([42500055880](https://github.com/andaro74/pharmadelta/actions/runs/42500055880)),
+`M02 gate` passed
+([42500055875](https://github.com/andaro74/pharmadelta/actions/runs/42500055875)),
+`M01 gate` failed, not required
+([42500055836](https://github.com/andaro74/pharmadelta/actions/runs/42500055836)).
+The `M03 gate`
+([42500055839](https://github.com/andaro74/pharmadelta/actions/runs/42500055839)),
+`M04 gate`
+([42500055922](https://github.com/andaro74/pharmadelta/actions/runs/42500055922))
+and `M05 gate`
+([42500055924](https://github.com/andaro74/pharmadelta/actions/runs/42500055924))
+read `GREEN` with every list `[]`, readings after their measurements,
+named in a comment on #35 and not in a cell (Unsure 11, ruled at PR 2).
+The push that adds this section runs every gate again; the second
+`M06 gate` run is read into the same comment.
+
+## Unsure (PR 3)
+
+Numbering continues from PR 2's. Each needs a seat's ruling. None blocks
+the measurement, which is the `main` run above.
+
+| # | Item | Seat |
+|---|---|---|
+| 28 | The ruling file names this PR as #35, the next number on this repository after #34. | Product |
+| 29 | `package.commit` (this repository's commit the package describes) is checked present and non-empty, and read back by nothing: each `repository` entry carries its own `commit`, and the gate reads that. Whether the gate should require every `repository` entry's `commit` to equal `package.commit`, or record `package.commit` in the read-back. Proposed: recorded in the read-back at the lift if the lift's record uses it; not required at M06. | Tool Owner, Engineering |
+| 30 | The read-back paths (`read_last_commit` on a full checkout, `read_commit`, `read_manifest_seat`, the artifact listing and download with `GITHUB_TOKEN` under `actions: read`, the redirect leg) have run in CI on no run yet: the plant makes no network read. Their first CI exercise is the lift's. A failure there reads `unreadable`, never a wrong verdict; the construction readings at PR 2 ran them with the owner's token, not the workflow's. | Engineering |
+| 31 | The grep step matches a package entry's `path` or an artifact's name as it matches a token: a path holding `ghs_` would fail the step and lose the artifact, a false positive. The lift names the paths; none proposed holds a prefix. Recorded for the lift. | Security, Engineering |
+| 32 | `signoffs_disagreed` reads one direction, as the row's words do ("the page shows a sign-off the served file does not serve"): a served sign-off the page does not show is named by no list while the page shows at least one block (a page with no block is `unreadable`). Whether the lift's page must show every served sign-off is Product's; the gate does not require it. | Product |
 
 ## Unsure (PR 2)
 

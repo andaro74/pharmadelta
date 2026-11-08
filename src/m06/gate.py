@@ -58,10 +58,13 @@ The verdict is ledger row 7's F6.1 and nothing else:
               sign-off, or a read-back F6.1 needs could not be made. Never RED, never GREEN.
 
 RED comes first. Nothing that fails after the served file was read turns a
-RED into UNSCORABLE (M05 PR 3's repair, built in from the start): every
-network and git read is guarded, recorded by its status or its exception's
-type, and never raised. GitHub's `verification` is recorded as read and not
-required (Unsure 1, ruled at PR 2); commits on this repository are unsigned.
+RED into UNSCORABLE (M05 PR 3's repair, built in from the start; M06 PR 3
+closed the reads it missed): every network, git, zip and file read is
+guarded, recorded by its status or its exception's type, and never raised;
+a page that cannot be read is recorded under `unreadable` and the lists
+stand; a read-back that raises keeps the differences found before it.
+GitHub's `verification` is recorded as read and not required (Unsure 1,
+ruled at PR 2); commits on this repository are unsigned.
 
 Hosts: GitHub's API (`GITHUB_API_URL`, else `https://api.github.com`) with
 the workflow's `GITHUB_TOKEN`, sent as a bearer on the API host only; an
@@ -88,6 +91,7 @@ import subprocess
 import sys
 import traceback
 import urllib.error
+import urllib.parse
 import urllib.request
 import zipfile
 from datetime import UTC, datetime
@@ -239,8 +243,8 @@ def read_page(path: Path) -> list[dict]:
     """The page's sign-offs: the JSON in each `id="signoff-<id>"` block, one object each, with the block's own id beside it."""
     try:
         html = path.read_text(encoding="utf-8")
-    except OSError as exc:
-        raise Unscorable(f"{rel(path)} could not be read: {exc}") from exc
+    except (OSError, ValueError) as exc:  # ValueError: UnicodeDecodeError, a page that is not UTF-8 (PR 3, Defect 2)
+        raise Unscorable(f"{rel(path)} could not be read: {type(exc).__name__}: {str(exc)[:160]}") from exc
     blocks = PAGE_BLOCK.findall(html)
     if not blocks:
         raise Unscorable(f'{rel(path)} has no <script type="application/json" id="signoff-<id>"> block')
@@ -393,27 +397,34 @@ def read_capped(resp: Any) -> bytes:
 
 
 def http_get(url: str, token: str | None, accept: str = "application/vnd.github+json", follow: bool = True) -> dict:
-    """One GET. Returns status, headers and body, or the exception's type; the token and any redirect URL are in no field."""
+    """One GET. Returns status and body, or the exception's type; the token and any redirect URL are in no field.
+
+    `follow` is true on the API leg only. The redirect leg (`follow` false) is the blob store's: it is fetched without
+    the token, and a failure there is recorded by the exception's type alone, because urllib's own messages can quote
+    the URL it refused (`ValueError: unknown url type: '<url>'`, `InvalidURL`) and that URL is the redirect's (PR 3,
+    Defect 4). The response's headers are returned by no leg: a `Location` is used once, here, and kept nowhere.
+    """
     headers = {"Accept": accept, "User-Agent": "pharmadelta-m06-gate", "X-GitHub-Api-Version": "2022-11-28"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
     opener = urllib.request.build_opener(NoRedirect())
     try:
         with opener.open(urllib.request.Request(url, headers=headers), timeout=60) as resp:
-            return {"status": resp.status, "headers": dict(resp.headers), "body": read_capped(resp), "error": None, "redirected": False}
+            return {"status": resp.status, "body": read_capped(resp), "error": None, "redirected": False}
     except urllib.error.HTTPError as exc:
         location = exc.headers.get("Location") if exc.headers else None
         if exc.code in (301, 302, 303, 307, 308) and follow and location:
-            got = http_get(location, token=None, accept="*/*", follow=False)
+            got = http_get(urllib.parse.urljoin(url, location), token=None, accept="*/*", follow=False)
             got["redirected"] = True
             return got
         try:
             body = exc.read()
         except Exception:  # noqa: BLE001
             body = b""
-        return {"status": exc.code, "headers": dict(exc.headers or {}), "body": body, "error": f"HTTP {exc.code}", "redirected": False}
-    except Exception as exc:  # noqa: BLE001  URLError, timeout, ValueError on a capped body, http.client's own: the type and a short message, never the URL
-        return {"status": None, "headers": {}, "body": b"", "error": f"{type(exc).__name__}: {str(exc)[:120]}", "redirected": False}
+        return {"status": exc.code, "body": body, "error": f"HTTP {exc.code}", "redirected": False}
+    except Exception as exc:  # noqa: BLE001  URLError, timeout, ValueError on a capped body, http.client's own: the type and, on the API leg only, a short message
+        message = f"{type(exc).__name__}: {str(exc)[:120]}" if follow else type(exc).__name__
+        return {"status": None, "body": b"", "error": message, "redirected": False}
 
 
 def api_json(path: str, token: str | None) -> dict:
@@ -551,11 +562,24 @@ class Artifacts:
             return {"read": False, "why": art["why"]}
         if member not in art["files"]:
             return {"read": True, "found": False, "why": f"artifact {name!r} holds no file {member!r} (it holds {art['files']})"}
-        return {"read": True, "found": True, "bytes": art["zip"].read(member)}
+        got = zip_member(art["zip"], member)
+        if not got["read"]:
+            return {"read": False, "why": f"artifact {name!r} of run {art['run_id']}: {got['why']}"}
+        return {"read": True, "found": True, "bytes": got["bytes"]}
+
+
+def zip_member(zf: zipfile.ZipFile, member: str) -> dict:
+    """One member's bytes, or why it could not be read: a bad CRC, an unsupported compression, an encrypted member (PR 3, Defect 1)."""
+    try:
+        return {"read": True, "bytes": zf.read(member)}
+    except Exception as exc:  # noqa: BLE001  zipfile.BadZipFile, zlib.error, NotImplementedError, RuntimeError
+        return {"read": False, "why": f"the member {member!r} could not be read: {type(exc).__name__}: {str(exc)[:120]}"}
 
 
 def read_repository_file(commit: str, name: str) -> dict:
-    """A file of this repository at one commit, from the checkout."""
+    """A file of this repository at one commit, from the checkout. The commit is a sha, as the record says; a branch name would be a moving target (PR 3)."""
+    if not re.fullmatch(r"[0-9a-f]{7,40}", commit or ""):
+        return {"read": False, "why": f"the entry names no commit of this repository ({commit!r})"}
     try:
         data = git_bytes("show", f"{commit}:{name}")
     except subprocess.CalledProcessError as exc:
@@ -584,13 +608,27 @@ def read_agent_file(agent_repo: str, commit: str, name: str, token: str | None) 
 
 
 def read_back(entry: dict, artifacts: Artifacts, token: str | None) -> dict:
-    """Everything F6.1 asks GitHub and the checkout about one signed sign-off; what differs and what could not be read."""
-    sig, pkg, reviewer = entry["signature"], entry["package"], entry.get("reviewer") if isinstance(entry.get("reviewer"), dict) else {}
-    seat, login, function = reviewer.get("seat"), reviewer.get("login"), reviewer.get("function")
-    seat_from = reviewer.get("seat_read_from") if isinstance(reviewer.get("seat_read_from"), dict) else {}
+    """Everything F6.1 asks GitHub and the checkout about one signed sign-off; what differs and what could not be read.
+
+    A read that raises is a read not made and is recorded under `not_read`; the differences found before it stand
+    (M05 PR 3's rule; PR 3, Defect 1). `run()` keeps a last fence around this function for what it does not foresee.
+    """
     differences: list[str] = []
     not_read: list[str] = []
     out: dict[str, Any] = {}
+    try:
+        _read_back(entry, artifacts, token, out, differences, not_read)
+    except Exception as exc:  # noqa: BLE001
+        not_read.append(f"the read-back raised {type(exc).__name__}: {str(exc)[:160]}")
+    out["differences"], out["not_read"] = differences, not_read
+    out["equal"] = None if (not differences and not_read) else not differences
+    return out
+
+
+def _read_back(entry: dict, artifacts: Artifacts, token: str | None, out: dict[str, Any], differences: list[str], not_read: list[str]) -> None:
+    sig, pkg, reviewer = entry["signature"], entry["package"], entry.get("reviewer") if isinstance(entry.get("reviewer"), dict) else {}
+    seat, login, function = reviewer.get("seat"), reviewer.get("login"), reviewer.get("function")
+    seat_from = reviewer.get("seat_read_from") if isinstance(reviewer.get("seat_read_from"), dict) else {}
 
     # The function shown is the seat's (SPEC/00 §5): a read of the record and the table, no network.
     expected_function = SEAT_FUNCTION.get(seat) if isinstance(seat, str) else None
@@ -632,7 +670,13 @@ def read_back(entry: dict, artifacts: Artifacts, token: str | None) -> dict:
 
     # The package file, its hash, its zip, its entries.
     path = package_file(entry)
-    data = path.read_bytes() if path else b""
+    try:
+        data = path.read_bytes() if path else b""
+    except OSError as exc:  # the file was in the checkout when the record was checked; a read that fails now is a read not made, not a difference (PR 3, Defect 1)
+        out["package_file"] = {"file": pkg["file"], "read": False, "why": type(exc).__name__}
+        out["entries"] = []
+        not_read.append(f"the package file {pkg['file']!r} could not be read: {type(exc).__name__}")
+        return
     digest = sha256_hex(data)
     out["package_file"] = {"file": pkg["file"], "bytes": len(data), "sha256": digest, "signed_over": sig["over"], "recorded": pkg["sha256"]}
     if digest != sig["over"]:
@@ -653,9 +697,10 @@ def read_back(entry: dict, artifacts: Artifacts, token: str | None) -> dict:
             differences.append(f"the package holds no {PACKAGE_MANIFEST}")
             out["package_zip"]["manifest_equal"] = False
         else:
+            listed_bytes = zip_member(zf, PACKAGE_MANIFEST)
             try:
-                listed = json.loads(zf.read(PACKAGE_MANIFEST).decode("utf-8"))
-                equal = canonical(listed) == canonical(pkg["entries"])
+                listed = json.loads(listed_bytes["bytes"].decode("utf-8")) if listed_bytes["read"] else None
+                equal = listed_bytes["read"] and canonical(listed) == canonical(pkg["entries"])
             except (UnicodeDecodeError, ValueError):
                 equal = False
             out["package_zip"]["manifest_equal"] = equal
@@ -668,7 +713,13 @@ def read_back(entry: dict, artifacts: Artifacts, token: str | None) -> dict:
                 differences.append(f"entry {e['path']!r} is not in the package")
                 entries_out.append(rec)
                 continue
-            got = zf.read(e["path"])
+            member_read = zip_member(zf, e["path"])
+            if not member_read["read"]:
+                rec.update({"in_package": True, "equal": None, "why": member_read["why"]})
+                not_read.append(f"entry {e['path']!r}: {member_read['why']}")
+                entries_out.append(rec)
+                continue
+            got = member_read["bytes"]
             rec.update({"in_package": True, "bytes": len(got), "sha256": sha256_hex(got), "sha256_equal": sha256_hex(got) == e["sha256"]})
             if not rec["sha256_equal"]:
                 differences.append(f"entry {e['path']!r} hashes to {rec['sha256'][:12]}…, not {e['sha256'][:12]}…")
@@ -714,10 +765,6 @@ def read_back(entry: dict, artifacts: Artifacts, token: str | None) -> dict:
         out["built_by"]["equal"] = src["bytes"] == data
         if not out["built_by"]["equal"]:
             differences.append(f"the package file is not the {member!r} that artifact {built['artifact']!r} of its run wrote")
-
-    out["differences"], out["not_read"] = differences, not_read
-    out["equal"] = None if (not differences and not_read) else not differences
-    return out
 
 
 # ------------------------------------------------------------------- gate
@@ -771,7 +818,7 @@ def summary_markdown(result: dict) -> str:
                 commit_s = (last.get("sha") or "")[:7] if last.get("read") else "not read"
                 login_s = (commit.get("author_login") or "none") if commit.get("read") else "not read"
                 holder_s = (manifest.get("login") or "none") if manifest.get("read") else "not read"
-                hash_s = "equal" if pf.get("sha256") == pf.get("signed_over") == pf.get("recorded") else "differs"
+                hash_s = "not read" if not pf.get("sha256") else ("equal" if pf.get("sha256") == pf.get("signed_over") == pf.get("recorded") else "differs")  # "not read" when the read-back raised before the file was hashed (PR 3, Defect 3)
                 ents = rb.get("entries") or []
                 entries_s = f"{sum(1 for x in ents if x.get('equal') is True)} of {len(ents)} equal"
                 rb_s = "equal" if rb.get("equal") else ("not fully read" if rb.get("equal") is None else "; ".join(rb.get("differences") or []))
