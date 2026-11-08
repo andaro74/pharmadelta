@@ -1,0 +1,94 @@
+# The M06 gate (milestones/README.md row 7, F6.1).
+#
+# Reads what the sign-off page serves (pages/api/sign-off.json) and what it
+# shows (the id="signoff-<id>" blocks of pages/sign-off.html), names every
+# sign-off shown as signed that carries no signing record or no package
+# record naming a file in the repository, and every page sign-off the file
+# does not serve; then, for each signed sign-off, reads back from GitHub's
+# API the commit that last changed the served file (its author's login,
+# its time, its verification), label-impact's manifest.yaml at the commit
+# the reviewer record names (the seat's login), hashes the package file and
+# compares each of its entries with the artifact of the CI run it names,
+# downloaded in this run. Writes the result as the artifact m06-gate-<sha>.
+# The job fails when the verdict is not GREEN. Only what this workflow
+# writes is evidence (SPEC/00 P4); a local run of the same command is not.
+#
+# What it reads, and with what: GitHub's API with the workflow's own
+# GITHUB_TOKEN, `contents: read` for the commit and the manifest (label-
+# impact is public) and `actions: read` for this repository's artifacts.
+# No secret and no variable of M03's: no door, no pool, no sign-in. The
+# checkout is full depth, because the gate asks git which commit last
+# changed the served file and a shallow checkout cannot answer. The token
+# is read from the environment and written nowhere; before upload the
+# result is grepped for the token's prefix and the job fails on a match,
+# so a result that holds it is never written as an artifact. gate.yml
+# (M00), m01.yml (M01), m02.yml (M02), m03.yml and m03-lift.yml (M03),
+# m04.yml (M04), m05.yml and m05-lift.yml (M05) are unchanged.
+
+name: m06
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  m06-gate:
+    name: M06 gate
+    runs-on: ubuntu-latest
+    steps:
+      # Full depth: `git log -1 -- pages/api/sign-off.json` must name the
+      # commit that last changed the file, not the checkout's head.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      # The artifact directory exists before anything can crash, so the
+      # upload below always has a directory to read (M00 PR 3, Q3 b).
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m06-gate"
+
+      # The gate writes result.json whenever its `main` runs: UNSCORABLE with
+      # the error when a served file could not be read and nothing is RED. A
+      # failure before `main` (an import error) exits 1 with no file, and
+      # the upload below then fails on if-no-files-found.
+      - name: Read the served sign-offs and the page; read the signing commit, the seat and the package back; judge row 7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          uv run python -m src.m06.gate
+          --out-dir "$RUNNER_TEMP/m06-gate"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      # The result must hold no token (M06 Unsure 8). An Actions token
+      # begins `ghs_`; hex digests cannot contain it. Runs whether the gate
+      # passed or failed; a match fails the job and the upload below does
+      # not run, so the file is never an artifact.
+      - name: Check the result holds no token
+        id: redact
+        if: always()
+        run: |
+          if grep -rqE 'ghs_[A-Za-z0-9]|ghp_[A-Za-z0-9]|github_pat_' "$RUNNER_TEMP/m06-gate"; then
+            echo "::error::the result holds a token; not uploaded"
+            exit 1
+          fi
+          echo "no match"
+
+      - name: Write the result as a CI artifact
+        if: ${{ !cancelled() && steps.redact.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: m06-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/m06-gate/
+          if-no-files-found: error
+          retention-days: 90
