@@ -1026,6 +1026,51 @@ not a reviewer's signature (Unsure 1, 15).
   the page rebuilt from it. After it nothing changes the served file:
   the commit that last changed it stays the reviewer's.
 
+### The build (CI runs 42504215645 and 42503988551, not the Measured cell)
+
+The first commit of this PR, `226ad89`, was pushed on 2026-11-08 UTC.
+The push ran `m06-lift.yml` once, as its `push` trigger says
+([42503988551](https://github.com/andaro74/pharmadelta/actions/runs/42503988551),
+17:14:50Z, success). Then `gh workflow run m06-lift.yml --ref m06-pr4`
+was tried for Unsure 33 and accepted: GitHub ran the dispatch on the
+branch before the file was on `main`
+([42504215645](https://github.com/andaro74/pharmadelta/actions/runs/42504215645),
+`workflow_dispatch`, 17:17:31Z, success). Both ran at `226ad89`. Both
+artifacts were downloaded with `gh run download` into fresh directories
+and read with `python -I`; the two zips are byte-identical
+(`cmp` equal, one SHA-256). The dispatch run is the one the record
+names, since the close asked for a dispatch; the push run is named
+here beside it.
+
+| Field | Run 42504215645 (`package.built_by`) |
+|---|---|
+| artifact | `m06-package-226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9`, id 13626414153, 53226 bytes zipped, `expires_at` 2027-02-06T17:17:32Z (the push run's: id 13627035673, 53221 bytes zipped, `expires_at` 2027-02-06T17:14:50Z) |
+| `build.json` | `ok` true, `written_by_ci` true, `commit` `226ad89ce575d89dfb90c9a5d93a8a5a9d1a31b9`, `dirty` false, `event` `workflow_dispatch`, `ref` `refs/heads/m06-pr4`, `run_at` `2026-11-08T17:17:41+00:00`, `env_set` `{"token": true}`, `failures` `[]`; 18248 bytes. Grepped for `ghs_`, `ghp_`, `github_pat_`, `execute-api`, `us-west-2_`, `blob.core` and `sig=`: no match |
+| `m06-evidence.zip` | 51837 bytes, SHA-256 `2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e`, equal to `build.json`'s `package.sha256`; 23 members: `manifest.json` and 22 entries; `manifest.json` equal to `build.json`'s `entries` as canonical JSON; every entry's bytes hash to its `sha256`; every entry carries the eight fields of `ENTRY_RECORD` in order; every `repository` entry's `commit` is `226ad89…`, the run's sha |
+| `artifacts_read` | seven artifacts, each listed 200 and downloaded 200, none expired: `m00-gate-47788c0…` (expires 2027-01-08T14:04:46Z), `m01-gate-223de2d…` (2027-01-08T18:46:23Z), `m01-gate-8cdd851…` (2027-01-09T00:16:26Z), `m02-gate-e8c3690…` (2027-01-09T16:15:55Z), `m03-gate-0b8d2ec…` (2027-01-29T05:09:45Z), `m04-gate-4d92676…` (2027-01-29T19:30:36Z), `m05-gate-8734adb…` (2027-01-30T02:39:54Z); the nine files taken hash as the same artifacts did when downloaded by hand at open |
+| `agent_commits` | `8cf0563` → `8cf056345196aa28be30d05ee1e1b8bd0690d67c` (named by `answers.json`), `956cd87` → `956cd875c8e8200da2183ad401597cc559540b24` (named by `break-it.json` and `sign-off.json`), both 200 |
+| the job | every step succeeded; the grep step read "no match"; the upload wrote the two files |
+
+Construction, not evidence (P4): the build run from a clean worktree at
+`226ad89` on this machine, with the owner's token in one process's
+environment, wrote a zip whose 23 members are byte-identical to the CI
+zip's and whose archive bytes are not: Windows Python's `zlib` is
+zlib-ng and Ubuntu's is zlib, and the two deflate the same bytes
+differently. The zip is deterministic given one zlib; the committed
+bytes are the artifact's, never a local build's, and a reader who
+rebuilds compares members and hashes, not archive bytes (Unsure 38).
+
+### The zip, committed
+
+The second commit of this PR adds `pages/evidence/m06-evidence.zip`,
+the file of the dispatch run's artifact copied byte for byte: SHA-256
+`2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e`,
+51837 bytes, checked after `git add` against the blob git stores (`git
+show :pages/evidence/m06-evidence.zip | sha256sum`), which `.gitattributes`
+leaves unconverted (`git ls-files --eol` reads `-text`). Nothing else
+under `pages/` changes in that commit; `pages/api/sign-off.json` still
+serves the plant.
+
 ### What follows, in order
 
 Each its own commit, recorded below as it happens: the build run and
@@ -1040,11 +1085,12 @@ the close, whose measurement is run 42495856254.
 
 | # | Item | Seat |
 |---|---|---|
-| 33 | `m06-lift.yml` runs on `workflow_dispatch` and once on a push that adds or edits its own file on a branch other than `main`, as `m03-lift.yml` and `m05-lift.yml` do (M03 Unsure 32). The close was asked for a dispatch-only workflow; a dispatch of a workflow file that is not on the default branch is refused by GitHub, so the first build is the push's. Whether a dispatch on this branch is accepted before the file is on `main` is tried at the push and recorded. | Engineering, Security |
+| 33 | `m06-lift.yml` runs on `workflow_dispatch` and once on a push that adds or edits its own file on a branch other than `main`, as `m03-lift.yml` and `m05-lift.yml` do (M03 Unsure 32). The close was asked for a dispatch-only workflow; a dispatch of a workflow file that is not on the default branch is refused by GitHub, so the first build is the push's. Whether a dispatch on this branch is accepted before the file is on `main` is tried at the push and recorded. **Read at the push:** accepted; run 42504215645 is the dispatch's, made before the file was on `main`, and the push's run 42503988551 wrote the same zip. The push trigger was not needed for the dispatch and stays as `m03-lift.yml` and `m05-lift.yml` have it; it cost one run. Ruled at `rulings/pr4.md`. | Engineering, Security |
 | 34 | The package carries `pages/api/sign-off.json` and `milestones/README.md` as at the build's commit: the plant's entry with `signature` null, and row 7's cell empty. A signature cannot be inside the package it signs over. Recorded; the statement names what the package holds. | Product |
 | 35 | Row 1's cell cites two runs; both `result.json` files are in the package (the PR run's artifact the cell names, and the `main` run's beside it). Rows 2, 4, 5 and 6 name a PR run beside the `main` run too, as "read the same"; only the `main` run's artifact, the cell's source, is taken for those. Row 1 is the one row whose named artifact is the PR run's. | Product |
 | 36 | The zip's basename is `m06-evidence.zip`, one name for the milestone; a later re-build (as M05's re-lift) would replace the file and the signature would have to be made again. A name carrying the build's sha was not chosen: the record carries `package.commit` and the hash. | Tool Owner, Product |
 | 37 | The download link on the page is the zip's GitHub URL at the commit that added it (the file view and the raw file), pinned by sha, with the SHA-256 beside it; `main`'s URL would move. The page writer reads that commit with `git log -1 -- <file>`. | Product, Security |
+| 38 | The zip's archive bytes depend on the zlib that deflates them: the CI zip and a local build at the same commit hold byte-identical members and differ as archives (zlib-ng on Windows, zlib on Ubuntu). The record's hash is the CI artifact's, the committed bytes are the artifact's, and the gate compares the committed file with the artifact's file; a local rebuild compares members and hashes. Whether the build should store members uncompressed, so that any zlib gives one archive, is a change outside this cap. | Engineering, Tool Owner |
 
 ## Unsure (PR 3)
 
