@@ -247,7 +247,9 @@ def build_entries(doc: dict) -> list[dict]:
             "answer": answer,
             "row": row,
             "clause": clause,
-            "agent": {"name": AGENT, "repository": AGENT_REPOSITORY, "commit": AGENT_COMMIT, "platform": AGENT_PLATFORM},
+            # the commit is the call record's own, as the artifact holds it, not this module's constant: a rebuild from an older
+            # artifact then reproduces the committed page (pages-style ruling, Engineering)
+            "agent": {"name": AGENT, "repository": AGENT_REPOSITORY, "commit": c["call"]["agent_commit"], "platform": AGENT_PLATFORM},
             "call": c["call"],
             "door": {
                 "status": door.get("status"),
@@ -300,6 +302,7 @@ def page_title(entries: list[dict]) -> str:
 def render_answer(e: dict, api: dict) -> str:
     out = []
     out.append(f"<h1>{esc('Does this rule change touch our label, and what do we owe?')}</h1>")
+    out.append('<article class="record">')
     out.append("<h2>The question</h2>")
     out.append(f"<blockquote><p>{esc(e.get('question'))}</p></blockquote>")
     answer, row, clause, call, door = e.get("answer"), e.get("row"), e.get("clause"), e["call"], e.get("door") or {}
@@ -371,6 +374,7 @@ def render_answer(e: dict, api: dict) -> str:
     out.append(f"        <tr><th scope=\"row\">scripted</th><td><code>false</code></td></tr>")
     out.append("  </tbody>")
     out.append("</table>")
+    out.append("</article>")
     return "\n".join(out)
 
 
@@ -385,25 +389,19 @@ def render_page(api: dict) -> str:
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         f"<title>{esc(page_title(entries))}</title>",
-        "<style>",
-        "  body { font-family: Georgia, serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #1a1a1a; background: #fff; }",
-        "  .scripted { border: 3px solid #b00020; padding: 0.75rem 1rem; background: #fff4f4; }",
-        "  .scripted strong { color: #b00020; }",
-        "  .norow { border: 3px solid #8a6d00; padding: 0.75rem 1rem; background: #fffbe6; }",
-        "  .norow strong { color: #8a6d00; }",
-        "  table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1rem; }",
-        "  th, td { border: 1px solid #bbb; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; font-size: 0.95rem; }",
-        "  th[scope=row] { width: 11rem; font-weight: normal; color: #444; }",
-        "  blockquote { border-left: 4px solid #999; margin: 0.5rem 0; padding: 0.25rem 1rem; }",
-        "  pre { white-space: pre-wrap; word-break: break-word; font-size: 0.85rem; background: #f6f6f6; padding: 0.5rem; }",
-        "  footer { margin-top: 2rem; font-size: 0.9rem; color: #444; }",
-        "  code { font-family: Consolas, monospace; }",
-        "</style>",
+        '<link rel="stylesheet" href="assets/site.css">',
         "</head>",
         "<body>",
         "<header>",
-        "  <p><strong>pharmadelta</strong> · LabelKeel (a placeholder name for this page, SPEC/00 §11) · detail page</p>",
-        "  <p>pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.",
+        '  <p class="kicker"><strong>pharmadelta</strong> · LabelKeel (a placeholder name for this page, SPEC/00 §11) · detail page</p>',
+        '  <nav class="site-nav" aria-label="Pages">',
+        '    <a href="../index.html">Front page</a>',
+        '    <a href="detail.html" aria-current="page">Detail</a>',
+        '    <a href="side-by-side.html">Side by side</a>',
+        '    <a href="break-it.html">Try to break it</a>',
+        '    <a href="sign-off.html">Sign-off</a>',
+        '  </nav>',
+        "  <p class=\"statement\">pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.",
         "     The company, Ardentia Generics, is fictional; its portfolio and every “our label” statement are invented.",
         "     The label is a real public-domain label of an old off-patent generic, read from DailyMed.</p>",
         f"  <p>Every answer on this page was produced by a call to the deployed agent, <code>{esc(AGENT)}</code>, through its door as the caller",
@@ -420,12 +418,14 @@ def render_page(api: dict) -> str:
     for e in entries:
         parts.append(render_answer(e, api))
     parts += [
+        '<section class="record">',
         "<h2>The same answer, as the API serves it</h2>",
         "<p>The object below is the entry in <code>api/answers.json</code>, the same JSON value. A reader of the page reads it from here.</p>",
         '<script type="application/json" id="answer">',
         script_json(block),
         "</script>",
         f"<pre>{esc(json_text(block))}</pre>",
+        "</section>",
         "<footer>",
         "  <p>This demo produces the evidence a validation would need. It is not medical information: the agent assesses",
         "     regulatory impact on labeling and never answers a treatment question (SPEC/00 §2). The authority for what this demo claims is",

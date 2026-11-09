@@ -483,7 +483,7 @@ def render_scenario(e: dict, api: dict) -> str:
                "artifact holds the door's full reading.</p>")
     out += ["<table>", "  <tbody>"]
     a, call, trace, door = e["agent"], e["call"], e["guardrail"], e["door"]
-    out.append(f"        <tr><th scope=\"row\">blocked</th><td>{code(e['blocked'])}, what the trace says</td></tr>")
+    out.append(f"        <tr><th scope=\"row\">blocked</th><td><code class=\"chip chip-{'ok' if e['blocked'] else 'warn'}\">{esc(json.dumps(e['blocked']))}</code>, what the trace says</td></tr>")
     out.append(f"        <tr><th scope=\"row\">agent</th><td>{code(a['name'])}, {esc(a['repository'])} at {code(a['commit'])}, deployed on {esc(a['platform'])}</td></tr>")
     for k in CALL_RECORD:
         v = call.get(k)
@@ -534,28 +534,19 @@ def render_page(api: dict) -> str:
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         "<title>pharmadelta: try to break it</title>",
-        "<style>",
-        "  body { font-family: Georgia, serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #1a1a1a; background: #fff; }",
-        "  .scenario { border: 1px solid #ccc; padding: 0 1rem 1rem; margin: 1.5rem 0; }",
-        "  .notstopped { border: 3px solid #8a6d00; padding: 0.75rem 1rem; background: #fffbe6; }",
-        "  .notstopped strong { color: #8a6d00; }",
-        "  .stopped { border: 3px solid #1a5e20; padding: 0.75rem 1rem; background: #f1f8f1; }",
-        "  .stopped strong { color: #1a5e20; }",
-        "  .norow { border: 3px solid #8a6d00; padding: 0.75rem 1rem; background: #fffbe6; }",
-        "  .norow strong { color: #8a6d00; }",
-        "  table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1rem; }",
-        "  th, td { border: 1px solid #bbb; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; font-size: 0.95rem; }",
-        "  th[scope=row] { width: 11rem; font-weight: normal; color: #444; }",
-        "  blockquote { border-left: 4px solid #999; margin: 0.5rem 0; padding: 0.25rem 1rem; }",
-        "  pre { white-space: pre-wrap; word-break: break-word; font-size: 0.85rem; background: #f6f6f6; padding: 0.5rem; }",
-        "  footer { margin-top: 2rem; font-size: 0.9rem; color: #444; }",
-        "  code { font-family: Consolas, monospace; }",
-        "</style>",
+        '<link rel="stylesheet" href="assets/site.css">',
         "</head>",
         "<body>",
         "<header>",
-        "  <p><strong>pharmadelta</strong> · try to break it</p>",
-        "  <p>pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.",
+        '  <p class="kicker"><strong>pharmadelta</strong> · try to break it</p>',
+        '  <nav class="site-nav" aria-label="Pages">',
+        '    <a href="../index.html">Front page</a>',
+        '    <a href="detail.html">Detail</a>',
+        '    <a href="side-by-side.html">Side by side</a>',
+        '    <a href="break-it.html" aria-current="page">Try to break it</a>',
+        '    <a href="sign-off.html">Sign-off</a>',
+        '  </nav>',
+        "  <p class=\"statement\">pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.",
         "     The company, Ardentia Generics, is fictional; its portfolio and every “our label” statement are invented.",
         "     The labels are real public-domain labels of old off-patent generics, read from DailyMed.</p>",
         "  <p>Six scenarios make up this demo's golden set (SPEC/00 §7). Four ask the agent a labeling question and expect an answer with",

@@ -4,28 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>pharmadelta: reviewer sign-off</title>
-<style>
-  body { font-family: Georgia, serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #1a1a1a; background: #fff; }
-  .signoff { border: 1px solid #ccc; padding: 0 1rem 1rem; margin: 1.5rem 0; }
-  .scripted { border: 3px solid #b00020; padding: 0.75rem 1rem; background: #fff4f4; }
-  .scripted strong { color: #b00020; }
-  .layer { border: 3px solid #1a5e20; padding: 0.75rem 1rem; background: #f1f8f1; }
-  .layer strong { color: #1a5e20; }
-  .none { border: 3px solid #8a6d00; padding: 0.75rem 1rem; background: #fffbe6; }
-  .none strong { color: #8a6d00; }
-  table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1rem; }
-  th, td { border: 1px solid #bbb; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; font-size: 0.95rem; }
-  th[scope=row] { width: 11rem; font-weight: normal; color: #444; }
-  blockquote { border-left: 4px solid #999; margin: 0.5rem 0; padding: 0.25rem 1rem; }
-  pre { white-space: pre-wrap; word-break: break-word; font-size: 0.85rem; background: #f6f6f6; padding: 0.5rem; }
-  footer { margin-top: 2rem; font-size: 0.9rem; color: #444; }
-  code { font-family: Consolas, monospace; word-break: break-all; }
-</style>
+<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <header>
-  <p><strong>pharmadelta</strong> · reviewer sign-off</p>
-  <p>pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.
+  <p class="kicker"><strong>pharmadelta</strong> · reviewer sign-off</p>
+  <nav class="site-nav" aria-label="Pages">
+    <a href="../index.html">Front page</a>
+    <a href="detail.html">Detail</a>
+    <a href="side-by-side.html">Side by side</a>
+    <a href="break-it.html">Try to break it</a>
+    <a href="sign-off.html" aria-current="page">Sign-off</a>
+  </nav>
+  <p class="statement">pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.
      The company, Ardentia Generics, is fictional; its portfolio and every “our label” statement are invented.
      The labels are real public-domain labels of old off-patent generics, read from DailyMed.</p>
   <p>This page holds the reviewer sign-off and the evidence package: who reviewed the evidence behind this demo's
@@ -60,6 +51,7 @@
 <p><strong>Regulatory Affairs</strong>, the seat <code>product</code>, held by <code>andaro74</code> as agentkeel-studio/label-impact's <code>manifest.yaml</code> reads at <code>956cd87</code> (<code>seats.product</code>). The function shown is the one SPEC/00 §5 maps to this seat.</p>
 <h3>The statement</h3>
 <blockquote><p>Reviewed: the evidence package named under `package` holds the CI-written results milestones/README.md cites in its Measured cells for rows 0, 1, 2, 4, 5 and 6, with the ledger, SPEC/00, the goldens and the four served files at the commit the package names and label-impact&#x27;s manifest at the agent commits the served files name, as read on the day of the signature.</p></blockquote>
+<section class="record">
 <h3>The signature</h3>
 <p>The signature is a commit: the one that last changed <code>api/sign-off.json</code>, made by the seat holder from their own
    terminal. The record names the hash signed and the login expected. Whether that commit's author is <code>andaro74</code>, when it
@@ -74,6 +66,8 @@
     <tr><th scope="row">signature.read_from</th><td><code>GET /repos/andaro74/pharmadelta/commits/&lt;sha&gt;</code></td></tr>
   </tbody>
 </table>
+</section>
+<section class="record">
 <h3>The evidence package</h3>
 <p><strong>Download the evidence package:</strong> <a href="https://github.com/andaro74/pharmadelta/blob/3e56b0772c0c24533772e40dd01584ebf04f4f8b/pages/evidence/m06-evidence.zip">m06-evidence.zip</a> (the file view at the commit that added it,
    <code>3e56b07</code>; <a href="https://github.com/andaro74/pharmadelta/raw/3e56b0772c0c24533772e40dd01584ebf04f4f8b/pages/evidence/m06-evidence.zip">the raw file</a>). Its SHA-256 is <code>2a3e3760f8fea4961624915108d8ece6e5a14d30d7057e7ca38f979798a1699e</code>; compare after downloading. The zip holds
@@ -109,13 +103,14 @@
   </tbody>
 </table>
 <p>Sources: <code>artifact</code>, a CI-written result: the file of that name in the artifact of the run linked, downloaded in the build run; <code>repository</code>, this repository&#x27;s file at the build&#x27;s commit; <code>agent</code>, label-impact&#x27;s file at the agent commit the served files name, read through GitHub&#x27;s contents API. A ledger row is the row of <code>milestones/README.md</code> the entry is evidence for; the ledger inside the package is as at the build's commit, and row 7's own measurement is what this package is signed for, not what it holds.</p>
+</section>
 <h3>Where this came from</h3>
 <table>
   <tbody>
     <tr><th scope="row">reviewer.function</th><td><code>Regulatory Affairs</code></td></tr>
     <tr><th scope="row">reviewer.seat</th><td><code>product</code></td></tr>
     <tr><th scope="row">reviewer.login</th><td><code>andaro74</code>, read from agentkeel-studio/label-impact <code>manifest.yaml</code> at <code>956cd87</code> (<code>seats.product</code>)</td></tr>
-    <tr><th scope="row">signed</th><td><code>true</code></td></tr>
+    <tr><th scope="row">signed</th><td><code class="chip chip-ok">true</code></td></tr>
     <tr><th scope="row">signature</th><td>over <code>2a3e3760f8fe…</code>, by <code>andaro74</code></td></tr>
     <tr><th scope="row">package</th><td><code>pages/evidence/m06-evidence.zip</code>, 22 entries, built by <a href="https://github.com/andaro74/pharmadelta/actions/runs/42504215645">https://github.com/andaro74/pharmadelta/actions/runs/42504215645</a></td></tr>
     <tr><th scope="row">scripted</th><td><code>false</code></td></tr>
