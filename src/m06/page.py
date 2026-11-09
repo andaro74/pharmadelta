@@ -271,7 +271,7 @@ def render_records(s: dict) -> list[str]:
         ("reviewer.function", code(r.get("function"))),
         ("reviewer.seat", code(r.get("seat"))),
         ("reviewer.login", f"{code(r.get('login'))}, read from {esc(seat_from.get('repository'))} {code(seat_from.get('path'))} at {code(seat_from.get('commit'))} ({code(seat_from.get('key'))})"),
-        ("signed", code(s.get("signed"))),
+        ("signed", f'<code class="chip chip-{"ok" if s.get("signed") is True else "warn"}">{esc(json.dumps(s.get("signed")) if s.get("signed") is None or isinstance(s.get("signed"), bool) else s.get("signed"))}</code>'),
         ("signature", code(None) if not isinstance(sig, dict) else f"over {code(str(sig.get('over'))[:12] + '…')}, by {code(sig.get('by'))}"),
         ("package", code(None) if not isinstance(pkg, dict) else f"{code(pkg.get('file'))}, {len(pkg.get('entries') or [])} entries, built by {link((pkg.get('built_by') or {}).get('run_url') or '')}"),
         ("scripted", code(s.get("scripted"))),
@@ -291,8 +291,8 @@ def render_signoff(s: dict) -> str:
                f"{esc(seat_from.get('repository'))}'s {code(seat_from.get('path'))} reads at {code(seat_from.get('commit'))} ({code(seat_from.get('key'))}). "
                + ("The function shown is the one SPEC/00 §5 maps to this seat." if expected == r.get("function") else f"SPEC/00 §5 maps this seat to {code(expected)}, not the function shown.") + "</p>")
     out += ["<h3>The statement</h3>", f"<blockquote><p>{esc(s.get('statement'))}</p></blockquote>"]
-    out += render_signature(s)
-    out += render_package(s)
+    out += ['<section class="record">', *render_signature(s), "</section>"]
+    out += ['<section class="record">', *render_package(s), "</section>"]
     out += render_records(s)
     out += [
         "<h3>The same entry, as the file serves it</h3>",
@@ -318,28 +318,19 @@ def render_page(doc: dict) -> str:
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         "<title>pharmadelta: reviewer sign-off</title>",
-        "<style>",
-        "  body { font-family: Georgia, serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #1a1a1a; background: #fff; }",
-        "  .signoff { border: 1px solid #ccc; padding: 0 1rem 1rem; margin: 1.5rem 0; }",
-        "  .scripted { border: 3px solid #b00020; padding: 0.75rem 1rem; background: #fff4f4; }",
-        "  .scripted strong { color: #b00020; }",
-        "  .layer { border: 3px solid #1a5e20; padding: 0.75rem 1rem; background: #f1f8f1; }",
-        "  .layer strong { color: #1a5e20; }",
-        "  .none { border: 3px solid #8a6d00; padding: 0.75rem 1rem; background: #fffbe6; }",
-        "  .none strong { color: #8a6d00; }",
-        "  table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1rem; }",
-        "  th, td { border: 1px solid #bbb; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; font-size: 0.95rem; }",
-        "  th[scope=row] { width: 11rem; font-weight: normal; color: #444; }",
-        "  blockquote { border-left: 4px solid #999; margin: 0.5rem 0; padding: 0.25rem 1rem; }",
-        "  pre { white-space: pre-wrap; word-break: break-word; font-size: 0.85rem; background: #f6f6f6; padding: 0.5rem; }",
-        "  footer { margin-top: 2rem; font-size: 0.9rem; color: #444; }",
-        "  code { font-family: Consolas, monospace; word-break: break-all; }",
-        "</style>",
+        '<link rel="stylesheet" href="assets/site.css">',
         "</head>",
         "<body>",
         "<header>",
-        "  <p><strong>pharmadelta</strong> · reviewer sign-off</p>",
-        "  <p>pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.",
+        '  <p class="kicker"><strong>pharmadelta</strong> · reviewer sign-off</p>',
+        '  <nav class="site-nav" aria-label="Pages">',
+        '    <a href="../index.html">Front page</a>',
+        '    <a href="detail.html">Detail</a>',
+        '    <a href="side-by-side.html">Side by side</a>',
+        '    <a href="break-it.html">Try to break it</a>',
+        '    <a href="sign-off.html" aria-current="page">Sign-off</a>',
+        '  </nav>',
+        "  <p class=\"statement\">pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.",
         "     The company, Ardentia Generics, is fictional; its portfolio and every “our label” statement are invented.",
         "     The labels are real public-domain labels of old off-patent generics, read from DailyMed.</p>",
         "  <p>This page holds the reviewer sign-off and the evidence package: who reviewed the evidence behind this demo's",
