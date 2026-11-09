@@ -68,3 +68,15 @@ scenarios as stopped under the rule each trace names, with the call
 record and the trace record of that run. Row 6's "Measured" cell and
 state are the measurement, taken at `8734adb` before the rules existed,
 and stand; the re-lift is a reading after it (M05 README, "Re-lift").
+
+GitHub Pages was enabled by the owner on 2026-11-08 UTC, deploy from
+branch `main`, folder `/`, and serves the repository as it is at
+`https://andaro74.github.io/pharmadelta/`; the four pages under
+`pages/` and the evidence zip are byte-identical to the files on
+`main`. One PR outside any cap
+(`milestones/adoption/rulings/pages-index.md`) added `index.html`, a
+front page of links, and closed Unsure 2, carried by name from M03 to
+M06 as the owner's setting. No Measured cell depended on it: "public"
+meant readable in the repository at every measurement. The pages show
+saved CI records and take no question; a live path is a platform item
+(M03 `rulings/pr4.md` 7).
