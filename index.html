@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pharmadelta</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #1a1a1a; background: #fff; }
+  table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1rem; }
+  th, td { border: 1px solid #bbb; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; font-size: 0.95rem; }
+  th[scope=row] { width: 11rem; font-weight: normal; color: #444; }
+  .layer { border: 3px solid #555; padding: 0.75rem 1rem; background: #f6f6f6; }
+  footer { margin-top: 2rem; font-size: 0.9rem; color: #444; }
+  code { font-family: Consolas, monospace; }
+</style>
+</head>
+<body>
+<header>
+  <p><strong>pharmadelta</strong> · front page</p>
+  <p>pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.
+     The company, Ardentia Generics, is fictional; its portfolio and every “our label” statement are invented.
+     The labels are real public-domain labels of old off-patent generics, read from DailyMed.</p>
+</header>
+
+<h1>A labeling rule changed. Which of our labels does it touch, and what do we owe?</h1>
+
+<p>That is the one question this demo answers. Every answer cites one row of a label table and one clause of
+   FDA regulation (21 CFR Parts 201 and 314). The agent that answers, <code>label-impact</code>, is a tenant of
+   the agentkeel platform. This site holds what surrounds it: the pages, the data they copy, and the ledger that
+   says what was claimed and what was measured.</p>
+
+<div class="layer" role="note">
+  <p><strong>What these pages are.</strong> Each page shows a record of a call that this repository's CI made and
+     saved, with the run that made it linked. Nothing here calls the agent when you open a page, and there is no
+     box to type a question into. Where the agent gave no answer, the page says so and shows what the call
+     returned. Where the baseline is shown, it is a deliberately weak control, not an assistant anyone would ship.</p>
+</div>
+
+<h2>The pages</h2>
+<table>
+  <tbody>
+    <tr><th scope="row"><a href="pages/detail.html">Detail</a></th>
+        <td>One question sent to the deployed agent. The agent's answer with its row and its clause, or "No row found" with what the call returned, and the record of the call.</td></tr>
+    <tr><th scope="row"><a href="pages/side-by-side.html">Side by side</a></th>
+        <td>The same question answered by an ordinary assistant (the frozen keyword baseline, run by CI) and by the deployed agent, next to each other.</td></tr>
+    <tr><th scope="row"><a href="pages/break-it.html">Try to break it</a></th>
+        <td>Two attack questions sent through the agent's door: a request for dosing advice and an instruction hidden in a pasted document. What the platform's guardrail did on each, with the rule it fired.</td></tr>
+    <tr><th scope="row"><a href="pages/sign-off.html">Sign-off</a></th>
+        <td>A seat holder's signature over a downloadable evidence package: the CI results the ledger cites, the ledger, the spec, the goldens and the served files, each with its hash and its source linked.</td></tr>
+  </tbody>
+</table>
+
+<h2>The record</h2>
+<table>
+  <tbody>
+    <tr><th scope="row"><a href="https://github.com/andaro74/pharmadelta/blob/main/milestones/README.md">The ledger</a></th>
+        <td>One row per milestone: the claim, the commit that made it false, the gate that caught it, and the CI run that measured it. Rows that stayed RED say so.</td></tr>
+    <tr><th scope="row"><a href="https://github.com/andaro74/pharmadelta/blob/main/SPEC/00-overview.md">SPEC/00</a></th>
+        <td>The authority for what this demo claims. If a page and the spec disagree, the spec wins.</td></tr>
+    <tr><th scope="row"><a href="pages/evidence/m06-evidence.zip">The evidence package</a></th>
+        <td><code>pages/evidence/m06-evidence.zip</code>. Its SHA-256 and its contents are listed on the <a href="pages/sign-off.html">sign-off page</a>; the build that wrote it is linked there.</td></tr>
+    <tr><th scope="row"><a href="https://github.com/andaro74/pharmadelta">The repository</a></th>
+        <td>The code, the data, the goldens and the workflows. This site is the <code>main</code> branch served as it is.</td></tr>
+  </tbody>
+</table>
+
+<h2>The data behind the pages</h2>
+<p>Each page copies one JSON file, served beside it: <a href="pages/api/answers.json"><code>answers.json</code></a>,
+   <a href="pages/api/baseline.json"><code>baseline.json</code></a>, <a href="pages/api/break-it.json"><code>break-it.json</code></a>
+   and <a href="pages/api/sign-off.json"><code>sign-off.json</code></a>. A reader who distrusts a page reads the file.</p>
+
+<footer>
+  <p>pharmadelta answers no treatment question; it assesses regulatory impact on labeling, nothing else.
+     Citations are checked against the eCFR before they appear (SPEC/00 P7). This page is navigation; it copies
+     no number and shows no answer.</p>
+</footer>
+</body>
+</html>
