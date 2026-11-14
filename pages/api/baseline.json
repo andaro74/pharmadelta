@@ -62,6 +62,60 @@
         "written_by_ci": true
       },
       "scripted": false
+    },
+    {
+      "id": "g-002",
+      "question": "An earlier version of 21 CFR 201.57(c)(9)(i) required a pregnancy category letter (A, B, C, D or X) in section 8.1. Does our metoprolol tartrate tablet label need a category letter, and what do we owe?",
+      "answer": {
+        "table_row": "metoprolol-tartrate.8.1",
+        "clause_id": "201.57(c)(9)(i)",
+        "answer_fields": {
+          "impacted": true,
+          "owed": "follow-rld",
+          "escalate": false
+        }
+      },
+      "row": {
+        "table_row": "metoprolol-tartrate.8.1",
+        "holder": "Ardentia Generics",
+        "holder_fictional": true,
+        "ingredient": "metoprolol tartrate",
+        "dosage_form": "tablet",
+        "strengths": "25 mg; 50 mg; 100 mg",
+        "anda": "ANDA202871",
+        "rld_nda": "NDA018704",
+        "dailymed_set_id": "24837d82-0f3f-4482-9af0-31e5f675c30f",
+        "label_revised": "2024-08",
+        "label_read_on": "2026-10-09",
+        "format": "201.56(d)",
+        "section": "8.1",
+        "section_title": "Pregnancy",
+        "section_terms": "Risk Summary; Clinical consideration; Data",
+        "section_terms_read_on": "2026-10-10",
+        "requirement": "201.57(c)(9)(i)"
+      },
+      "clause": {
+        "id": "201.57(c)(9)(i)",
+        "citation": "21 CFR 201.57(c)(9)(i)",
+        "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
+        "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
+        "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
+        "ecfr_as_of": "2026-10-07",
+        "effective_date": "2016-11-29",
+        "text_copied_on": "2026-10-10",
+        "existence_checked_by_hand_on": "2026-10-09",
+        "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
+      },
+      "run": {
+        "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41250971500",
+        "artifact": "m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09",
+        "commit": "36c453aa306377137a324e9a1f340af1fb3c7e09",
+        "baseline_commit": "df860b7f67d44947bf1c6c53b4c38f0322c32ce5",
+        "started_at": "2026-10-31T23:04:49+00:00",
+        "method": "keyword matching; see src/baseline/answer.py",
+        "written_by_ci": true
+      },
+      "scripted": false
     }
   ]
 }

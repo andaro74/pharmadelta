@@ -289,7 +289,11 @@ def build_entries(doc: dict) -> list[dict]:
                 "request_id_header": door.get("request_id_header"),
                 "stop_reason": door.get("stop_reason"),
                 "parsed": door.get("parsed"),
-                "text": door.get("text"),
+                # the agent's free text is served only where it is all the call returned (no answer shown with its row
+                # and its clause, M03 Unsure 26). Beside a shown answer it is prose the page cannot stand behind: a CFR
+                # citation not checked against the source (P7), a word SPEC/00 §11 bans. It stays in the run's artifact,
+                # as the guardrail's message does at M05 (Unsure 22).
+                "text": None if (isinstance(answer, dict) and isinstance(row, dict) and isinstance(clause, dict)) else door.get("text"),
             },
             "scripted": False,
         })
