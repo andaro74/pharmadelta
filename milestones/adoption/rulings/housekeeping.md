@@ -113,7 +113,7 @@ repository to be fixed before M07 opens. The repository was read at
 
 ## What a reader can falsify
 
-- `git diff 136af05..<head> --stat` touches the eleven files this
+- `git diff 136af05..<head> --stat` touches the ten files this
   ruling authorises and no other; nothing under `pages/`, `data/`,
   `goldens/` or `src/baseline/`.
 - Rows 0 to 8 of `milestones/README.md` are byte-for-byte as at
