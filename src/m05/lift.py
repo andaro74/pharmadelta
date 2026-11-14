@@ -332,7 +332,9 @@ def build_entries(doc: dict) -> list[dict]:
             "row": row,
             "clause": clause,
             "why_none": None,
-            "agent": {"name": AGENT, "repository": AGENT_REPOSITORY, "commit": AGENT_COMMIT, "platform": AGENT_PLATFORM},
+            # the commit is the call record's own, as the artifact holds it, not src/m03/lift.py's constant: a rebuild from
+            # an older artifact then reproduces the committed page (as src/m03/lift.py does; m03-relift ruling, Engineering)
+            "agent": {"name": AGENT, "repository": AGENT_REPOSITORY, "commit": (c.get("call") or {}).get("agent_commit"), "platform": AGENT_PLATFORM},
             "call": {f: (c.get("call") or {}).get(f) for f in CALL_RECORD},
             "guardrail": trace,
             "door": {f: door.get(f) for f in DOOR_SHOWN},

@@ -69,10 +69,12 @@ from src.m03.gate import (
     write_json,
 )
 
-# The deployed agent (milestones/M03/README.md, "The deployed agent, as read at open"): label-impact at 8cf0563,
-# deployed on agentkeel m10. Its manifest admits the caller `pharmadelta` with issuer `self`.
+# The deployed agent (milestones/M03/README.md, "The deployed agent, as read at open"): label-impact at 8cf0563 at
+# the close, on agentkeel m10. Its manifest admits the caller `pharmadelta` with issuer `self`. The constant is the
+# commit the platform last deployed, read by hand before a lift call: 956cd87 at the M05 re-lift, bd89989 at the M03
+# re-lift (agentkeel deploy run 42967373936, 2026-11-11). A call record carries the constant as it was at its call.
 AGENT_REPOSITORY = "agentkeel-studio/label-impact"
-AGENT_COMMIT = "956cd87"
+AGENT_COMMIT = "bd89989"
 AGENT_PLATFORM = "agentkeel m10"
 ISSUER = "self"
 ARTIFACT_PREFIX = "m03-lift-"
