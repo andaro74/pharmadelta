@@ -27,14 +27,30 @@
 <article class="record">
 <h2>The question</h2>
 <blockquote><p>FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?</p></blockquote>
+<h2>The expected answer</h2>
+<p>What the Data Owner seat wrote as the expected answer to this question: <a href="https://github.com/andaro74/pharmadelta/blob/df860b7/goldens/g-001.yaml"><code>goldens/g-001.yaml</code></a> at <code>df860b7</code>,
+   a golden of kind <code>ordinary</code>. It is the test's answer, copied here. No run wrote it. Where this page says
+   “equals expected” or “differs from expected”, it compares two values shown on this page; that is not a measured result.
+   What was measured is in <code>milestones/README.md</code>: row 0 scored the baseline against the goldens. Scoring the agent against
+   its goldens is agentkeel's, in the agent's own repository.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>lisinopril.8.1</code></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td></tr>
+        <tr><th scope="row">impacted</th><td><code>true</code></td></tr>
+        <tr><th scope="row">owed</th><td><code>&quot;follow-rld&quot;</code></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
 <h2>The answer</h2>
 <p>Row <code>lisinopril.8.1</code> under clause <code>201.57(c)(9)(i)</code>, as the agent answered on the call recorded below.</p>
+<p>Against the expected answer above: <code>table_row</code> <span class="chip chip-ok">equals expected</span> <code>clause_id</code> <span class="chip chip-ok">equals expected</span></p>
 <table>
-  <thead><tr><th>Field</th><th>Value</th><th>Meaning (milestones/M00/fields.md)</th></tr></thead>
+  <thead><tr><th>Field</th><th>Value</th><th>Against the expected answer</th><th>Meaning (milestones/M00/fields.md)</th></tr></thead>
   <tbody>
-        <tr><th scope="row">impacted</th><td><code>true</code></td><td>this label&#x27;s section must change because of what the question describes</td></tr>
-        <tr><th scope="row">owed</th><td><code>&quot;follow-rld&quot;</code></td><td>what the holder owes now: none; cbe-0 (a changes-being-effected supplement under 314.70(c)(6)(iii)(A)); follow-rld (keep the label the same as the reference listed drug&#x27;s and adopt its change when it is approved, 314.150(b)(10)); alert-report (a 15-day Alert report under 314.80(c)(1)(i))</td></tr>
-        <tr><th scope="row">escalate</th><td><code>false</code></td><td>an adverse drug experience in the question is both serious and unexpected (314.80(a)) against the label&#x27;s 6 row; true starts the reporting path</td></tr>
+        <tr><th scope="row">impacted</th><td><code>true</code></td><td><span class="chip chip-ok">equals expected</span></td><td>this label&#x27;s section must change because of what the question describes</td></tr>
+        <tr><th scope="row">owed</th><td><code>&quot;follow-rld&quot;</code></td><td><span class="chip chip-ok">equals expected</span></td><td>what the holder owes now: none; cbe-0 (a changes-being-effected supplement under 314.70(c)(6)(iii)(A)); follow-rld (keep the label the same as the reference listed drug&#x27;s and adopt its change when it is approved, 314.150(b)(10)); alert-report (a 15-day Alert report under 314.80(c)(1)(i))</td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td><td><span class="chip chip-ok">equals expected</span></td><td>an adverse drug experience in the question is both serious and unexpected (314.80(a)) against the label&#x27;s 6 row; true starts the reporting path</td></tr>
   </tbody>
 </table>
 <h2>Its row: <code>lisinopril.8.1</code></h2>
@@ -66,7 +82,7 @@
 <p>Source note: <code>[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]</code>. eCFR: <a href="https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)">https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)</a>.
    Note: Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.</p>
 <h2>Where this answer came from</h2>
-<p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under <code>run_url</code> wrote the record; its artifact holds the door's full reading.</p>
+<p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under <code>run_url</code> wrote the record; its artifact holds the door's full reading. Any text the agent wrote beside its answer is in that artifact and is not shown here: this page shows an answer only as a row, a clause and the answer fields.</p>
 <table>
   <tbody>
         <tr><th scope="row">agent</th><td><code>label-impact</code>, agentkeel-studio/label-impact at <code>bd89989</code>, deployed on agentkeel m10</td></tr>
@@ -87,14 +103,30 @@
 <article class="record">
 <h2>The question</h2>
 <blockquote><p>An earlier version of 21 CFR 201.57(c)(9)(i) required a pregnancy category letter (A, B, C, D or X) in section 8.1. Does our metoprolol tartrate tablet label need a category letter, and what do we owe?</p></blockquote>
+<h2>The expected answer</h2>
+<p>What the Data Owner seat wrote as the expected answer to this question: <a href="https://github.com/andaro74/pharmadelta/blob/3b014f1/goldens/g-002.yaml"><code>goldens/g-002.yaml</code></a> at <code>3b014f1</code>,
+   a golden of kind <code>trap</code>. It is the test's answer, copied here. No run wrote it. Where this page says
+   “equals expected” or “differs from expected”, it compares two values shown on this page; that is not a measured result.
+   What was measured is in <code>milestones/README.md</code>: row 0 scored the baseline against the goldens. Scoring the agent against
+   its goldens is agentkeel's, in the agent's own repository.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td></tr>
+        <tr><th scope="row">impacted</th><td><code>false</code></td></tr>
+        <tr><th scope="row">owed</th><td><code>&quot;none&quot;</code></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
 <h2>The answer</h2>
 <p>Row <code>metoprolol-tartrate.8.1</code> under clause <code>201.57(c)(9)(i)</code>, as the agent answered on the call recorded below.</p>
+<p>Against the expected answer above: <code>table_row</code> <span class="chip chip-ok">equals expected</span> <code>clause_id</code> <span class="chip chip-ok">equals expected</span></p>
 <table>
-  <thead><tr><th>Field</th><th>Value</th><th>Meaning (milestones/M00/fields.md)</th></tr></thead>
+  <thead><tr><th>Field</th><th>Value</th><th>Against the expected answer</th><th>Meaning (milestones/M00/fields.md)</th></tr></thead>
   <tbody>
-        <tr><th scope="row">impacted</th><td><code>false</code></td><td>this label&#x27;s section must change because of what the question describes</td></tr>
-        <tr><th scope="row">owed</th><td><code>&quot;none&quot;</code></td><td>what the holder owes now: none; cbe-0 (a changes-being-effected supplement under 314.70(c)(6)(iii)(A)); follow-rld (keep the label the same as the reference listed drug&#x27;s and adopt its change when it is approved, 314.150(b)(10)); alert-report (a 15-day Alert report under 314.80(c)(1)(i))</td></tr>
-        <tr><th scope="row">escalate</th><td><code>false</code></td><td>an adverse drug experience in the question is both serious and unexpected (314.80(a)) against the label&#x27;s 6 row; true starts the reporting path</td></tr>
+        <tr><th scope="row">impacted</th><td><code>false</code></td><td><span class="chip chip-ok">equals expected</span></td><td>this label&#x27;s section must change because of what the question describes</td></tr>
+        <tr><th scope="row">owed</th><td><code>&quot;none&quot;</code></td><td><span class="chip chip-ok">equals expected</span></td><td>what the holder owes now: none; cbe-0 (a changes-being-effected supplement under 314.70(c)(6)(iii)(A)); follow-rld (keep the label the same as the reference listed drug&#x27;s and adopt its change when it is approved, 314.150(b)(10)); alert-report (a 15-day Alert report under 314.80(c)(1)(i))</td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td><td><span class="chip chip-ok">equals expected</span></td><td>an adverse drug experience in the question is both serious and unexpected (314.80(a)) against the label&#x27;s 6 row; true starts the reporting path</td></tr>
   </tbody>
 </table>
 <h2>Its row: <code>metoprolol-tartrate.8.1</code></h2>
@@ -126,7 +158,7 @@
 <p>Source note: <code>[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]</code>. eCFR: <a href="https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)">https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)</a>.
    Note: Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.</p>
 <h2>Where this answer came from</h2>
-<p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under <code>run_url</code> wrote the record; its artifact holds the door's full reading.</p>
+<p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under <code>run_url</code> wrote the record; its artifact holds the door's full reading. Any text the agent wrote beside its answer is in that artifact and is not shown here: this page shows an answer only as a row, a clause and the answer fields.</p>
 <table>
   <tbody>
         <tr><th scope="row">agent</th><td><code>label-impact</code>, agentkeel-studio/label-impact at <code>bd89989</code>, deployed on agentkeel m10</td></tr>

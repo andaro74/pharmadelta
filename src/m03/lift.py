@@ -336,22 +336,99 @@ def page_title(entries: list[dict]) -> str:
     return "LabelKeel: the answers the API serves"
 
 
-def render_answer(e: dict, api: dict) -> str:
+# ----------------------------------------------------- the expected answer
+REPOSITORY_URL = "https://github.com/andaro74/pharmadelta"
+
+
+def expected_answer(goldens: Path, golden_id: str) -> dict | None:
+    """The golden's `expected`, as the Data Owner wrote it, with the commit that last changed the golden; None when `goldens/<id>.yaml` holds none.
+
+    A copy of the test's answer for the page, not a result: no run wrote it and no gate reads it from the page.
+    """
+    path = goldens / f"{golden_id}.yaml"
+    try:
+        golden = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, yaml.YAMLError):
+        return None
+    expected = golden.get("expected") if isinstance(golden, dict) else None
+    if not isinstance(expected, dict):
+        return None
+    fields = expected.get("answer_fields") if isinstance(expected.get("answer_fields"), dict) else {}
+    try:
+        commit = git("log", "-1", "--format=%h", "--", str(path)) or None
+    except Exception:  # noqa: BLE001  the block is still written, without a commit, when git cannot answer
+        commit = None
+    return {
+        "id": golden_id,
+        "kind": golden.get("kind"),
+        "seat": golden.get("seat"),
+        "added": golden.get("added"),
+        "commit": commit,
+        "answer": {
+            "table_row": expected.get("table_row"),
+            "clause_id": expected.get("clause_id"),
+            "answer_fields": {name: fields.get(name) for name in ANSWER_FIELD_MEANING},
+        },
+    }
+
+
+def expected_mark(shown: Any, expected: Any) -> str:
+    """Whether a value shown on the page equals the golden's: two values on the page compared, not a measured verdict."""
+    if type(shown) is type(expected) and shown == expected:
+        return '<span class="chip chip-ok">equals expected</span>'
+    return '<span class="chip chip-danger">differs from expected</span>'
+
+
+def render_expected(expected: dict, heading: str, quoted: bool = True) -> list[str]:
+    """The block. `quoted` shows a string field as JSON, as the detail page shows its values; the side-by-side page shows it bare."""
+    answer = expected["answer"]
+    path = f"goldens/{expected['id']}.yaml"
+    where = f"<code>{esc(path)}</code>"
+    if expected.get("commit"):
+        where = f"<a href=\"{esc(REPOSITORY_URL)}/blob/{esc(expected['commit'])}/{esc(path)}\">{where}</a> at <code>{esc(expected['commit'])}</code>"
+    out = [
+        f"<{heading}>The expected answer</{heading}>",
+        f"<p>What the {esc(expected.get('seat') or 'Data Owner')} seat wrote as the expected answer to this question: {where},",
+        f"   a golden of kind <code>{esc(expected.get('kind'))}</code>. It is the test's answer, copied here. No run wrote it. Where this page says",
+        "   “equals expected” or “differs from expected”, it compares two values shown on this page; that is not a measured result.",
+        "   What was measured is in <code>milestones/README.md</code>: row 0 scored the baseline against the goldens. Scoring the agent against",
+        "   its goldens is agentkeel's, in the agent's own repository.</p>",
+        "<table>",
+        "  <tbody>",
+        f"        <tr><th scope=\"row\">table_row</th><td><code>{esc(answer['table_row'])}</code></td></tr>",
+        f"        <tr><th scope=\"row\">clause_id</th><td><code>{esc(answer['clause_id'])}</code></td></tr>",
+    ]
+    for name, value in answer["answer_fields"].items():
+        shown = json.dumps(value) if quoted or not isinstance(value, str) else value
+        out.append(f"        <tr><th scope=\"row\">{esc(name)}</th><td><code>{esc(shown)}</code></td></tr>")
+    out += ["  </tbody>", "</table>"]
+    return out
+
+
+def render_answer(e: dict, api: dict, goldens: Path) -> str:
     out = []
+    expected = expected_answer(goldens, e["id"])
     out.append(f"<h1>{esc('Does this rule change touch our label, and what do we owe?')}</h1>")
     out.append('<article class="record">')
     out.append("<h2>The question</h2>")
     out.append(f"<blockquote><p>{esc(e.get('question'))}</p></blockquote>")
     answer, row, clause, call, door = e.get("answer"), e.get("row"), e.get("clause"), e["call"], e.get("door") or {}
+    if expected:
+        out += render_expected(expected, "h2")
     if answer_shown(e):
         out.append("<h2>The answer</h2>")
         out.append(f"<p>Row <code>{esc(answer['table_row'])}</code> under clause <code>{esc(answer['clause_id'])}</code>, as the agent answered on the call recorded below.</p>")
-        out.append("<table>")
-        out.append("  <thead><tr><th>Field</th><th>Value</th><th>Meaning (milestones/M00/fields.md)</th></tr></thead>")
-        out.append("  <tbody>")
         fields = answer.get("answer_fields") or {}
+        if expected:
+            exp = expected["answer"]
+            out.append(f"<p>Against the expected answer above: <code>table_row</code> {expected_mark(answer['table_row'], exp['table_row'])} "
+                       f"<code>clause_id</code> {expected_mark(answer['clause_id'], exp['clause_id'])}</p>")
+        out.append("<table>")
+        out.append("  <thead><tr><th>Field</th><th>Value</th>" + ("<th>Against the expected answer</th>" if expected else "") + "<th>Meaning (milestones/M00/fields.md)</th></tr></thead>")
+        out.append("  <tbody>")
         for name in ("impacted", "owed", "escalate"):
-            out.append(f"        <tr><th scope=\"row\">{esc(name)}</th><td><code>{esc(json.dumps(fields.get(name)))}</code></td><td>{esc(ANSWER_FIELD_MEANING[name])}</td></tr>")
+            mark = f"<td>{expected_mark(fields.get(name), expected['answer']['answer_fields'].get(name))}</td>" if expected else ""
+            out.append(f"        <tr><th scope=\"row\">{esc(name)}</th><td><code>{esc(json.dumps(fields.get(name)))}</code></td>{mark}<td>{esc(ANSWER_FIELD_MEANING[name])}</td></tr>")
         out.append("  </tbody>")
         out.append("</table>")
         out.append(f"<h2>Its row: <code>{esc(row['table_row'])}</code></h2>")
@@ -393,7 +470,9 @@ def render_answer(e: dict, api: dict) -> str:
             out.append(f"<pre>{esc(door['text'])}</pre>")
     out.append("<h2>Where this answer came from</h2>")
     out.append("<p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. "
-               "The run linked under <code>run_url</code> wrote the record; its artifact holds the door's full reading.</p>")
+               "The run linked under <code>run_url</code> wrote the record; its artifact holds the door's full reading. "
+               "Any text the agent wrote beside its answer is in that artifact and is not shown here: this page shows an answer "
+               "only as a row, a clause and the answer fields.</p>")
     out.append("<table>")
     out.append("  <tbody>")
     a = e["agent"]
@@ -415,7 +494,7 @@ def render_answer(e: dict, api: dict) -> str:
     return "\n".join(out)
 
 
-def render_page(api: dict) -> str:
+def render_page(api: dict, goldens: Path = ROOT / "goldens") -> str:
     entries = api["answers"]
     block = entries[0] if len(entries) == 1 else entries
     scripted = [e["id"] for e in entries if e.get("scripted")]
@@ -453,7 +532,7 @@ def render_page(api: dict) -> str:
             "</div>",
         ]
     for e in entries:
-        parts.append(render_answer(e, api))
+        parts.append(render_answer(e, api, goldens))
     parts += [
         '<section class="record">',
         "<h2>The same answer, as the API serves it</h2>",
@@ -493,7 +572,7 @@ def write(args: argparse.Namespace) -> int:
     args.api.parent.mkdir(parents=True, exist_ok=True)
     # LF on every platform, as .gitattributes stores the files: a rebuild on Windows then equals the committed bytes.
     args.api.write_text(json_text(api) + "\n", encoding="utf-8", newline="\n")
-    args.page.write_text(render_page(api), encoding="utf-8", newline="\n")
+    args.page.write_text(render_page(api, args.goldens), encoding="utf-8", newline="\n")
     for e in entries:
         print(f"{e['id']}: {'answer shown with its row and its clause' if answer_shown(e) else 'no row found; the page shows the question, the record and what the call returned'}; request_id {e['call']['request_id']}; run {e['call']['run_url']}")
     print(f"wrote {args.api} and {args.page} from {path}")
@@ -513,6 +592,7 @@ def main() -> int:
     p_write.add_argument("--from", dest="from_dir", required=True, type=Path, help="the directory holding call.json")
     p_write.add_argument("--api", type=Path, default=ROOT / "pages" / "api" / "answers.json")
     p_write.add_argument("--page", type=Path, default=ROOT / "pages" / "detail.html")
+    p_write.add_argument("--goldens", type=Path, default=ROOT / "goldens", help="where the expected answers shown beside each answer are read from")
     args = parser.parse_args()
     if args.command == "call":
         args.also = [i for i in args.also.replace(",", " ").split() if i]

@@ -50,6 +50,7 @@ from typing import Any
 
 import yaml
 
+from src.m03.lift import expected_answer, expected_mark, render_expected
 from src.m04.gate import ANSWER_FIELDS, ROOT, RUN_RECORD, git
 
 ARTIFACT_PREFIX = "m04-gate-"
@@ -213,15 +214,21 @@ def answer_shown(entry: dict) -> bool:
     return isinstance(entry.get("answer"), dict) and isinstance(entry.get("row"), dict) and isinstance(entry.get("clause"), dict)
 
 
-def render_answer(entry: dict, data_commit: str) -> list[str]:
+def render_answer(entry: dict, data_commit: str, expected: dict | None = None) -> list[str]:
     """The answer with its row and its clause, as the plant's page laid them out; nothing when any of the three is missing."""
     answer, row, clause = entry["answer"], entry["row"], entry["clause"]
     fields = answer.get("answer_fields") or {}
     out = ["<h3>The answer</h3>", "<table>", "  <tbody>"]
-    out.append(f"        <tr><th scope=\"row\">table_row</th><td>{code(answer['table_row'])}</td></tr>")
-    out.append(f"        <tr><th scope=\"row\">clause_id</th><td>{code(answer['clause_id'])}</td></tr>")
+    exp = expected["answer"] if expected else None
+
+    def mark(shown: Any, wanted: Any) -> str:
+        """The third cell: the value against the golden's, when the question has a golden."""
+        return f"<td>{expected_mark(shown, wanted)}</td>" if exp else ""
+
+    out.append(f"        <tr><th scope=\"row\">table_row</th><td>{code(answer['table_row'])}</td>{mark(answer['table_row'], exp and exp['table_row'])}</tr>")
+    out.append(f"        <tr><th scope=\"row\">clause_id</th><td>{code(answer['clause_id'])}</td>{mark(answer['clause_id'], exp and exp['clause_id'])}</tr>")
     for name in ANSWER_FIELDS:
-        out.append(f"        <tr><th scope=\"row\">{esc(name)}</th><td>{code(fields.get(name))}</td></tr>")
+        out.append(f"        <tr><th scope=\"row\">{esc(name)}</th><td>{code(fields.get(name))}</td>{mark(fields.get(name), exp and exp['answer_fields'].get(name))}</tr>")
     out += ["  </tbody>", "</table>"]
     out.append("<p>What each answer field means (<code>milestones/M00/fields.md</code>):</p>")
     out += ["<table>", "  <tbody>"]
@@ -253,14 +260,14 @@ def render_answer(entry: dict, data_commit: str) -> list[str]:
     return out
 
 
-def render_baseline_column(entry: dict, data_commit: str) -> list[str]:
+def render_baseline_column(entry: dict, data_commit: str, expected: dict | None = None) -> list[str]:
     out = [
         '<section class="column" id="ordinary-assistant">',
         "<h2>An ordinary assistant</h2>",
         "<p><code>src/baseline/</code>, the frozen baseline: keyword matching, no model, no network, no randomness.</p>",
     ]
     if answer_shown(entry):
-        out += render_answer(entry, data_commit)
+        out += render_answer(entry, data_commit, expected)
     else:
         answer = entry["answer"]
         if not isinstance(entry.get("row"), dict):
@@ -300,7 +307,7 @@ def render_baseline_column(entry: dict, data_commit: str) -> list[str]:
     return out
 
 
-def render_agent_column(entry: dict, api: dict) -> list[str]:
+def render_agent_column(entry: dict, api: dict, expected: dict | None = None) -> list[str]:
     """The deployed agent's entry as `pages/api/answers.json` serves it, in the shape `pages/detail.html` shows it."""
     agent, call, door = entry.get("agent") or {}, entry.get("call") or {}, entry.get("door") or {}
     lift = api.get("lift") or {}
@@ -310,7 +317,7 @@ def render_agent_column(entry: dict, api: dict) -> list[str]:
         f"<p>{code(agent.get('name'))}, {esc(agent.get('repository'))}, called through its door as <code>pharmadelta</code> by this repository's CI.</p>",
     ]
     if answer_shown(entry):
-        out += render_answer(entry, api.get("data_commit"))
+        out += render_answer(entry, api.get("data_commit"), expected)
     else:
         answer = entry.get("answer")
         if answer is None:
@@ -335,7 +342,8 @@ def render_agent_column(entry: dict, api: dict) -> list[str]:
     out += [
         "<h3>Where this answer came from</h3>",
         "<p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under",
-        f"   <code>run_url</code> wrote the record; its artifact {code(lift.get('artifact'))} holds the door's full reading.</p>",
+        f"   <code>run_url</code> wrote the record; its artifact {code(lift.get('artifact'))} holds the door's full reading. Any text the agent",
+        "   wrote beside its answer is in that artifact and is not shown here: this page shows an answer only as a row, a clause and the answer fields.</p>",
         "<table>",
         "  <tbody>",
         f"        <tr><th scope=\"row\">agent</th><td>{code(agent.get('name'))}, {esc(agent.get('repository'))} at {code(agent.get('commit'))}, deployed on {esc(agent.get('platform'))}</td></tr>",
@@ -354,7 +362,7 @@ def render_agent_column(entry: dict, api: dict) -> list[str]:
     return out
 
 
-def render_page(baseline_api: dict, agent_api: dict) -> str:
+def render_page(baseline_api: dict, agent_api: dict, goldens: Path = ROOT / "goldens") -> str:
     entries = baseline_api["answers"]
     agent_by_id = {a["id"]: a for a in agent_api.get("answers") or [] if isinstance(a, dict) and isinstance(a.get("id"), str)}
     agent_entries = [agent_by_id[e["id"]] for e in entries if e["id"] in agent_by_id]
@@ -405,11 +413,14 @@ def render_page(baseline_api: dict, agent_api: dict) -> str:
         parts.append("<h1>Does this rule change touch our label, and what do we owe?</h1>")
         parts.append("<h2>The question</h2>")
         parts.append(f"<blockquote><p>{esc(e.get('question'))}</p></blockquote>")
+        expected = expected_answer(goldens, e["id"])
+        if expected:
+            parts += ['<section class="record">', *render_expected(expected, "h2", quoted=False), "</section>"]
         parts.append('<div class="columns">')
-        parts += render_baseline_column(e, baseline_api["data_commit"])
+        parts += render_baseline_column(e, baseline_api["data_commit"], expected)
         agent_entry = agent_by_id.get(e["id"])
         if agent_entry is not None:
-            parts += render_agent_column(agent_entry, agent_api)
+            parts += render_agent_column(agent_entry, agent_api, expected)
         else:
             parts += [
                 '<section class="column" id="deployed-agent">',
@@ -467,7 +478,7 @@ def write(args: argparse.Namespace) -> int:
     args.api.parent.mkdir(parents=True, exist_ok=True)
     # LF on every platform, as .gitattributes stores the files: a rebuild on Windows then equals the committed bytes (M03 Unsure 33).
     args.api.write_text(json_text(api) + "\n", encoding="utf-8", newline="\n")
-    args.page.write_text(render_page(api, agent_api), encoding="utf-8", newline="\n")
+    args.page.write_text(render_page(api, agent_api, args.goldens), encoding="utf-8", newline="\n")
     for e in entries:
         print(f"{e['id']}: {'answer shown with its row and its clause' if answer_shown(e) else 'no row found; the page shows what the run wrote and its record'}; run {e['run']['run_url']}; started {e['run']['started_at']}")
     print(f"wrote {args.api} and {args.page} from {args.from_dir}")
