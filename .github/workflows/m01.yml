@@ -25,8 +25,18 @@ name: m01
 # Every push run since read PENDING on the registry (Unsure 12), so the
 # push trigger was removed 2026-10-12 (milestones/M01/rulings/main-run.md).
 # `gh workflow run m01.yml --ref main` reads main on demand.
+#
+# On a pull request it runs only when the PR touches the reader or this
+# file (milestones/adoption/rulings/housekeeping.md 2). The reason the
+# trigger was kept is that a PR that edits the reader is still read
+# (rulings/main-run.md); every other PR read PENDING on the registry
+# (Unsure 12) and on a deploy run that scrolled out of the reader's
+# window (Unsure 15), exit 3, a failed check that judged nothing.
 on:
   pull_request:
+    paths:
+      - 'src/m01/**'
+      - '.github/workflows/m01.yml'
   workflow_dispatch:
 
 permissions:

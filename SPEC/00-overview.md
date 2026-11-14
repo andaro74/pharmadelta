@@ -1,10 +1,11 @@
 # SPEC/00 — Overview: pharmadelta, a labeling impact demo on agentkeel
 
-Status: DRAFT, not adopted · Owner: Product seat · Drafted 2026-10-09 from
+Status: Adopted 2026-10-09 by ADR-0001 (`docs/adr/ADR-0001-spec00-adopted.md`),
+in the adoption pull request (#1) · Owner: Product seat · Drafted 2026-10-09 from
 the handoff brief of 2026-10-08 and a read of `andaro74/agentkeel` at tag
 `m08` (`0ba6d1d`), `agentkeel-studio/window-check` and this repository at
-`77330e8`. The code was read, not run. Adoption is by ADR-0001 in the
-adoption pull request, which also rules on every item in §12.
+`77330e8`. The code was read, not run. ADR-0001 also ruled on every item
+in §12.
 
 This file is the authority. If `CLAUDE.md`, the README or a chat summary
 disagrees with it, this file wins and the other gets a pull request.

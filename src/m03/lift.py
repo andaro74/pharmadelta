@@ -463,7 +463,7 @@ def render_answer(e: dict, api: dict, goldens: Path) -> str:
                    "No row and no clause are copied in. What the call returned is below, verbatim, and the call's record follows.</p>")
         out.append("</div>")
         out.append("<h3>What the call returned, verbatim</h3>")
-        out.append(f"<p>The door's <code>parsed</code> object, or <code>null</code> when the agent's text held no JSON object:</p>")
+        out.append("<p>The door's <code>parsed</code> object, or <code>null</code> when the agent's text held no JSON object:</p>")
         out.append(f"<pre>{esc(json_text(door.get('parsed')))}</pre>")
         if door.get("text"):
             out.append("<p>The agent's text on that call, verbatim. It is the agent's own words, not this page's:</p>")
@@ -487,7 +487,7 @@ def render_answer(e: dict, api: dict, goldens: Path) -> str:
             cell = f"<code>{esc(v)}</code>"
         out.append(f"        <tr><th scope=\"row\">call.{esc(k)}</th><td>{cell}</td></tr>")
     out.append(f"        <tr><th scope=\"row\">door status</th><td><code>{esc(door.get('status'))}</code>, request id in <code>{esc(door.get('request_id_header'))}</code></td></tr>")
-    out.append(f"        <tr><th scope=\"row\">scripted</th><td><code>false</code></td></tr>")
+    out.append("        <tr><th scope=\"row\">scripted</th><td><code>false</code></td></tr>")
     out.append("  </tbody>")
     out.append("</table>")
     out.append("</article>")
