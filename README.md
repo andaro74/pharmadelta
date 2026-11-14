@@ -11,9 +11,9 @@ The authority for what this demo claims is [SPEC/00-overview.md](SPEC/00-overvie
 
 The pages are at <https://andaro74.github.io/pharmadelta/>. They show saved CI records and take no question.
 
-**New here?** Start with the [executive overview](https://andaro74.github.io/pharmadelta/pages/overview.html) (three pictures) or the [five-minute walkthrough](docs/demo-walkthrough.md).
+**New here?** The three pictures below are also on the [executive overview](https://andaro74.github.io/pharmadelta/pages/overview.html) page. For a guided tour, take the [five-minute walkthrough](docs/demo-walkthrough.md).
 
-## The problem
+## What it solves for the business
 
 A generics company holds many drug labels. FDA labeling rules change. Each time, someone has to work out:
 
@@ -21,11 +21,25 @@ A generics company holds many drug labels. FDA labeling rules change. Each time,
 - what we owe because of it, and
 - which rule says so.
 
+Done by hand, each step leaves a question open. pharmadelta is a demo of answering the same question with a row, a clause and a named owner behind every answer.
+
+![The same job, two ways. By hand, an illustration of a manual process, not measured: a rule-change notice arrives (which version of the rule is in force today?); someone searches the labels (was the right section of the right label found?); someone decides what is owed (which clause says so?); the conclusion goes round by email (who decided the rules it was judged by?); it is filed away (can anyone check it again next year?). With pharmadelta, what the pages and the ledger show: ask the question (the rules are built from the eCFR, each with its date); the agent looks up the label (every answer names the row it read); it answers impacted, owed, escalate (every answer names its clause; no clause, no answer); the rules have owners (seven seats, each with a named owner); the record is saved and signed (a gate asks again on every run; evidence to download).](docs/assets/workflow-today-and-with.svg)
+
+The left lane is an illustration, written by hand. Nobody measured a manual process for this demo: it claims no time, no cost and no error rate. The right lane says only what the pages and the [ledger](milestones/README.md) show.
+
 An assistant that answers this from keywords gets the easy cases and fails the traps: a rule that is no longer in force, a route that is not open to a generics company, a reportable event buried in a note about something else. A wrong answer here can become a wrong filing.
 
 pharmadelta answers that one question. Every answer names one row of the company's label table and one clause of 21 CFR Parts 201 and 314. An answer without both is not shown.
 
 The company, Ardentia Generics, is fictional. Its portfolio and every "our label" statement are invented. The labels are real public-domain labels of old off-patent generics, read from DailyMed.
+
+## One rule change, start to finish
+
+One of the traps, as the pages hold it. The question asks about an earlier version of a rule. A keyword assistant says the label must change. The agent looks up the label's row, cites the clause, and answers that nothing is owed.
+
+![One rule change in six steps. 1: a question arrives: an earlier version of the pregnancy rule required a category letter; does our metoprolol tartrate tablet label need one, and what do we owe? 2: it is checked first: the door admits only a named caller and the guardrail reads the question against the rules. 3: the label is looked up: row metoprolol-tartrate.8.1, section 8.1 Pregnancy. 4: the rule is cited: 21 CFR 201.57(c)(9)(i). 5: the answer: impacted no, owed nothing, escalate no; it equals the answer the test expects. 6: it can be re-checked: CI saves the call, a gate asks again on every run, a seat holder signs the evidence.](docs/assets/workflow-one-rule-change.svg)
+
+The answer drawn is the saved record of [CI run 43621291917](https://github.com/andaro74/pharmadelta/actions/runs/43621291917). The [side-by-side page](https://andaro74.github.io/pharmadelta/pages/side-by-side.html) shows it in full beside the ordinary assistant's answer.
 
 ## What you can see
 
@@ -68,6 +82,10 @@ A single app with the rules written into its prompt could answer the four questi
 | Better than what? | No control. | A frozen keyword baseline runs beside the agent. It fails the traps. | Rows 0 and 5 |
 | Can I check it myself? | Read the code. | A signed evidence package to download, each file with its hash and the CI run that wrote it. | Row 7 |
 | What does the next agent cost? | Build it all again. | A second agent starts from the same template and gets the same controls. | Row 8, **not yet measured** (M07) |
+
+Who owns each decision, as this demo maps the platform's seven seats to pharma functions:
+
+![Who owns what: seven seats. Regulatory Affairs, seat product: what the assessment covers and when it is acceptable. Medical Affairs, seat rule-owner: what the agent may say: no treatment answers, no off-label answers. Labeling Operations, seat data-owner: what correct means: the label table, the clauses, the test questions. Quality, seat threshold-owner: the bars the agent must clear and which model is pinned. Security, seat security: what tooling and infrastructure may do. Platform Engineering, seat tool-owner: what the agent's one tool returns. Engineering, seat engineering: that it works. No seat: Pharmacovigilance and Legal are consulted; they do not sign. In this demo one person holds all seven seats.](docs/assets/workflow-who-owns-what.svg)
 
 What the platform costs: three repositories where one would do, more moving parts, and a deploy pipeline to run. For one agent, one team and no one to answer to, an app with the rules inside is less work. The platform is for the case where a second agent arrives, or where someone outside the team has to rely on the answer. This demo has measured the rows above for the second case. The first case is M07 and is not measured yet.
 
