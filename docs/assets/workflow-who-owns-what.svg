@@ -1,0 +1,77 @@
+<svg width="980" height="540" viewBox="0 0 980 540" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif">
+  <!--
+    Executive overview, workflow 3: who owns what. The seven seats and the
+    function shown beside each are SPEC/00 section 5's table, word for word
+    in meaning. Pharmacovigilance and Legal hold no seat and are drawn as
+    consulted, never as a signature (section 5; CLAUDE.md). The image says
+    one person holds all seven seats in this demo (agentkeel ruling R1).
+    None of the six words; no measured number.
+  -->
+  <g font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">
+    <rect x="1" y="1" width="978" height="538" rx="16" fill="#0d1a2e" stroke="#2c3d5c" stroke-width="1.5"/>
+    <text x="30" y="42" fill="#cbd6e6" font-size="13" letter-spacing="3">WHO OWNS WHAT &#183; SEVEN SEATS</text>
+  </g>
+
+  <!-- row 1: y 64, cards 218 x 176 at x = 30, 264, 498, 732 -->
+  <rect x="30" y="64" width="218" height="176" rx="12" fill="#182a47" stroke="#f0a43a" stroke-width="2"/>
+  <text x="48" y="96" fill="#ffe1ad" font-size="17" font-weight="bold">Regulatory Affairs</text>
+  <text x="48" y="116" fill="#8b9bb4" font-size="11.5" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">seat: product</text>
+  <text x="48" y="150" fill="#dbe4f0" font-size="13.5">What the assessment</text>
+  <text x="48" y="170" fill="#dbe4f0" font-size="13.5">covers, and when it is</text>
+  <text x="48" y="190" fill="#dbe4f0" font-size="13.5">acceptable.</text>
+
+  <rect x="264" y="64" width="218" height="176" rx="12" fill="#2a1a30" stroke="#f472b6" stroke-width="2"/>
+  <text x="282" y="96" fill="#fcd0e4" font-size="17" font-weight="bold">Medical Affairs</text>
+  <text x="282" y="116" fill="#8b9bb4" font-size="11.5" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">seat: rule-owner</text>
+  <text x="282" y="150" fill="#dbe4f0" font-size="13.5">What the agent may say:</text>
+  <text x="282" y="170" fill="#dbe4f0" font-size="13.5">no treatment answers,</text>
+  <text x="282" y="190" fill="#dbe4f0" font-size="13.5">no off-label answers.</text>
+
+  <rect x="498" y="64" width="218" height="176" rx="12" fill="#12283b" stroke="#34d399" stroke-width="2"/>
+  <text x="516" y="96" fill="#a7f3d0" font-size="17" font-weight="bold">Labeling Operations</text>
+  <text x="516" y="116" fill="#8b9bb4" font-size="11.5" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">seat: data-owner</text>
+  <text x="516" y="150" fill="#dbe4f0" font-size="13.5">What correct means:</text>
+  <text x="516" y="170" fill="#dbe4f0" font-size="13.5">the label table, the</text>
+  <text x="516" y="190" fill="#dbe4f0" font-size="13.5">clauses, the test questions.</text>
+
+  <rect x="732" y="64" width="218" height="176" rx="12" fill="#182342" stroke="#a78bfa" stroke-width="2"/>
+  <text x="750" y="96" fill="#ddd2fe" font-size="17" font-weight="bold">Quality</text>
+  <text x="750" y="116" fill="#8b9bb4" font-size="11.5" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">seat: threshold-owner</text>
+  <text x="750" y="150" fill="#dbe4f0" font-size="13.5">The bars the agent must</text>
+  <text x="750" y="170" fill="#dbe4f0" font-size="13.5">clear, and which model</text>
+  <text x="750" y="190" fill="#dbe4f0" font-size="13.5">is pinned.</text>
+
+  <!-- row 2: y 256 -->
+  <rect x="30" y="256" width="218" height="176" rx="12" fill="#12253f" stroke="#4da3ff" stroke-width="2"/>
+  <text x="48" y="288" fill="#bfdcff" font-size="17" font-weight="bold">Security</text>
+  <text x="48" y="308" fill="#8b9bb4" font-size="11.5" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">seat: security</text>
+  <text x="48" y="342" fill="#dbe4f0" font-size="13.5">What tooling and</text>
+  <text x="48" y="362" fill="#dbe4f0" font-size="13.5">infrastructure may do.</text>
+
+  <rect x="264" y="256" width="218" height="176" rx="12" fill="#0f2a3a" stroke="#22d3ee" stroke-width="2"/>
+  <text x="282" y="288" fill="#a5f3fc" font-size="17" font-weight="bold">Platform Engineering</text>
+  <text x="282" y="308" fill="#8b9bb4" font-size="11.5" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">seat: tool-owner</text>
+  <text x="282" y="342" fill="#dbe4f0" font-size="13.5">What the agent's one</text>
+  <text x="282" y="362" fill="#dbe4f0" font-size="13.5">tool returns.</text>
+
+  <rect x="498" y="256" width="218" height="176" rx="12" fill="#151f33" stroke="#94a3b8" stroke-width="2"/>
+  <text x="516" y="288" fill="#e2e8f0" font-size="17" font-weight="bold">Engineering</text>
+  <text x="516" y="308" fill="#8b9bb4" font-size="11.5" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">seat: engineering</text>
+  <text x="516" y="342" fill="#dbe4f0" font-size="13.5">That it works.</text>
+
+  <!-- no seat: consulted only -->
+  <rect x="732" y="256" width="218" height="176" rx="12" fill="rgba(19,33,58,0.35)" stroke="#5b7091" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="750" y="288" fill="#cbd6e6" font-size="15" font-weight="bold" letter-spacing="1">NO SEAT</text>
+  <text x="750" y="322" fill="#dbe4f0" font-size="13.5">Pharmacovigilance and</text>
+  <text x="750" y="342" fill="#dbe4f0" font-size="13.5">Legal are consulted.</text>
+  <text x="750" y="372" fill="#dbe4f0" font-size="13.5">They do not sign: a page</text>
+  <text x="750" y="392" fill="#dbe4f0" font-size="13.5">shows no signature</text>
+  <text x="750" y="412" fill="#dbe4f0" font-size="13.5">without a seat behind it.</text>
+
+  <!-- footer -->
+  <g font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace" font-size="11.5">
+    <text x="30" y="468" fill="#8b9bb4"><tspan fill="#f0a43a">&#9679;</tspan>&#160; the platform refuses an agent while any seat is empty</text>
+    <text x="30" y="490" fill="#8b9bb4"><tspan fill="#f0a43a">&#9679;</tspan>&#160; in this demo one person holds all seven seats, and the pages say so</text>
+    <text x="30" y="512" fill="#667799"><tspan fill="#f0a43a">&#9679;</tspan>&#160; a demo &#183; the company is fictional &#183; not medical information</text>
+  </g>
+</svg>

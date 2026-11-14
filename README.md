@@ -11,6 +11,8 @@ The authority for what this demo claims is [SPEC/00-overview.md](SPEC/00-overvie
 
 The pages are at <https://andaro74.github.io/pharmadelta/>. They show saved CI records and take no question.
 
+**New here?** Start with the [executive overview](https://andaro74.github.io/pharmadelta/pages/overview.html) (three pictures) or the [five-minute walkthrough](docs/demo-walkthrough.md).
+
 ## The problem
 
 A generics company holds many drug labels. FDA labeling rules change. Each time, someone has to work out:

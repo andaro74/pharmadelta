@@ -1,4 +1,4 @@
-/* pharmadelta: one stylesheet for the five pages (index.html and pages/*.html).
+/* pharmadelta: one stylesheet for the site's pages (index.html and pages/*.html).
    Self-hosted. No @import, no web font, no image, no script. Every colour is a
    custom property on :root; dark mode redefines the same properties under
    prefers-color-scheme. The pages are evidence records: the look is an audit
@@ -255,6 +255,11 @@ body > header .statement ~ p { font-size: 0.95rem; }
 .chip-danger, .chip-red { color: var(--danger-fg); background: var(--danger-bg); border-color: var(--danger-border); }
 .chip-neutral { color: var(--neutral-fg); background: var(--neutral-bg); border-color: var(--neutral-border); }
 code.chip { font-family: var(--mono); font-size: 0.82rem; }
+
+/* ---- figures: the overview's pictures and the front page's header image. The stylesheet itself loads no image. ---- */
+figure.figure { margin: 1.25rem 0; }
+figure.figure img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+figure.figure figcaption { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); }
 
 /* ---- footer ---- */
 body > footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }

@@ -1,0 +1,111 @@
+<svg width="980" height="580" viewBox="0 0 980 580" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif">
+  <!--
+    Executive overview, workflow 1: one rule change, start to finish. The
+    trap golden g-002, as the saved record of CI run 43621291917 holds it
+    (pages/api/answers.json). Every value drawn is in that record: the row,
+    the clause and the three answer fields. Same palette as
+    docs/assets/architecture.svg. SPEC/00 section 11 applies: none of the six
+    words, no measured number; the answer is drawn with its row and its
+    clause.
+  -->
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5b7091"/>
+    </marker>
+  </defs>
+  <g font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">
+    <rect x="1" y="1" width="978" height="578" rx="16" fill="#0d1a2e" stroke="#2c3d5c" stroke-width="1.5"/>
+    <text x="30" y="42" fill="#cbd6e6" font-size="13" letter-spacing="3">ONE RULE CHANGE, START TO FINISH</text>
+  </g>
+
+  <!-- row 1 -->
+  <!-- 1 the question (cyan) -->
+  <rect x="30" y="64" width="290" height="196" rx="12" fill="#0f2a3a" stroke="#22d3ee" stroke-width="2"/>
+  <circle cx="58" cy="94" r="14" fill="#22d3ee"/>
+  <text x="58" y="99" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">1</text>
+  <text x="82" y="99" fill="#a5f3fc" font-size="15" font-weight="bold" letter-spacing="1">A QUESTION ARRIVES</text>
+  <text x="48" y="136" fill="#dbe4f0" font-size="14">“An earlier version of the pregnancy</text>
+  <text x="48" y="158" fill="#dbe4f0" font-size="14">rule required a category letter.</text>
+  <text x="48" y="180" fill="#dbe4f0" font-size="14">Does our metoprolol tartrate tablet</text>
+  <text x="48" y="202" fill="#dbe4f0" font-size="14">label need one, and what do we owe?”</text>
+  <text x="48" y="238" fill="#8b9bb4" font-size="12">a trap: that version is no longer the rule</text>
+
+  <line x1="320" y1="162" x2="341" y2="162" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- 2 the door and the guardrail (blue) -->
+  <rect x="345" y="64" width="290" height="196" rx="12" fill="#12253f" stroke="#4da3ff" stroke-width="2"/>
+  <circle cx="373" cy="94" r="14" fill="#4da3ff"/>
+  <text x="373" y="99" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">2</text>
+  <text x="397" y="99" fill="#bfdcff" font-size="15" font-weight="bold" letter-spacing="1">IT IS CHECKED FIRST</text>
+  <text x="363" y="136" fill="#dbe4f0" font-size="14">The door admits only a named caller.</text>
+  <text x="363" y="158" fill="#dbe4f0" font-size="14">The guardrail reads the question</text>
+  <text x="363" y="180" fill="#dbe4f0" font-size="14">against the rules. This one is about</text>
+  <text x="363" y="202" fill="#dbe4f0" font-size="14">labeling, so it goes through.</text>
+  <text x="363" y="238" fill="#8b9bb4" font-size="12">a treatment question would stop here</text>
+
+  <line x1="635" y1="162" x2="656" y2="162" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- 3 the label row (green) -->
+  <rect x="660" y="64" width="290" height="196" rx="12" fill="#12283b" stroke="#34d399" stroke-width="2"/>
+  <circle cx="688" cy="94" r="14" fill="#34d399"/>
+  <text x="688" y="99" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">3</text>
+  <text x="712" y="99" fill="#a7f3d0" font-size="15" font-weight="bold" letter-spacing="1">THE LABEL IS LOOKED UP</text>
+  <text x="678" y="136" fill="#dbe4f0" font-size="14">The agent finds one row of the</text>
+  <text x="678" y="158" fill="#dbe4f0" font-size="14">company's label table:</text>
+  <rect x="678" y="172" width="254" height="30" rx="6" fill="#0a1526" stroke="#34d399" stroke-width="1"/>
+  <text x="805" y="192" text-anchor="middle" fill="#a7f3d0" font-size="13" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">metoprolol-tartrate.8.1</text>
+  <text x="678" y="238" fill="#8b9bb4" font-size="12">section 8.1, Pregnancy</text>
+
+  <!-- wrap from 3 down to 4 -->
+  <path d="M805 260 L805 280 L175 280 L175 296" stroke="#5b7091" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+  <circle cx="490" cy="280" r="3.5" fill="#f0a43a"/>
+
+  <!-- row 2 -->
+  <!-- 4 the clause (violet) -->
+  <rect x="30" y="300" width="290" height="196" rx="12" fill="#182342" stroke="#a78bfa" stroke-width="2"/>
+  <circle cx="58" cy="330" r="14" fill="#a78bfa"/>
+  <text x="58" y="335" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">4</text>
+  <text x="82" y="335" fill="#ddd2fe" font-size="15" font-weight="bold" letter-spacing="1">THE RULE IS CITED</text>
+  <text x="48" y="372" fill="#dbe4f0" font-size="14">It names the one clause the question</text>
+  <text x="48" y="394" fill="#dbe4f0" font-size="14">turns on:</text>
+  <rect x="48" y="408" width="254" height="30" rx="6" fill="#0a1526" stroke="#a78bfa" stroke-width="1"/>
+  <text x="175" y="428" text-anchor="middle" fill="#ddd2fe" font-size="13" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">21 CFR 201.57(c)(9)(i)</text>
+  <text x="48" y="474" fill="#8b9bb4" font-size="12">the rule for what section 8.1 must say</text>
+
+  <line x1="320" y1="398" x2="341" y2="398" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- 5 the answer (amber) -->
+  <rect x="345" y="300" width="290" height="196" rx="12" fill="#182a47" stroke="#f0a43a" stroke-width="2.5"/>
+  <circle cx="373" cy="330" r="14" fill="#f0a43a"/>
+  <text x="373" y="335" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">5</text>
+  <text x="397" y="335" fill="#ffe1ad" font-size="15" font-weight="bold" letter-spacing="1">THE ANSWER</text>
+  <text x="363" y="372" fill="#dbe4f0" font-size="14">Is the label impacted?</text>
+  <text x="617" y="372" text-anchor="end" fill="#f4f7fb" font-size="14" font-weight="bold">No</text>
+  <line x1="363" y1="382" x2="617" y2="382" stroke="#2c3d5c" stroke-width="1"/>
+  <text x="363" y="404" fill="#dbe4f0" font-size="14">What do we owe?</text>
+  <text x="617" y="404" text-anchor="end" fill="#f4f7fb" font-size="14" font-weight="bold">Nothing</text>
+  <line x1="363" y1="414" x2="617" y2="414" stroke="#2c3d5c" stroke-width="1"/>
+  <text x="363" y="436" fill="#dbe4f0" font-size="14">Escalate?</text>
+  <text x="617" y="436" text-anchor="end" fill="#f4f7fb" font-size="14" font-weight="bold">No</text>
+  <rect x="363" y="452" width="254" height="26" rx="13" fill="#12283b" stroke="#34d399" stroke-width="1"/>
+  <text x="490" y="470" text-anchor="middle" fill="#a7f3d0" font-size="12.5" font-weight="bold">equals the answer the test expects</text>
+
+  <line x1="635" y1="398" x2="656" y2="398" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- 6 the record (slate) -->
+  <rect x="660" y="300" width="290" height="196" rx="12" fill="#151f33" stroke="#94a3b8" stroke-width="2"/>
+  <circle cx="688" cy="330" r="14" fill="#94a3b8"/>
+  <text x="688" y="335" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">6</text>
+  <text x="712" y="335" fill="#e2e8f0" font-size="15" font-weight="bold" letter-spacing="1">IT CAN BE RE-CHECKED</text>
+  <text x="678" y="372" fill="#dbe4f0" font-size="14">CI saves the call and its run.</text>
+  <text x="678" y="394" fill="#dbe4f0" font-size="14">A gate asks the agent again on</text>
+  <text x="678" y="416" fill="#dbe4f0" font-size="14">every run and compares.</text>
+  <text x="678" y="438" fill="#dbe4f0" font-size="14">A seat holder signs the evidence.</text>
+  <text x="678" y="474" fill="#8b9bb4" font-size="12">the pages show the saved record</text>
+
+  <!-- footer -->
+  <g font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace" font-size="11.5">
+    <text x="30" y="530" fill="#8b9bb4"><tspan fill="#f0a43a">&#9679;</tspan>&#160; from the saved record of CI run 43621291917, shown in full on the side-by-side page</text>
+    <text x="30" y="552" fill="#667799"><tspan fill="#f0a43a">&#9679;</tspan>&#160; a demo &#183; the company is fictional &#183; not medical information</text>
+  </g>
+</svg>

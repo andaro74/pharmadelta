@@ -11,6 +11,7 @@
   <p class="kicker"><strong>pharmadelta</strong> · front page</p>
   <nav class="site-nav" aria-label="Pages">
     <a href="index.html" aria-current="page">Front page</a>
+    <a href="pages/overview.html">Overview</a>
     <a href="pages/detail.html">Detail</a>
     <a href="pages/side-by-side.html">Side by side</a>
     <a href="pages/break-it.html">Try to break it</a>
@@ -20,6 +21,11 @@
      The company, Ardentia Generics, is fictional; its portfolio and every “our label” statement are invented.
      The labels are real public-domain labels of old off-patent generics, read from DailyMed.</p>
 </header>
+
+<figure class="figure">
+  <img src="docs/assets/readme-header.png" width="1200" height="630"
+       alt="PharmaDelta: an agent for FDA drug labeling changes. A question passes a door that admits named callers only and a guardrail that holds the rules outside the agent; the agent cites one row of the label table and one clause of 21 CFR; a CI gate asks again; the answer is a row, a clause and what we owe. A demo: the company is fictional, and it is not medical information.">
+</figure>
 
 <h1>A labeling rule changed. Which of our labels does it touch, and what do we owe?</h1>
 
@@ -34,6 +40,16 @@
      box to type a question into. Where the agent gave no answer, the page says so and shows what the call
      returned. Where the baseline is shown, it is a deliberately weak control, not an assistant anyone would ship.</p>
 </div>
+
+<h2>Start here</h2>
+<table>
+  <tbody>
+    <tr><th scope="row"><a href="pages/overview.html">Executive overview</a></th>
+        <td>The problem and how the demo answers it, in three pictures: one rule change from start to finish, the same job by hand and with pharmadelta, and who owns what.</td></tr>
+    <tr><th scope="row"><a href="https://github.com/andaro74/pharmadelta/blob/main/docs/demo-walkthrough.md">Five-minute walkthrough</a></th>
+        <td>Which page to open, in order, and what to notice on each.</td></tr>
+  </tbody>
+</table>
 
 <h2>The pages</h2>
 <table>
@@ -71,7 +87,7 @@
 <footer>
   <p>pharmadelta answers no treatment question; it assesses regulatory impact on labeling, nothing else.
      Citations are checked against the eCFR before they appear (SPEC/00 P7). This page is navigation; it copies
-     no number and shows no answer.</p>
+     no number and shows no answer. The picture at the top is the repository's header image.</p>
 </footer>
 </body>
 </html>
