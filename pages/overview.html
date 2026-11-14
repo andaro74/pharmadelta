@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pharmadelta: executive overview</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body class="wide">
+<header>
+  <p class="kicker"><strong>pharmadelta</strong> · executive overview</p>
+  <nav class="site-nav" aria-label="Pages">
+    <a href="../index.html">Front page</a>
+    <a href="overview.html" aria-current="page">Overview</a>
+    <a href="detail.html">Detail</a>
+    <a href="side-by-side.html">Side by side</a>
+    <a href="break-it.html">Try to break it</a>
+    <a href="sign-off.html">Sign-off</a>
+  </nav>
+  <p class="statement">pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.
+     The company, Ardentia Generics, is fictional; its portfolio and every “our label” statement are invented.
+     The labels are real public-domain labels of old off-patent generics, read from DailyMed.</p>
+</header>
+
+<h1>A labeling rule changed. Which of our labels does it touch, and what do we owe?</h1>
+
+<p>A generics company holds many drug labels, and FDA labeling rules change. Each time, someone has to work out which
+   labels the change touches, what the company owes because of it, and which rule says so. pharmadelta is a demo of an
+   agent that answers that one question, and of what has to surround the agent before anyone can rely on the answer.</p>
+
+<div class="layer" role="note">
+  <p><strong>What this page is.</strong> An overview in three pictures, written by hand. It measures nothing and shows
+     no result of its own. The one answer drawn below is the saved record of a call this repository's CI made; the
+     <a href="side-by-side.html">side-by-side page</a> shows that record in full, with the run that wrote it. What was
+     measured is in <a href="https://github.com/andaro74/pharmadelta/blob/main/milestones/README.md">the ledger</a>.</p>
+</div>
+
+<h2>1. One rule change, start to finish</h2>
+
+<p>The question below is a trap. It asks about an earlier version of a rule. An assistant that matches keywords sees
+   “pregnancy”, “category letter” and the label's name, and says the label must change. The agent looks up the label's
+   row, cites the clause, and answers that nothing is owed.</p>
+
+<figure class="figure">
+  <img src="../docs/assets/workflow-one-rule-change.svg" width="980" height="580"
+       alt="One rule change in six steps. 1: a question arrives: an earlier version of the pregnancy rule required a category letter; does our metoprolol tartrate tablet label need one, and what do we owe? 2: it is checked first: the door admits only a named caller and the guardrail reads the question against the rules. 3: the label is looked up: row metoprolol-tartrate.8.1, section 8.1 Pregnancy. 4: the rule is cited: 21 CFR 201.57(c)(9)(i). 5: the answer: impacted no, owed nothing, escalate no; it equals the answer the test expects. 6: it can be re-checked: CI saves the call, a gate asks again on every run, a seat holder signs the evidence.">
+  <figcaption>The answer drawn here is row <code>metoprolol-tartrate.8.1</code> under clause <code>201.57(c)(9)(i)</code>,
+     from <a href="https://github.com/andaro74/pharmadelta/actions/runs/43621291917">CI run 43621291917</a>. See it beside
+     the ordinary assistant's answer on the <a href="side-by-side.html">side-by-side page</a>.</figcaption>
+</figure>
+
+<h3>The three traps on the pages</h3>
+<table>
+  <tbody>
+    <tr><th scope="row">A rule no longer in force</th>
+        <td>The question quotes an earlier version of a rule. What the earlier version asked for is not owed.</td></tr>
+    <tr><th scope="row">A route not open to us on our own</th>
+        <td>The question names a real filing route, for a change the reference drug's label does not carry. A generics company
+            keeps its label the same as the reference drug's.</td></tr>
+    <tr><th scope="row">A reportable event inside a note about something else</th>
+        <td>A distributor's note about a carton shortfall mentions, in one sentence, a patient admitted to hospital. The label
+            does not change. A report is owed.</td></tr>
+  </tbody>
+</table>
+<p>Each trap, with the row and the clause behind each answer and the answer the test expects, is on the
+   <a href="side-by-side.html">side-by-side page</a>.</p>
+
+<h2>2. The same job, two ways</h2>
+
+<div class="scripted" role="note">
+  <p><strong>Illustration.</strong> The left lane of this picture was written by hand to show where a manual process
+     leaves questions open. Nobody measured a manual process for this demo: it claims no time, no cost and no error rate
+     (SPEC/00 P8).</p>
+</div>
+
+<figure class="figure">
+  <img src="../docs/assets/workflow-today-and-with.svg" width="980" height="660"
+       alt="The same job, two ways. By hand, an illustration of a manual process, not measured: a rule-change notice arrives (which version of the rule is in force today?); someone searches the labels (was the right section of the right label found?); someone decides what is owed (which clause says so?); the conclusion goes round by email (who decided the rules it was judged by?); it is filed away (can anyone check it again next year?). With pharmadelta, what the pages and the ledger show: ask the question (the rules are built from the eCFR, each with its date); the agent looks up the label (every answer names the row it read); it answers impacted, owed, escalate (every answer names its clause; no clause, no answer); the rules have owners (seven seats, each with a named owner); the record is saved and signed (a gate asks again on every run; evidence to download).">
+  <figcaption>The right lane says only what the pages and the ledger show. Each line has a row behind it:
+     the rules and their dates (ledger row 2), the seats (row 1), the gates that ask again (rows 4 to 6), the signed
+     evidence (row 7).</figcaption>
+</figure>
+
+<h2>3. Who owns what</h2>
+
+<p>The agent runs on a platform that gives every agent seven seats. Each seat is a named person who decides one thing.
+   The platform refused this agent while one seat was empty (ledger row 1).</p>
+
+<figure class="figure">
+  <img src="../docs/assets/workflow-who-owns-what.svg" width="980" height="540"
+       alt="Who owns what: seven seats. Regulatory Affairs, seat product: what the assessment covers and when it is acceptable. Medical Affairs, seat rule-owner: what the agent may say: no treatment answers, no off-label answers. Labeling Operations, seat data-owner: what correct means: the label table, the clauses, the test questions. Quality, seat threshold-owner: the bars the agent must clear and which model is pinned. Security, seat security: what tooling and infrastructure may do. Platform Engineering, seat tool-owner: what the agent's one tool returns. Engineering, seat engineering: that it works. No seat: Pharmacovigilance and Legal are consulted; they do not sign. In this demo one person holds all seven seats.">
+  <figcaption>The functions are this demo's mapping of the platform's seats (SPEC/00 §5). In this demo one person holds
+     all seven seats, so the reviewer reviews their own work. The <a href="sign-off.html">sign-off page</a> says so too.</figcaption>
+</figure>
+
+<h2>What it is not</h2>
+<table>
+  <tbody>
+    <tr><th scope="row">Not a validation</th><td>It produces the evidence a validation would need.</td></tr>
+    <tr><th scope="row">Not medical information</th><td>The agent assesses regulatory impact on labeling. It never answers a treatment question.</td></tr>
+    <tr><th scope="row">Not live</th><td>The pages show saved records. There is no box to type a question into.</td></tr>
+    <tr><th scope="row">Not a statement about any marketed product</th><td>The company and its portfolio are fictional.</td></tr>
+  </tbody>
+</table>
+
+<h2>Where to go next</h2>
+<table>
+  <tbody>
+    <tr><th scope="row"><a href="https://github.com/andaro74/pharmadelta/blob/main/docs/demo-walkthrough.md">The five-minute walkthrough</a></th>
+        <td>Which page to open, in order, and what to notice on each.</td></tr>
+    <tr><th scope="row"><a href="side-by-side.html">Side by side</a></th>
+        <td>Four questions, each answered by the ordinary assistant and by the agent, with the answer the test expects.</td></tr>
+    <tr><th scope="row"><a href="break-it.html">Try to break it</a></th>
+        <td>Two attack questions and what the platform's guardrail did on each.</td></tr>
+    <tr><th scope="row"><a href="sign-off.html">Sign-off</a></th>
+        <td>The signature and the evidence package to download.</td></tr>
+    <tr><th scope="row"><a href="https://github.com/andaro74/pharmadelta#readme">The README</a></th>
+        <td>How it is built, the AWS services behind it, and why a platform and not one app with the rules inside.</td></tr>
+  </tbody>
+</table>
+
+<footer>
+  <p>This demo produces the evidence a validation would need. It is not medical information: the agent assesses
+     regulatory impact on labeling and never answers a treatment question (SPEC/00 §2). The authority for what this demo
+     claims is <code>SPEC/00-overview.md</code>; what was measured is in <code>milestones/README.md</code>. No number on
+     this page is a measured result: the run id and the ledger's row numbers are the records' own, linked above.</p>
+</footer>
+</body>
+</html>

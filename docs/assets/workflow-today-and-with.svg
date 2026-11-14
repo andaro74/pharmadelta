@@ -1,0 +1,80 @@
+<svg width="980" height="660" viewBox="0 0 980 660" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif">
+  <!--
+    Executive overview, workflow 2: the same job by hand and with
+    pharmadelta. The left lane is an ILLUSTRATION of a manual process: no
+    one measured it, and the image says so twice (SPEC/00 P8). It states no
+    time and no cost. The right lane states only what this repository's
+    pages and ledger show: clauses built from the eCFR with their effective
+    dates (row 2), an answer shown only with its row and its clause (section
+    11), seven seats (row 1), a gate that asks again on every run (rows 4
+    to 6), a signed evidence package (row 7). None of the six words.
+  -->
+  <g font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">
+    <rect x="1" y="1" width="978" height="658" rx="16" fill="#0d1a2e" stroke="#2c3d5c" stroke-width="1.5"/>
+    <text x="30" y="42" fill="#cbd6e6" font-size="13" letter-spacing="3">THE SAME JOB, TWO WAYS</text>
+  </g>
+
+  <!-- lane headers -->
+  <rect x="30" y="62" width="440" height="56" rx="10" fill="#151f33" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="50" y="87" fill="#e2e8f0" font-size="16" font-weight="bold" letter-spacing="1">BY HAND</text>
+  <text x="50" y="107" fill="#fcd0e4" font-size="12.5">an illustration of a manual process, not measured</text>
+
+  <rect x="510" y="62" width="440" height="56" rx="10" fill="#182a47" stroke="#f0a43a" stroke-width="2"/>
+  <text x="530" y="87" fill="#ffe1ad" font-size="16" font-weight="bold" letter-spacing="1">WITH PHARMADELTA</text>
+  <text x="530" y="107" fill="#dbe4f0" font-size="12.5">what the pages and the ledger show</text>
+
+  <!-- step rows: y = 136 + 88 * n, height 74 -->
+  <g>
+    <!-- row 1 -->
+    <rect x="30" y="136" width="440" height="74" rx="10" fill="#151f33" stroke="#3a4d6b" stroke-width="1.5"/>
+    <text x="50" y="164" fill="#e2e8f0" font-size="15" font-weight="bold">A rule-change notice arrives</text>
+    <text x="50" y="190" fill="#fcd0e4" font-size="13"><tspan font-weight="bold">?</tspan>&#160; Which version of the rule is in force today?</text>
+    <rect x="510" y="136" width="440" height="74" rx="10" fill="#12283b" stroke="#34d399" stroke-width="1.5"/>
+    <text x="530" y="164" fill="#f4f7fb" font-size="15" font-weight="bold">Ask the question</text>
+    <text x="530" y="190" fill="#a7f3d0" font-size="13"><tspan font-weight="bold">&#10003;</tspan>&#160; The rules are built from the eCFR, each with its date.</text>
+
+    <!-- row 2 -->
+    <rect x="30" y="224" width="440" height="74" rx="10" fill="#151f33" stroke="#3a4d6b" stroke-width="1.5"/>
+    <text x="50" y="252" fill="#e2e8f0" font-size="15" font-weight="bold">Someone searches the labels</text>
+    <text x="50" y="278" fill="#fcd0e4" font-size="13"><tspan font-weight="bold">?</tspan>&#160; Was the right section of the right label found?</text>
+    <rect x="510" y="224" width="440" height="74" rx="10" fill="#12283b" stroke="#34d399" stroke-width="1.5"/>
+    <text x="530" y="252" fill="#f4f7fb" font-size="15" font-weight="bold">The agent looks up the label</text>
+    <text x="530" y="278" fill="#a7f3d0" font-size="13"><tspan font-weight="bold">&#10003;</tspan>&#160; Every answer names the row it read.</text>
+
+    <!-- row 3 -->
+    <rect x="30" y="312" width="440" height="74" rx="10" fill="#151f33" stroke="#3a4d6b" stroke-width="1.5"/>
+    <text x="50" y="340" fill="#e2e8f0" font-size="15" font-weight="bold">Someone decides what is owed</text>
+    <text x="50" y="366" fill="#fcd0e4" font-size="13"><tspan font-weight="bold">?</tspan>&#160; Which clause says so?</text>
+    <rect x="510" y="312" width="440" height="74" rx="10" fill="#12283b" stroke="#34d399" stroke-width="1.5"/>
+    <text x="530" y="340" fill="#f4f7fb" font-size="15" font-weight="bold">It answers: impacted, owed, escalate</text>
+    <text x="530" y="366" fill="#a7f3d0" font-size="13"><tspan font-weight="bold">&#10003;</tspan>&#160; Every answer names its clause. No clause, no answer.</text>
+
+    <!-- row 4 -->
+    <rect x="30" y="400" width="440" height="74" rx="10" fill="#151f33" stroke="#3a4d6b" stroke-width="1.5"/>
+    <text x="50" y="428" fill="#e2e8f0" font-size="15" font-weight="bold">The conclusion goes round by email</text>
+    <text x="50" y="454" fill="#fcd0e4" font-size="13"><tspan font-weight="bold">?</tspan>&#160; Who decided the rules it was judged by?</text>
+    <rect x="510" y="400" width="440" height="74" rx="10" fill="#12283b" stroke="#34d399" stroke-width="1.5"/>
+    <text x="530" y="428" fill="#f4f7fb" font-size="15" font-weight="bold">The rules have owners</text>
+    <text x="530" y="454" fill="#a7f3d0" font-size="13"><tspan font-weight="bold">&#10003;</tspan>&#160; Seven seats, each with a named owner.</text>
+
+    <!-- row 5 -->
+    <rect x="30" y="488" width="440" height="74" rx="10" fill="#151f33" stroke="#3a4d6b" stroke-width="1.5"/>
+    <text x="50" y="516" fill="#e2e8f0" font-size="15" font-weight="bold">It is filed away</text>
+    <text x="50" y="542" fill="#fcd0e4" font-size="13"><tspan font-weight="bold">?</tspan>&#160; Can anyone check it again next year?</text>
+    <rect x="510" y="488" width="440" height="74" rx="10" fill="#12283b" stroke="#34d399" stroke-width="1.5"/>
+    <text x="530" y="516" fill="#f4f7fb" font-size="15" font-weight="bold">The record is saved and signed</text>
+    <text x="530" y="542" fill="#a7f3d0" font-size="13"><tspan font-weight="bold">&#10003;</tspan>&#160; A gate asks again on every run. Evidence to download.</text>
+  </g>
+
+  <!-- down arrows inside each lane -->
+  <g stroke="#5b7091" stroke-width="1.5">
+    <line x1="250" y1="210" x2="250" y2="224"/><line x1="250" y1="298" x2="250" y2="312"/><line x1="250" y1="386" x2="250" y2="400"/><line x1="250" y1="474" x2="250" y2="488"/>
+    <line x1="730" y1="210" x2="730" y2="224"/><line x1="730" y1="298" x2="730" y2="312"/><line x1="730" y1="386" x2="730" y2="400"/><line x1="730" y1="474" x2="730" y2="488"/>
+  </g>
+
+  <!-- footer -->
+  <g font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace" font-size="11.5">
+    <text x="30" y="602" fill="#8b9bb4"><tspan fill="#f0a43a">&#9679;</tspan>&#160; the left lane is an illustration. nothing here measured it: no time, no cost, no error rate</text>
+    <text x="30" y="624" fill="#667799"><tspan fill="#f0a43a">&#9679;</tspan>&#160; a demo &#183; the company is fictional &#183; not medical information</text>
+  </g>
+</svg>
