@@ -1224,7 +1224,7 @@ changes row 4 or row 5.
 
 | # | Item | Seat |
 |---|---|---|
-| 32 | Which trap is served. `g-002` by the rule above. `g-003` (the baseline answers `cbe-0` under 314.70(c)(6)(iii)(A) on another row) and `g-004` (a pasted note with a reportable event) differ more visibly and are not served. Whether one of them joins is Product's, each by the same path: `also` on the lift, `--also` on the M04 writer. | Product |
+| 32 | Which trap is served. `g-002` by the rule above. `g-003` (the baseline answers `cbe-0` under 314.70(c)(6)(iii)(A) on another row) and `g-004` (a pasted note with a reportable event) differ more visibly and are not served. Whether one of them joins is Product's, each by the same path: `also` on the lift, `--also` on the M04 writer. **Ruled** (`milestones/adoption/rulings/three-traps.md` 1, 2; #44): both join; the pages serve every trap in `goldens/`. | Product |
 | 33 | The page shows two differing answers on `g-002` and does not say which one the golden expects. An executive reader has to know that an earlier version of a rule owes nothing. Whether the page states the golden's `expected` beside the columns, with the golden linked, is Product's and Data Owner's: P6 says a test never supplies the answer to the thing tested, and the page is not the test. Proposed: yes, in its own PR, labelled as the Data Owner's expected answer. **Ruled** (`milestones/adoption/rulings/expected-answer.md` 1, 2; #41): the expected answer is shown, with "equals expected" or "differs from expected" beside each value. | Product, Data Owner |
 | 34 | The agent wrote prose after its JSON object on `g-002`, with an unchecked citation and a banned word. label-impact #9's prompt asks for the five fields; whether it should ask for the object alone is label-impact's. Flagged, not designed. | Rule Owner, Tool Owner (label-impact) |
 | 35 | `door.text` null beside a shown answer changes `g-001`'s entry too and makes "verbatim" on the page mean the parsed object, not the text. The full text is in the artifact the page names. Whether the page should say in words that the agent's free text is not shown. Proposed: one sentence, with Unsure 33's PR. **Ruled** (`milestones/adoption/rulings/expected-answer.md` 4; #41): the sentence is on both pages. | Product, Security |
@@ -1306,3 +1306,57 @@ section above, asked for by the owner on 2026-11-14 after #40 merged at
 | 38 | The marks are written by the page writer, run by hand, from two values on the page. If a later lift serves an answer that differs, the mark changes with the rebuild and no gate says so. Whether a gate should read the marks against the golden in CI is a change to a gate, outside this PR. Proposed: no; the marks restate what the page prints. | Engineering, Product |
 | 39 | The evidence package signed at `37352ef` holds the two pages as at its build. It is not re-built (M03 Unsure 36). | Product |
 | 40 | The ruling file names this PR as #41, the next number on this repository after #40. | Product |
+
+## All three traps (outside the cap, 2026-11-14)
+
+PR #44, `milestones/adoption/rulings/three-traps.md`. Outside any cap
+(U9). No claim, no plant, no measurement; rows 4 and 5 are not touched.
+It rules Unsure 32 above: `g-003` and `g-004` join `g-002`, so the two
+pages serve one ordinary question and every `trap` in `goldens/`. No
+code, gate or workflow changes; the path is #40's.
+
+### The two records
+
+| | The ordinary assistant, [run 41250971500](https://github.com/andaro74/pharmadelta/actions/runs/41250971500) | The deployed agent, [run 43621291917](https://github.com/andaro74/pharmadelta/actions/runs/43621291917) |
+|---|---|---|
+| record | the run `pages/api/baseline.json` already named | `workflow_dispatch` of `m03-lift.yml` on `three-traps` at `7437113` with `also` `g-003 g-004`; artifact `m03-lift-7437113d400586ec7dc19bb21a3732ea9c77b46b`; `ok` true, `written_by_ci` true, `dirty` false, sign-in 200, `agent_commit` `bd89989`; four calls, each 200, `end_turn`, `guardrail_topics` `[]`, one tool call, success |
+| `g-001` | as before | as before; request id `G10LHiefvHcESIg=` |
+| `g-002` | as before | as before; request id `G10LsjXFPHcESCA=` |
+| `g-003` | `metformin.bw`, `314.70(c)(6)(iii)(A)`, `impacted` true, `owed` `cbe-0`, `escalate` false | `metformin.5.1`, `314.150(b)(10)`, `impacted` false, `owed` `follow-rld`, `escalate` false; request id `G10NjiSFvHcESrA=` |
+| `g-004` | `metformin.bw`, `314.94(a)(8)(iv)`, `impacted` true, `owed` `follow-rld`, `escalate` false | `metformin.6`, `314.80(c)(1)(i)`, `impacted` false, `owed` `alert-report`, `escalate` true; request id `G10O-gLIPHcEShA=` |
+
+Read by hand on 2026-11-14: the agent's answer equals the golden's
+`expected` on every field of all four. The baseline's equals it on
+`g-001` and differs on two fields of `g-002`, four of `g-003` and all
+five of `g-004`. The side-by-side page prints 29 "equals expected" and
+11 "differs from expected"; the detail page, 20 and 0. These are
+counts of what the page prints, not a measured result (`rulings/expected-answer.md` 2).
+
+### What the page shows and does not
+
+- Every answer is shown with its row and its clause; no entry reads
+  "no row found".
+- The agent's text carried prose after its object on `g-002` and
+  `g-004` (label-impact #10). It is on no page.
+- `g-004`'s question is a pasted note about a carton shortfall that
+  mentions a patient admitted to hospital. It is the fictional
+  company's note, written for the golden at M00. The answer is what is
+  owed under 21 CFR 314.80, a reporting duty, not a statement about any
+  treatment.
+- One call per question on the page. Four answers are not a rate.
+
+### What a reader can falsify
+
+- `git diff 7437113..<head> --stat` touches nine files, none under
+  `src/`, `.github/`, `goldens/` or `data/`.
+- `gh run download 43621291917` and a `src.m03.lift write` from it,
+  then `gh run download 41250971500` and a `src.m04.lift write` from
+  it, leave `git status --short` empty on the head.
+- `git log -1 --format=%h -- pages/api/sign-off.json` reads `37352ef`.
+
+### Unsure (three traps)
+
+| # | Item | Seat |
+|---|---|---|
+| 41 | The pages are long with four questions on each. Whether each question should fold, or the side-by-side page should lead with a summary. A page change, not a record change. | Product |
+| 42 | The ruling file names this PR as #44, the next number on this repository after #43. | Product |
