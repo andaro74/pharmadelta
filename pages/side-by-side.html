@@ -32,11 +32,13 @@
 <h1>Does this rule change touch our label, and what do we owe?</h1>
 <h2>The question</h2>
 <blockquote><p>FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?</p></blockquote>
-<div class="columns">
-<section class="column" id="ordinary-assistant">
-<h2>An ordinary assistant</h2>
-<p><code>src/baseline/</code>, the frozen baseline: keyword matching, no model, no network, no randomness.</p>
-<h3>The answer</h3>
+<section class="record">
+<h2>The expected answer</h2>
+<p>What the Data Owner seat wrote as the expected answer to this question: <a href="https://github.com/andaro74/pharmadelta/blob/df860b7/goldens/g-001.yaml"><code>goldens/g-001.yaml</code></a> at <code>df860b7</code>,
+   a golden of kind <code>ordinary</code>. It is the test's answer, copied here. No run wrote it. Where this page says
+   “equals expected” or “differs from expected”, it compares two values shown on this page; that is not a measured result.
+   What was measured is in <code>milestones/README.md</code>: row 0 scored the baseline against the goldens. Scoring the agent against
+   its goldens is agentkeel's, in the agent's own repository.</p>
 <table>
   <tbody>
         <tr><th scope="row">table_row</th><td><code>lisinopril.8.1</code></td></tr>
@@ -44,6 +46,21 @@
         <tr><th scope="row">impacted</th><td><code>true</code></td></tr>
         <tr><th scope="row">owed</th><td><code>follow-rld</code></td></tr>
         <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
+</section>
+<div class="columns">
+<section class="column" id="ordinary-assistant">
+<h2>An ordinary assistant</h2>
+<p><code>src/baseline/</code>, the frozen baseline: keyword matching, no model, no network, no randomness.</p>
+<h3>The answer</h3>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>lisinopril.8.1</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">impacted</th><td><code>true</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">owed</th><td><code>follow-rld</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
   </tbody>
 </table>
 <p>What each answer field means (<code>milestones/M00/fields.md</code>):</p>
@@ -115,11 +132,11 @@
 <h3>The answer</h3>
 <table>
   <tbody>
-        <tr><th scope="row">table_row</th><td><code>lisinopril.8.1</code></td></tr>
-        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td></tr>
-        <tr><th scope="row">impacted</th><td><code>true</code></td></tr>
-        <tr><th scope="row">owed</th><td><code>follow-rld</code></td></tr>
-        <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+        <tr><th scope="row">table_row</th><td><code>lisinopril.8.1</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">impacted</th><td><code>true</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">owed</th><td><code>follow-rld</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
   </tbody>
 </table>
 <p>What each answer field means (<code>milestones/M00/fields.md</code>):</p>
@@ -170,7 +187,8 @@
 </table>
 <h3>Where this answer came from</h3>
 <p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under
-   <code>run_url</code> wrote the record; its artifact <code>m03-lift-4bfa4d884a4b43299e59169fe0c1532b9dd922a8</code> holds the door's full reading.</p>
+   <code>run_url</code> wrote the record; its artifact <code>m03-lift-4bfa4d884a4b43299e59169fe0c1532b9dd922a8</code> holds the door's full reading. Any text the agent
+   wrote beside its answer is in that artifact and is not shown here: this page shows an answer only as a row, a clause and the answer fields.</p>
 <table>
   <tbody>
         <tr><th scope="row">agent</th><td><code>label-impact</code>, agentkeel-studio/label-impact at <code>bd89989</code>, deployed on agentkeel m10</td></tr>
@@ -191,6 +209,23 @@
 <h1>Does this rule change touch our label, and what do we owe?</h1>
 <h2>The question</h2>
 <blockquote><p>An earlier version of 21 CFR 201.57(c)(9)(i) required a pregnancy category letter (A, B, C, D or X) in section 8.1. Does our metoprolol tartrate tablet label need a category letter, and what do we owe?</p></blockquote>
+<section class="record">
+<h2>The expected answer</h2>
+<p>What the Data Owner seat wrote as the expected answer to this question: <a href="https://github.com/andaro74/pharmadelta/blob/3b014f1/goldens/g-002.yaml"><code>goldens/g-002.yaml</code></a> at <code>3b014f1</code>,
+   a golden of kind <code>trap</code>. It is the test's answer, copied here. No run wrote it. Where this page says
+   “equals expected” or “differs from expected”, it compares two values shown on this page; that is not a measured result.
+   What was measured is in <code>milestones/README.md</code>: row 0 scored the baseline against the goldens. Scoring the agent against
+   its goldens is agentkeel's, in the agent's own repository.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td></tr>
+        <tr><th scope="row">impacted</th><td><code>false</code></td></tr>
+        <tr><th scope="row">owed</th><td><code>none</code></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
+</section>
 <div class="columns">
 <section class="column" id="ordinary-assistant">
 <h2>An ordinary assistant</h2>
@@ -198,11 +233,11 @@
 <h3>The answer</h3>
 <table>
   <tbody>
-        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td></tr>
-        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td></tr>
-        <tr><th scope="row">impacted</th><td><code>true</code></td></tr>
-        <tr><th scope="row">owed</th><td><code>follow-rld</code></td></tr>
-        <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">impacted</th><td><code>true</code></td><td><span class="chip chip-danger">differs from expected</span></td></tr>
+        <tr><th scope="row">owed</th><td><code>follow-rld</code></td><td><span class="chip chip-danger">differs from expected</span></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
   </tbody>
 </table>
 <p>What each answer field means (<code>milestones/M00/fields.md</code>):</p>
@@ -274,11 +309,11 @@
 <h3>The answer</h3>
 <table>
   <tbody>
-        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td></tr>
-        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td></tr>
-        <tr><th scope="row">impacted</th><td><code>false</code></td></tr>
-        <tr><th scope="row">owed</th><td><code>none</code></td></tr>
-        <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">impacted</th><td><code>false</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">owed</th><td><code>none</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td><td><span class="chip chip-ok">equals expected</span></td></tr>
   </tbody>
 </table>
 <p>What each answer field means (<code>milestones/M00/fields.md</code>):</p>
@@ -329,7 +364,8 @@
 </table>
 <h3>Where this answer came from</h3>
 <p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under
-   <code>run_url</code> wrote the record; its artifact <code>m03-lift-4bfa4d884a4b43299e59169fe0c1532b9dd922a8</code> holds the door's full reading.</p>
+   <code>run_url</code> wrote the record; its artifact <code>m03-lift-4bfa4d884a4b43299e59169fe0c1532b9dd922a8</code> holds the door's full reading. Any text the agent
+   wrote beside its answer is in that artifact and is not shown here: this page shows an answer only as a row, a clause and the answer fields.</p>
 <table>
   <tbody>
         <tr><th scope="row">agent</th><td><code>label-impact</code>, agentkeel-studio/label-impact at <code>bd89989</code>, deployed on agentkeel m10</td></tr>
