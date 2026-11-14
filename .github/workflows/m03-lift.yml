@@ -17,6 +17,10 @@
 # client's secret. `permissions` stays `contents: read`: no workflow of
 # this repository writes to a branch.
 #
+# A dispatch may name golden ids under `also`: questions the API does not
+# serve yet, each asked with its golden's question, so that a new served
+# answer starts from a CI call and never from a hand-written entry.
+#
 # Runs by hand (workflow_dispatch), and once on a push that adds or edits
 # this file on a branch other than main, because a dispatch needs the
 # file on the default branch and the lift is made before it is there.
@@ -27,6 +31,11 @@ name: m03-lift
 
 on:
   workflow_dispatch:
+    inputs:
+      also:
+        description: "Golden ids the API does not serve yet (e.g. g-002), each asked with its golden's question. Empty: the served questions only."
+        required: false
+        default: ""
   push:
     branches-ignore: [main]
     paths: ['.github/workflows/m03-lift.yml']
@@ -57,9 +66,12 @@ jobs:
           M03_DOOR_URL: ${{ vars.M03_DOOR_URL }}
           M03_DOOR_POOL_ID: ${{ vars.M03_DOOR_POOL_ID }}
           M03_DOOR_CALLERS_CLIENT_ID: ${{ vars.M03_DOOR_CALLERS_CLIENT_ID }}
+          # the dispatch input reaches the shell as an environment value, never as script text
+          M03_LIFT_ALSO: ${{ inputs.also }}
         run: >
           uv run python -m src.m03.lift call
           --out-dir "$RUNNER_TEMP/m03-lift"
+          --also "$M03_LIFT_ALSO"
           --summary "$GITHUB_STEP_SUMMARY"
 
       - name: Write the call record as a CI artifact

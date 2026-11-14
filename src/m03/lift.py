@@ -4,10 +4,13 @@ Two commands. Neither changes the gate (`src/m03/gate.py`), which judges
 ledger row 4; this module reuses the gate's sign-in and call and writes
 what the gate reads.
 
-    uv run python -m src.m03.lift call --out-dir <dir> [--summary <md>]
+    uv run python -m src.m03.lift call --out-dir <dir> [--summary <md>] [--also <ids>]
 
 Runs in CI (`.github/workflows/m03-lift.yml`). Reads the questions
-`pages/api/answers.json` serves, signs in to label-impact's identity pool
+`pages/api/answers.json` serves, and for each id under `--also` that the
+file does not serve yet the question of `goldens/<id>.yaml` (how a new
+question is first served: asked in CI, then written from the record),
+signs in to label-impact's identity pool
 as `pharmadelta` with the repository secret (Cognito `InitiateAuth`,
 `USER_PASSWORD_AUTH`, the gate's `sign_in`), asks the deployed agent each
 question through its door (the gate's `ask_door`), and writes
@@ -51,6 +54,8 @@ import urllib.parse
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 from src.m03.gate import (
     AGENT,
@@ -122,6 +127,19 @@ def provenance() -> dict[str, Any]:
     }
 
 
+def golden_question(goldens: Path, golden_id: str) -> str:
+    """The `question` of `goldens/<id>.yaml`, the text a newly served id is asked with (`call --also`)."""
+    path = goldens / f"{golden_id}.yaml"
+    try:
+        golden = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        raise Unscorable(f"{path.name} could not be read: {type(exc).__name__}: {exc}") from exc
+    question = golden.get("question") if isinstance(golden, dict) else None
+    if not isinstance(question, str) or not question:
+        raise Unscorable(f"{path.name} holds no `question` string")
+    return question
+
+
 # ---------------------------------------------------------------- call
 def call(args: argparse.Namespace) -> int:
     out = provenance()
@@ -136,7 +154,20 @@ def call(args: argparse.Namespace) -> int:
     except Unscorable as exc:
         out.update(ok=False, why=f"the door: {exc}", calls=calls)
         return finish(args, out)
-    served = read_served(args.api)
+    served = list(read_served(args.api))
+    # `--also`: ids the file does not serve yet, each asked with its golden's question; `write` then serves them from
+    # the record. An id the file serves already is asked once, with the served question.
+    served_ids = {a["id"] for a in served}
+    for golden_id in args.also:
+        if golden_id in served_ids:
+            continue
+        try:
+            served.append({"id": golden_id, "question": golden_question(args.goldens, golden_id)})
+        except Unscorable as exc:
+            out.update(ok=False, why=f"--also {golden_id}: {exc}", calls=calls)
+            return finish(args, out)
+        served_ids.add(golden_id)
+    out["also"] = list(args.also)
     token, out["sign_in"] = sign_in(env["pool_id"], env["client_id"], env["password"])
     if token is None:
         out.update(ok=False, why=f"the sign-in failed: {out['sign_in'].get('error')} ({out['sign_in'].get('message')})", calls=calls)
@@ -258,7 +289,11 @@ def build_entries(doc: dict) -> list[dict]:
                 "request_id_header": door.get("request_id_header"),
                 "stop_reason": door.get("stop_reason"),
                 "parsed": door.get("parsed"),
-                "text": door.get("text"),
+                # the agent's free text is served only where it is all the call returned (no answer shown with its row
+                # and its clause, M03 Unsure 26). Beside a shown answer it is prose the page cannot stand behind: a CFR
+                # citation not checked against the source (P7), a word SPEC/00 §11 bans. It stays in the run's artifact,
+                # as the guardrail's message does at M05 (Unsure 22).
+                "text": None if (isinstance(answer, dict) and isinstance(row, dict) and isinstance(clause, dict)) else door.get("text"),
             },
             "scripted": False,
         })
@@ -472,12 +507,15 @@ def main() -> int:
     p_call.add_argument("--out-dir", required=True, type=Path)
     p_call.add_argument("--summary", type=Path, help="append a Markdown summary here (GITHUB_STEP_SUMMARY in CI)")
     p_call.add_argument("--api", type=Path, default=ROOT / "pages" / "api" / "answers.json")
-    p_write = sub.add_parser("write", help="by hand: rebuild the pages from a call run's artifact")
+    p_call.add_argument("--also", default="", help="golden ids the API does not serve yet, separated by commas or spaces; each is asked with its golden's question")
+    p_call.add_argument("--goldens", type=Path, default=ROOT / "goldens")
+    p_write =sub.add_parser("write", help="by hand: rebuild the pages from a call run's artifact")
     p_write.add_argument("--from", dest="from_dir", required=True, type=Path, help="the directory holding call.json")
     p_write.add_argument("--api", type=Path, default=ROOT / "pages" / "api" / "answers.json")
     p_write.add_argument("--page", type=Path, default=ROOT / "pages" / "detail.html")
     args = parser.parse_args()
     if args.command == "call":
+        args.also = [i for i in args.also.replace(",", " ").split() if i]
         args.out_dir.mkdir(parents=True, exist_ok=True)
         try:
             return call(args)

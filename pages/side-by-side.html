@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>pharmadelta: side by side, g-001</title>
+<title>pharmadelta: side by side, g-001, g-002</title>
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body class="wide">
@@ -170,18 +170,177 @@
 </table>
 <h3>Where this answer came from</h3>
 <p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under
-   <code>run_url</code> wrote the record; its artifact <code>m03-lift-4e5d5ba5a52977248d8554c65eeedd2b6c3d9851</code> holds the door's full reading.</p>
+   <code>run_url</code> wrote the record; its artifact <code>m03-lift-4bfa4d884a4b43299e59169fe0c1532b9dd922a8</code> holds the door's full reading.</p>
 <table>
   <tbody>
         <tr><th scope="row">agent</th><td><code>label-impact</code>, agentkeel-studio/label-impact at <code>bd89989</code>, deployed on agentkeel m10</td></tr>
         <tr><th scope="row">call.subject</th><td><code>pharmadelta</code></td></tr>
         <tr><th scope="row">call.issuer</th><td><code>self</code></td></tr>
         <tr><th scope="row">call.door_host</th><td><code>sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139</code> (the SHA-256 of the door URL's host; the host is not written, M03 Unsure 12)</td></tr>
-        <tr><th scope="row">call.request_id</th><td><code>G1U1Sjc1PHcEMoQ=</code></td></tr>
-        <tr><th scope="row">call.called_at</th><td><code>2026-11-14T13:54:41+00:00</code></td></tr>
+        <tr><th scope="row">call.request_id</th><td><code>G1YLLg6xvHcEMYA=</code></td></tr>
+        <tr><th scope="row">call.called_at</th><td><code>2026-11-14T14:17:30+00:00</code></td></tr>
         <tr><th scope="row">call.agent</th><td><code>label-impact</code></td></tr>
         <tr><th scope="row">call.agent_commit</th><td><code>bd89989</code></td></tr>
-        <tr><th scope="row">call.run_url</th><td><a href="https://github.com/andaro74/pharmadelta/actions/runs/43602104535">https://github.com/andaro74/pharmadelta/actions/runs/43602104535</a></td></tr>
+        <tr><th scope="row">call.run_url</th><td><a href="https://github.com/andaro74/pharmadelta/actions/runs/43604067436">https://github.com/andaro74/pharmadelta/actions/runs/43604067436</a></td></tr>
+        <tr><th scope="row">door status</th><td><code>200</code>, request id in <code>apigw-requestid</code></td></tr>
+        <tr><th scope="row">scripted</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
+</section>
+</div>
+<h1>Does this rule change touch our label, and what do we owe?</h1>
+<h2>The question</h2>
+<blockquote><p>An earlier version of 21 CFR 201.57(c)(9)(i) required a pregnancy category letter (A, B, C, D or X) in section 8.1. Does our metoprolol tartrate tablet label need a category letter, and what do we owe?</p></blockquote>
+<div class="columns">
+<section class="column" id="ordinary-assistant">
+<h2>An ordinary assistant</h2>
+<p><code>src/baseline/</code>, the frozen baseline: keyword matching, no model, no network, no randomness.</p>
+<h3>The answer</h3>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td></tr>
+        <tr><th scope="row">impacted</th><td><code>true</code></td></tr>
+        <tr><th scope="row">owed</th><td><code>follow-rld</code></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
+<p>What each answer field means (<code>milestones/M00/fields.md</code>):</p>
+<table>
+  <tbody>
+        <tr><th scope="row">impacted</th><td>this label&#x27;s section must change because of what the question describes</td></tr>
+        <tr><th scope="row">owed</th><td>what the holder owes now: none; cbe-0 (a changes-being-effected supplement under 314.70(c)(6)(iii)(A)); follow-rld (keep the label the same as the reference listed drug&#x27;s and adopt its change when it is approved, 314.150(b)(10)); alert-report (a 15-day Alert report under 314.80(c)(1)(i))</td></tr>
+        <tr><th scope="row">escalate</th><td>an adverse drug experience in the question is both serious and unexpected (314.80(a)) against the label&#x27;s 6 row; true starts the reporting path</td></tr>
+  </tbody>
+</table>
+<h3>The row</h3>
+<p>Row <code>metoprolol-tartrate.8.1</code> of the label table, as <code>data/table.json</code> holds it at <code>595dd68</code>. The holder is fictional; the label is real.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td></tr>
+        <tr><th scope="row">holder</th><td><code>Ardentia Generics</code></td></tr>
+        <tr><th scope="row">holder_fictional</th><td><code>true</code></td></tr>
+        <tr><th scope="row">ingredient</th><td><code>metoprolol tartrate</code></td></tr>
+        <tr><th scope="row">dosage_form</th><td><code>tablet</code></td></tr>
+        <tr><th scope="row">strengths</th><td><code>25 mg; 50 mg; 100 mg</code></td></tr>
+        <tr><th scope="row">anda</th><td><code>ANDA202871</code></td></tr>
+        <tr><th scope="row">rld_nda</th><td><code>NDA018704</code></td></tr>
+        <tr><th scope="row">dailymed_set_id</th><td><code>24837d82-0f3f-4482-9af0-31e5f675c30f</code></td></tr>
+        <tr><th scope="row">label_revised</th><td><code>2024-08</code></td></tr>
+        <tr><th scope="row">label_read_on</th><td><code>2026-10-09</code></td></tr>
+        <tr><th scope="row">format</th><td><code>201.56(d)</code></td></tr>
+        <tr><th scope="row">section</th><td><code>8.1</code></td></tr>
+        <tr><th scope="row">section_title</th><td><code>Pregnancy</code></td></tr>
+        <tr><th scope="row">section_terms</th><td><code>Risk Summary; Clinical consideration; Data</code></td></tr>
+        <tr><th scope="row">section_terms_read_on</th><td><code>2026-10-10</code></td></tr>
+        <tr><th scope="row">requirement</th><td><code>201.57(c)(9)(i)</code></td></tr>
+  </tbody>
+</table>
+<h3>The clause</h3>
+<p>Clause <code>201.57(c)(9)(i)</code>, as <code>data/clauses.json</code> holds it at <code>595dd68</code>.</p>
+<blockquote><p>(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:</p></blockquote>
+<table>
+  <tbody>
+        <tr><th scope="row">citation</th><td>21 CFR 201.57(c)(9)(i)</td></tr>
+        <tr><th scope="row">source note</th><td>[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]</td></tr>
+        <tr><th scope="row">eCFR</th><td><a href="https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)">https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)</a></td></tr>
+        <tr><th scope="row">eCFR as of</th><td><code>2026-10-07</code></td></tr>
+        <tr><th scope="row">effective date</th><td><code>2016-11-29</code></td></tr>
+        <tr><th scope="row">text copied on</th><td><code>2026-10-10</code></td></tr>
+        <tr><th scope="row">existence checked by hand on</th><td><code>2026-10-09</code></td></tr>
+        <tr><th scope="row">note</th><td>Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.</td></tr>
+  </tbody>
+</table>
+<h3>Where this answer came from</h3>
+<p>The record of the run that produced it: <code>uv run python -m src.baseline.run</code> over <code>goldens/</code>, made by this
+   repository's CI in the <code>m04</code> workflow. The run linked under <code>run_url</code> wrote the observation; its artifact <code>m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09</code>
+   holds it in <code>observations.json</code> beside the gate's <code>result.json</code>. The time and the commits below are that run's.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">run.run_url</th><td><a href="https://github.com/andaro74/pharmadelta/actions/runs/41250971500">https://github.com/andaro74/pharmadelta/actions/runs/41250971500</a></td></tr>
+        <tr><th scope="row">run.artifact</th><td><code>m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09</code></td></tr>
+        <tr><th scope="row">run.commit</th><td><code>36c453aa306377137a324e9a1f340af1fb3c7e09</code> (the commit the run checked out)</td></tr>
+        <tr><th scope="row">run.baseline_commit</th><td><code>df860b7f67d44947bf1c6c53b4c38f0322c32ce5</code> (the last commit touching <code>src/baseline/</code>, at or before tag <code>m00</code>)</td></tr>
+        <tr><th scope="row">run.started_at</th><td><code>2026-10-31T23:04:49+00:00</code></td></tr>
+        <tr><th scope="row">run.method</th><td><code>keyword matching; see src/baseline/answer.py</code></td></tr>
+        <tr><th scope="row">run.written_by_ci</th><td><code>true</code></td></tr>
+        <tr><th scope="row">scripted</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
+</section>
+<section class="column" id="deployed-agent">
+<h2>The deployed agent</h2>
+<p><code>label-impact</code>, agentkeel-studio/label-impact, called through its door as <code>pharmadelta</code> by this repository's CI.</p>
+<h3>The answer</h3>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td></tr>
+        <tr><th scope="row">clause_id</th><td><code>201.57(c)(9)(i)</code></td></tr>
+        <tr><th scope="row">impacted</th><td><code>false</code></td></tr>
+        <tr><th scope="row">owed</th><td><code>none</code></td></tr>
+        <tr><th scope="row">escalate</th><td><code>false</code></td></tr>
+  </tbody>
+</table>
+<p>What each answer field means (<code>milestones/M00/fields.md</code>):</p>
+<table>
+  <tbody>
+        <tr><th scope="row">impacted</th><td>this label&#x27;s section must change because of what the question describes</td></tr>
+        <tr><th scope="row">owed</th><td>what the holder owes now: none; cbe-0 (a changes-being-effected supplement under 314.70(c)(6)(iii)(A)); follow-rld (keep the label the same as the reference listed drug&#x27;s and adopt its change when it is approved, 314.150(b)(10)); alert-report (a 15-day Alert report under 314.80(c)(1)(i))</td></tr>
+        <tr><th scope="row">escalate</th><td>an adverse drug experience in the question is both serious and unexpected (314.80(a)) against the label&#x27;s 6 row; true starts the reporting path</td></tr>
+  </tbody>
+</table>
+<h3>The row</h3>
+<p>Row <code>metoprolol-tartrate.8.1</code> of the label table, as <code>data/table.json</code> holds it at <code>595dd68</code>. The holder is fictional; the label is real.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">table_row</th><td><code>metoprolol-tartrate.8.1</code></td></tr>
+        <tr><th scope="row">holder</th><td><code>Ardentia Generics</code></td></tr>
+        <tr><th scope="row">holder_fictional</th><td><code>true</code></td></tr>
+        <tr><th scope="row">ingredient</th><td><code>metoprolol tartrate</code></td></tr>
+        <tr><th scope="row">dosage_form</th><td><code>tablet</code></td></tr>
+        <tr><th scope="row">strengths</th><td><code>25 mg; 50 mg; 100 mg</code></td></tr>
+        <tr><th scope="row">anda</th><td><code>ANDA202871</code></td></tr>
+        <tr><th scope="row">rld_nda</th><td><code>NDA018704</code></td></tr>
+        <tr><th scope="row">dailymed_set_id</th><td><code>24837d82-0f3f-4482-9af0-31e5f675c30f</code></td></tr>
+        <tr><th scope="row">label_revised</th><td><code>2024-08</code></td></tr>
+        <tr><th scope="row">label_read_on</th><td><code>2026-10-09</code></td></tr>
+        <tr><th scope="row">format</th><td><code>201.56(d)</code></td></tr>
+        <tr><th scope="row">section</th><td><code>8.1</code></td></tr>
+        <tr><th scope="row">section_title</th><td><code>Pregnancy</code></td></tr>
+        <tr><th scope="row">section_terms</th><td><code>Risk Summary; Clinical consideration; Data</code></td></tr>
+        <tr><th scope="row">section_terms_read_on</th><td><code>2026-10-10</code></td></tr>
+        <tr><th scope="row">requirement</th><td><code>201.57(c)(9)(i)</code></td></tr>
+  </tbody>
+</table>
+<h3>The clause</h3>
+<p>Clause <code>201.57(c)(9)(i)</code>, as <code>data/clauses.json</code> holds it at <code>595dd68</code>.</p>
+<blockquote><p>(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:</p></blockquote>
+<table>
+  <tbody>
+        <tr><th scope="row">citation</th><td>21 CFR 201.57(c)(9)(i)</td></tr>
+        <tr><th scope="row">source note</th><td>[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]</td></tr>
+        <tr><th scope="row">eCFR</th><td><a href="https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)">https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)</a></td></tr>
+        <tr><th scope="row">eCFR as of</th><td><code>2026-10-07</code></td></tr>
+        <tr><th scope="row">effective date</th><td><code>2016-11-29</code></td></tr>
+        <tr><th scope="row">text copied on</th><td><code>2026-10-10</code></td></tr>
+        <tr><th scope="row">existence checked by hand on</th><td><code>2026-10-09</code></td></tr>
+        <tr><th scope="row">note</th><td>Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.</td></tr>
+  </tbody>
+</table>
+<h3>Where this answer came from</h3>
+<p>The record of the call that produced it, made by this repository's CI as <code>pharmadelta</code>. The run linked under
+   <code>run_url</code> wrote the record; its artifact <code>m03-lift-4bfa4d884a4b43299e59169fe0c1532b9dd922a8</code> holds the door's full reading.</p>
+<table>
+  <tbody>
+        <tr><th scope="row">agent</th><td><code>label-impact</code>, agentkeel-studio/label-impact at <code>bd89989</code>, deployed on agentkeel m10</td></tr>
+        <tr><th scope="row">call.subject</th><td><code>pharmadelta</code></td></tr>
+        <tr><th scope="row">call.issuer</th><td><code>self</code></td></tr>
+        <tr><th scope="row">call.door_host</th><td><code>sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139</code> (the SHA-256 of the door URL's host; the host is not written, M03 Unsure 12)</td></tr>
+        <tr><th scope="row">call.request_id</th><td><code>G1YMzhR4PHcEMZA=</code></td></tr>
+        <tr><th scope="row">call.called_at</th><td><code>2026-11-14T14:17:40+00:00</code></td></tr>
+        <tr><th scope="row">call.agent</th><td><code>label-impact</code></td></tr>
+        <tr><th scope="row">call.agent_commit</th><td><code>bd89989</code></td></tr>
+        <tr><th scope="row">call.run_url</th><td><a href="https://github.com/andaro74/pharmadelta/actions/runs/43604067436">https://github.com/andaro74/pharmadelta/actions/runs/43604067436</a></td></tr>
         <tr><th scope="row">door status</th><td><code>200</code>, request id in <code>apigw-requestid</code></td></tr>
         <tr><th scope="row">scripted</th><td><code>false</code></td></tr>
   </tbody>
@@ -194,266 +353,530 @@
    Each is the same JSON value its file holds. A reader of the page reads them from here.</p>
 <h3>The ordinary assistant's entry</h3>
 <script type="application/json" id="baseline-answer">
-{
-  "id": "g-001",
-  "question": "FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?",
-  "answer": {
-    "table_row": "lisinopril.8.1",
-    "clause_id": "201.57(c)(9)(i)",
-    "answer_fields": {
-      "impacted": true,
-      "owed": "follow-rld",
-      "escalate": false
-    }
-  },
-  "row": {
-    "table_row": "lisinopril.8.1",
-    "holder": "Ardentia Generics",
-    "holder_fictional": true,
-    "ingredient": "lisinopril",
-    "dosage_form": "tablet",
-    "strengths": "2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg",
-    "anda": "ANDA075743",
-    "rld_nda": "NDA019777",
-    "dailymed_set_id": "f8d16c85-50e2-4d99-afae-6fb902734e42",
-    "label_revised": "2022-06",
-    "label_read_on": "2026-10-09",
-    "format": "201.56(d)",
-    "section": "8.1",
-    "section_title": "Pregnancy",
-    "section_terms": "Risk Summary; Clinical Considerations",
-    "section_terms_read_on": "2026-10-10",
-    "requirement": "201.57(c)(9)(i)"
-  },
-  "clause": {
-    "id": "201.57(c)(9)(i)",
-    "citation": "21 CFR 201.57(c)(9)(i)",
-    "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
-    "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
-    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
-    "ecfr_as_of": "2026-10-07",
-    "effective_date": "2016-11-29",
-    "text_copied_on": "2026-10-10",
-    "existence_checked_by_hand_on": "2026-10-09",
-    "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
-  },
-  "run": {
-    "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41250971500",
-    "artifact": "m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09",
-    "commit": "36c453aa306377137a324e9a1f340af1fb3c7e09",
-    "baseline_commit": "df860b7f67d44947bf1c6c53b4c38f0322c32ce5",
-    "started_at": "2026-10-31T23:04:49+00:00",
-    "method": "keyword matching; see src/baseline/answer.py",
-    "written_by_ci": true
-  },
-  "scripted": false
-}
-</script>
-<pre>{
-  &quot;id&quot;: &quot;g-001&quot;,
-  &quot;question&quot;: &quot;FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?&quot;,
-  &quot;answer&quot;: {
-    &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
-    &quot;clause_id&quot;: &quot;201.57(c)(9)(i)&quot;,
-    &quot;answer_fields&quot;: {
-      &quot;impacted&quot;: true,
-      &quot;owed&quot;: &quot;follow-rld&quot;,
-      &quot;escalate&quot;: false
-    }
-  },
-  &quot;row&quot;: {
-    &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
-    &quot;holder&quot;: &quot;Ardentia Generics&quot;,
-    &quot;holder_fictional&quot;: true,
-    &quot;ingredient&quot;: &quot;lisinopril&quot;,
-    &quot;dosage_form&quot;: &quot;tablet&quot;,
-    &quot;strengths&quot;: &quot;2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg&quot;,
-    &quot;anda&quot;: &quot;ANDA075743&quot;,
-    &quot;rld_nda&quot;: &quot;NDA019777&quot;,
-    &quot;dailymed_set_id&quot;: &quot;f8d16c85-50e2-4d99-afae-6fb902734e42&quot;,
-    &quot;label_revised&quot;: &quot;2022-06&quot;,
-    &quot;label_read_on&quot;: &quot;2026-10-09&quot;,
-    &quot;format&quot;: &quot;201.56(d)&quot;,
-    &quot;section&quot;: &quot;8.1&quot;,
-    &quot;section_title&quot;: &quot;Pregnancy&quot;,
-    &quot;section_terms&quot;: &quot;Risk Summary; Clinical Considerations&quot;,
-    &quot;section_terms_read_on&quot;: &quot;2026-10-10&quot;,
-    &quot;requirement&quot;: &quot;201.57(c)(9)(i)&quot;
-  },
-  &quot;clause&quot;: {
-    &quot;id&quot;: &quot;201.57(c)(9)(i)&quot;,
-    &quot;citation&quot;: &quot;21 CFR 201.57(c)(9)(i)&quot;,
-    &quot;text&quot;: &quot;(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:&quot;,
-    &quot;source_note&quot;: &quot;[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]&quot;,
-    &quot;ecfr_url&quot;: &quot;https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)&quot;,
-    &quot;ecfr_as_of&quot;: &quot;2026-10-07&quot;,
-    &quot;effective_date&quot;: &quot;2016-11-29&quot;,
-    &quot;text_copied_on&quot;: &quot;2026-10-10&quot;,
-    &quot;existence_checked_by_hand_on&quot;: &quot;2026-10-09&quot;,
-    &quot;note&quot;: &quot;Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.&quot;
-  },
-  &quot;run&quot;: {
-    &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/41250971500&quot;,
-    &quot;artifact&quot;: &quot;m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09&quot;,
-    &quot;commit&quot;: &quot;36c453aa306377137a324e9a1f340af1fb3c7e09&quot;,
-    &quot;baseline_commit&quot;: &quot;df860b7f67d44947bf1c6c53b4c38f0322c32ce5&quot;,
-    &quot;started_at&quot;: &quot;2026-10-31T23:04:49+00:00&quot;,
-    &quot;method&quot;: &quot;keyword matching; see src/baseline/answer.py&quot;,
-    &quot;written_by_ci&quot;: true
-  },
-  &quot;scripted&quot;: false
-}</pre>
-<h3>The deployed agent's entry</h3>
-<script type="application/json" id="agent-answer">
-{
-  "id": "g-001",
-  "question": "FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?",
-  "answer": {
-    "table_row": "lisinopril.8.1",
-    "clause_id": "201.57(c)(9)(i)",
-    "answer_fields": {
-      "impacted": true,
-      "owed": "follow-rld",
-      "escalate": false
-    }
-  },
-  "row": {
-    "table_row": "lisinopril.8.1",
-    "holder": "Ardentia Generics",
-    "holder_fictional": true,
-    "ingredient": "lisinopril",
-    "dosage_form": "tablet",
-    "strengths": "2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg",
-    "anda": "ANDA075743",
-    "rld_nda": "NDA019777",
-    "dailymed_set_id": "f8d16c85-50e2-4d99-afae-6fb902734e42",
-    "label_revised": "2022-06",
-    "label_read_on": "2026-10-09",
-    "format": "201.56(d)",
-    "section": "8.1",
-    "section_title": "Pregnancy",
-    "section_terms": "Risk Summary; Clinical Considerations",
-    "section_terms_read_on": "2026-10-10",
-    "requirement": "201.57(c)(9)(i)"
-  },
-  "clause": {
-    "id": "201.57(c)(9)(i)",
-    "citation": "21 CFR 201.57(c)(9)(i)",
-    "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
-    "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
-    "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
-    "ecfr_as_of": "2026-10-07",
-    "effective_date": "2016-11-29",
-    "text_copied_on": "2026-10-10",
-    "existence_checked_by_hand_on": "2026-10-09",
-    "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
-  },
-  "agent": {
-    "name": "label-impact",
-    "repository": "agentkeel-studio/label-impact",
-    "commit": "bd89989",
-    "platform": "agentkeel m10"
-  },
-  "call": {
-    "subject": "pharmadelta",
-    "issuer": "self",
-    "door_host": "sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139",
-    "request_id": "G1U1Sjc1PHcEMoQ=",
-    "called_at": "2026-11-14T13:54:41+00:00",
-    "agent": "label-impact",
-    "agent_commit": "bd89989",
-    "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/43602104535"
-  },
-  "door": {
-    "status": 200,
-    "request_id_header": "apigw-requestid",
-    "stop_reason": "end_turn",
-    "parsed": {
+[
+  {
+    "id": "g-001",
+    "question": "FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?",
+    "answer": {
       "table_row": "lisinopril.8.1",
       "clause_id": "201.57(c)(9)(i)",
-      "impacted": true,
-      "owed": "follow-rld",
-      "escalate": false
+      "answer_fields": {
+        "impacted": true,
+        "owed": "follow-rld",
+        "escalate": false
+      }
     },
-    "text": "```json\n{\n  \"table_row\": \"lisinopril.8.1\",\n  \"clause_id\": \"201.57(c)(9)(i)\",\n  \"impacted\": true,\n  \"owed\": \"follow-rld\",\n  \"escalate\": false\n}\n```"
+    "row": {
+      "table_row": "lisinopril.8.1",
+      "holder": "Ardentia Generics",
+      "holder_fictional": true,
+      "ingredient": "lisinopril",
+      "dosage_form": "tablet",
+      "strengths": "2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg",
+      "anda": "ANDA075743",
+      "rld_nda": "NDA019777",
+      "dailymed_set_id": "f8d16c85-50e2-4d99-afae-6fb902734e42",
+      "label_revised": "2022-06",
+      "label_read_on": "2026-10-09",
+      "format": "201.56(d)",
+      "section": "8.1",
+      "section_title": "Pregnancy",
+      "section_terms": "Risk Summary; Clinical Considerations",
+      "section_terms_read_on": "2026-10-10",
+      "requirement": "201.57(c)(9)(i)"
+    },
+    "clause": {
+      "id": "201.57(c)(9)(i)",
+      "citation": "21 CFR 201.57(c)(9)(i)",
+      "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
+      "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
+      "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
+      "ecfr_as_of": "2026-10-07",
+      "effective_date": "2016-11-29",
+      "text_copied_on": "2026-10-10",
+      "existence_checked_by_hand_on": "2026-10-09",
+      "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
+    },
+    "run": {
+      "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41250971500",
+      "artifact": "m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09",
+      "commit": "36c453aa306377137a324e9a1f340af1fb3c7e09",
+      "baseline_commit": "df860b7f67d44947bf1c6c53b4c38f0322c32ce5",
+      "started_at": "2026-10-31T23:04:49+00:00",
+      "method": "keyword matching; see src/baseline/answer.py",
+      "written_by_ci": true
+    },
+    "scripted": false
   },
-  "scripted": false
-}
+  {
+    "id": "g-002",
+    "question": "An earlier version of 21 CFR 201.57(c)(9)(i) required a pregnancy category letter (A, B, C, D or X) in section 8.1. Does our metoprolol tartrate tablet label need a category letter, and what do we owe?",
+    "answer": {
+      "table_row": "metoprolol-tartrate.8.1",
+      "clause_id": "201.57(c)(9)(i)",
+      "answer_fields": {
+        "impacted": true,
+        "owed": "follow-rld",
+        "escalate": false
+      }
+    },
+    "row": {
+      "table_row": "metoprolol-tartrate.8.1",
+      "holder": "Ardentia Generics",
+      "holder_fictional": true,
+      "ingredient": "metoprolol tartrate",
+      "dosage_form": "tablet",
+      "strengths": "25 mg; 50 mg; 100 mg",
+      "anda": "ANDA202871",
+      "rld_nda": "NDA018704",
+      "dailymed_set_id": "24837d82-0f3f-4482-9af0-31e5f675c30f",
+      "label_revised": "2024-08",
+      "label_read_on": "2026-10-09",
+      "format": "201.56(d)",
+      "section": "8.1",
+      "section_title": "Pregnancy",
+      "section_terms": "Risk Summary; Clinical consideration; Data",
+      "section_terms_read_on": "2026-10-10",
+      "requirement": "201.57(c)(9)(i)"
+    },
+    "clause": {
+      "id": "201.57(c)(9)(i)",
+      "citation": "21 CFR 201.57(c)(9)(i)",
+      "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
+      "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
+      "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
+      "ecfr_as_of": "2026-10-07",
+      "effective_date": "2016-11-29",
+      "text_copied_on": "2026-10-10",
+      "existence_checked_by_hand_on": "2026-10-09",
+      "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
+    },
+    "run": {
+      "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/41250971500",
+      "artifact": "m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09",
+      "commit": "36c453aa306377137a324e9a1f340af1fb3c7e09",
+      "baseline_commit": "df860b7f67d44947bf1c6c53b4c38f0322c32ce5",
+      "started_at": "2026-10-31T23:04:49+00:00",
+      "method": "keyword matching; see src/baseline/answer.py",
+      "written_by_ci": true
+    },
+    "scripted": false
+  }
+]
 </script>
-<pre>{
-  &quot;id&quot;: &quot;g-001&quot;,
-  &quot;question&quot;: &quot;FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?&quot;,
-  &quot;answer&quot;: {
-    &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
-    &quot;clause_id&quot;: &quot;201.57(c)(9)(i)&quot;,
-    &quot;answer_fields&quot;: {
-      &quot;impacted&quot;: true,
-      &quot;owed&quot;: &quot;follow-rld&quot;,
-      &quot;escalate&quot;: false
-    }
-  },
-  &quot;row&quot;: {
-    &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
-    &quot;holder&quot;: &quot;Ardentia Generics&quot;,
-    &quot;holder_fictional&quot;: true,
-    &quot;ingredient&quot;: &quot;lisinopril&quot;,
-    &quot;dosage_form&quot;: &quot;tablet&quot;,
-    &quot;strengths&quot;: &quot;2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg&quot;,
-    &quot;anda&quot;: &quot;ANDA075743&quot;,
-    &quot;rld_nda&quot;: &quot;NDA019777&quot;,
-    &quot;dailymed_set_id&quot;: &quot;f8d16c85-50e2-4d99-afae-6fb902734e42&quot;,
-    &quot;label_revised&quot;: &quot;2022-06&quot;,
-    &quot;label_read_on&quot;: &quot;2026-10-09&quot;,
-    &quot;format&quot;: &quot;201.56(d)&quot;,
-    &quot;section&quot;: &quot;8.1&quot;,
-    &quot;section_title&quot;: &quot;Pregnancy&quot;,
-    &quot;section_terms&quot;: &quot;Risk Summary; Clinical Considerations&quot;,
-    &quot;section_terms_read_on&quot;: &quot;2026-10-10&quot;,
-    &quot;requirement&quot;: &quot;201.57(c)(9)(i)&quot;
-  },
-  &quot;clause&quot;: {
-    &quot;id&quot;: &quot;201.57(c)(9)(i)&quot;,
-    &quot;citation&quot;: &quot;21 CFR 201.57(c)(9)(i)&quot;,
-    &quot;text&quot;: &quot;(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:&quot;,
-    &quot;source_note&quot;: &quot;[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]&quot;,
-    &quot;ecfr_url&quot;: &quot;https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)&quot;,
-    &quot;ecfr_as_of&quot;: &quot;2026-10-07&quot;,
-    &quot;effective_date&quot;: &quot;2016-11-29&quot;,
-    &quot;text_copied_on&quot;: &quot;2026-10-10&quot;,
-    &quot;existence_checked_by_hand_on&quot;: &quot;2026-10-09&quot;,
-    &quot;note&quot;: &quot;Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.&quot;
-  },
-  &quot;agent&quot;: {
-    &quot;name&quot;: &quot;label-impact&quot;,
-    &quot;repository&quot;: &quot;agentkeel-studio/label-impact&quot;,
-    &quot;commit&quot;: &quot;bd89989&quot;,
-    &quot;platform&quot;: &quot;agentkeel m10&quot;
-  },
-  &quot;call&quot;: {
-    &quot;subject&quot;: &quot;pharmadelta&quot;,
-    &quot;issuer&quot;: &quot;self&quot;,
-    &quot;door_host&quot;: &quot;sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139&quot;,
-    &quot;request_id&quot;: &quot;G1U1Sjc1PHcEMoQ=&quot;,
-    &quot;called_at&quot;: &quot;2026-11-14T13:54:41+00:00&quot;,
-    &quot;agent&quot;: &quot;label-impact&quot;,
-    &quot;agent_commit&quot;: &quot;bd89989&quot;,
-    &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/43602104535&quot;
-  },
-  &quot;door&quot;: {
-    &quot;status&quot;: 200,
-    &quot;request_id_header&quot;: &quot;apigw-requestid&quot;,
-    &quot;stop_reason&quot;: &quot;end_turn&quot;,
-    &quot;parsed&quot;: {
+<pre>[
+  {
+    &quot;id&quot;: &quot;g-001&quot;,
+    &quot;question&quot;: &quot;FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?&quot;,
+    &quot;answer&quot;: {
       &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
       &quot;clause_id&quot;: &quot;201.57(c)(9)(i)&quot;,
-      &quot;impacted&quot;: true,
-      &quot;owed&quot;: &quot;follow-rld&quot;,
-      &quot;escalate&quot;: false
+      &quot;answer_fields&quot;: {
+        &quot;impacted&quot;: true,
+        &quot;owed&quot;: &quot;follow-rld&quot;,
+        &quot;escalate&quot;: false
+      }
     },
-    &quot;text&quot;: &quot;```json\n{\n  \&quot;table_row\&quot;: \&quot;lisinopril.8.1\&quot;,\n  \&quot;clause_id\&quot;: \&quot;201.57(c)(9)(i)\&quot;,\n  \&quot;impacted\&quot;: true,\n  \&quot;owed\&quot;: \&quot;follow-rld\&quot;,\n  \&quot;escalate\&quot;: false\n}\n```&quot;
+    &quot;row&quot;: {
+      &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
+      &quot;holder&quot;: &quot;Ardentia Generics&quot;,
+      &quot;holder_fictional&quot;: true,
+      &quot;ingredient&quot;: &quot;lisinopril&quot;,
+      &quot;dosage_form&quot;: &quot;tablet&quot;,
+      &quot;strengths&quot;: &quot;2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg&quot;,
+      &quot;anda&quot;: &quot;ANDA075743&quot;,
+      &quot;rld_nda&quot;: &quot;NDA019777&quot;,
+      &quot;dailymed_set_id&quot;: &quot;f8d16c85-50e2-4d99-afae-6fb902734e42&quot;,
+      &quot;label_revised&quot;: &quot;2022-06&quot;,
+      &quot;label_read_on&quot;: &quot;2026-10-09&quot;,
+      &quot;format&quot;: &quot;201.56(d)&quot;,
+      &quot;section&quot;: &quot;8.1&quot;,
+      &quot;section_title&quot;: &quot;Pregnancy&quot;,
+      &quot;section_terms&quot;: &quot;Risk Summary; Clinical Considerations&quot;,
+      &quot;section_terms_read_on&quot;: &quot;2026-10-10&quot;,
+      &quot;requirement&quot;: &quot;201.57(c)(9)(i)&quot;
+    },
+    &quot;clause&quot;: {
+      &quot;id&quot;: &quot;201.57(c)(9)(i)&quot;,
+      &quot;citation&quot;: &quot;21 CFR 201.57(c)(9)(i)&quot;,
+      &quot;text&quot;: &quot;(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:&quot;,
+      &quot;source_note&quot;: &quot;[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]&quot;,
+      &quot;ecfr_url&quot;: &quot;https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)&quot;,
+      &quot;ecfr_as_of&quot;: &quot;2026-10-07&quot;,
+      &quot;effective_date&quot;: &quot;2016-11-29&quot;,
+      &quot;text_copied_on&quot;: &quot;2026-10-10&quot;,
+      &quot;existence_checked_by_hand_on&quot;: &quot;2026-10-09&quot;,
+      &quot;note&quot;: &quot;Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.&quot;
+    },
+    &quot;run&quot;: {
+      &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/41250971500&quot;,
+      &quot;artifact&quot;: &quot;m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09&quot;,
+      &quot;commit&quot;: &quot;36c453aa306377137a324e9a1f340af1fb3c7e09&quot;,
+      &quot;baseline_commit&quot;: &quot;df860b7f67d44947bf1c6c53b4c38f0322c32ce5&quot;,
+      &quot;started_at&quot;: &quot;2026-10-31T23:04:49+00:00&quot;,
+      &quot;method&quot;: &quot;keyword matching; see src/baseline/answer.py&quot;,
+      &quot;written_by_ci&quot;: true
+    },
+    &quot;scripted&quot;: false
   },
-  &quot;scripted&quot;: false
-}</pre>
+  {
+    &quot;id&quot;: &quot;g-002&quot;,
+    &quot;question&quot;: &quot;An earlier version of 21 CFR 201.57(c)(9)(i) required a pregnancy category letter (A, B, C, D or X) in section 8.1. Does our metoprolol tartrate tablet label need a category letter, and what do we owe?&quot;,
+    &quot;answer&quot;: {
+      &quot;table_row&quot;: &quot;metoprolol-tartrate.8.1&quot;,
+      &quot;clause_id&quot;: &quot;201.57(c)(9)(i)&quot;,
+      &quot;answer_fields&quot;: {
+        &quot;impacted&quot;: true,
+        &quot;owed&quot;: &quot;follow-rld&quot;,
+        &quot;escalate&quot;: false
+      }
+    },
+    &quot;row&quot;: {
+      &quot;table_row&quot;: &quot;metoprolol-tartrate.8.1&quot;,
+      &quot;holder&quot;: &quot;Ardentia Generics&quot;,
+      &quot;holder_fictional&quot;: true,
+      &quot;ingredient&quot;: &quot;metoprolol tartrate&quot;,
+      &quot;dosage_form&quot;: &quot;tablet&quot;,
+      &quot;strengths&quot;: &quot;25 mg; 50 mg; 100 mg&quot;,
+      &quot;anda&quot;: &quot;ANDA202871&quot;,
+      &quot;rld_nda&quot;: &quot;NDA018704&quot;,
+      &quot;dailymed_set_id&quot;: &quot;24837d82-0f3f-4482-9af0-31e5f675c30f&quot;,
+      &quot;label_revised&quot;: &quot;2024-08&quot;,
+      &quot;label_read_on&quot;: &quot;2026-10-09&quot;,
+      &quot;format&quot;: &quot;201.56(d)&quot;,
+      &quot;section&quot;: &quot;8.1&quot;,
+      &quot;section_title&quot;: &quot;Pregnancy&quot;,
+      &quot;section_terms&quot;: &quot;Risk Summary; Clinical consideration; Data&quot;,
+      &quot;section_terms_read_on&quot;: &quot;2026-10-10&quot;,
+      &quot;requirement&quot;: &quot;201.57(c)(9)(i)&quot;
+    },
+    &quot;clause&quot;: {
+      &quot;id&quot;: &quot;201.57(c)(9)(i)&quot;,
+      &quot;citation&quot;: &quot;21 CFR 201.57(c)(9)(i)&quot;,
+      &quot;text&quot;: &quot;(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:&quot;,
+      &quot;source_note&quot;: &quot;[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]&quot;,
+      &quot;ecfr_url&quot;: &quot;https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)&quot;,
+      &quot;ecfr_as_of&quot;: &quot;2026-10-07&quot;,
+      &quot;effective_date&quot;: &quot;2016-11-29&quot;,
+      &quot;text_copied_on&quot;: &quot;2026-10-10&quot;,
+      &quot;existence_checked_by_hand_on&quot;: &quot;2026-10-09&quot;,
+      &quot;note&quot;: &quot;Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.&quot;
+    },
+    &quot;run&quot;: {
+      &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/41250971500&quot;,
+      &quot;artifact&quot;: &quot;m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09&quot;,
+      &quot;commit&quot;: &quot;36c453aa306377137a324e9a1f340af1fb3c7e09&quot;,
+      &quot;baseline_commit&quot;: &quot;df860b7f67d44947bf1c6c53b4c38f0322c32ce5&quot;,
+      &quot;started_at&quot;: &quot;2026-10-31T23:04:49+00:00&quot;,
+      &quot;method&quot;: &quot;keyword matching; see src/baseline/answer.py&quot;,
+      &quot;written_by_ci&quot;: true
+    },
+    &quot;scripted&quot;: false
+  }
+]</pre>
+<h3>The deployed agent's entry</h3>
+<script type="application/json" id="agent-answer">
+[
+  {
+    "id": "g-001",
+    "question": "FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?",
+    "answer": {
+      "table_row": "lisinopril.8.1",
+      "clause_id": "201.57(c)(9)(i)",
+      "answer_fields": {
+        "impacted": true,
+        "owed": "follow-rld",
+        "escalate": false
+      }
+    },
+    "row": {
+      "table_row": "lisinopril.8.1",
+      "holder": "Ardentia Generics",
+      "holder_fictional": true,
+      "ingredient": "lisinopril",
+      "dosage_form": "tablet",
+      "strengths": "2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg",
+      "anda": "ANDA075743",
+      "rld_nda": "NDA019777",
+      "dailymed_set_id": "f8d16c85-50e2-4d99-afae-6fb902734e42",
+      "label_revised": "2022-06",
+      "label_read_on": "2026-10-09",
+      "format": "201.56(d)",
+      "section": "8.1",
+      "section_title": "Pregnancy",
+      "section_terms": "Risk Summary; Clinical Considerations",
+      "section_terms_read_on": "2026-10-10",
+      "requirement": "201.57(c)(9)(i)"
+    },
+    "clause": {
+      "id": "201.57(c)(9)(i)",
+      "citation": "21 CFR 201.57(c)(9)(i)",
+      "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
+      "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
+      "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
+      "ecfr_as_of": "2026-10-07",
+      "effective_date": "2016-11-29",
+      "text_copied_on": "2026-10-10",
+      "existence_checked_by_hand_on": "2026-10-09",
+      "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
+    },
+    "agent": {
+      "name": "label-impact",
+      "repository": "agentkeel-studio/label-impact",
+      "commit": "bd89989",
+      "platform": "agentkeel m10"
+    },
+    "call": {
+      "subject": "pharmadelta",
+      "issuer": "self",
+      "door_host": "sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139",
+      "request_id": "G1YLLg6xvHcEMYA=",
+      "called_at": "2026-11-14T14:17:30+00:00",
+      "agent": "label-impact",
+      "agent_commit": "bd89989",
+      "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/43604067436"
+    },
+    "door": {
+      "status": 200,
+      "request_id_header": "apigw-requestid",
+      "stop_reason": "end_turn",
+      "parsed": {
+        "table_row": "lisinopril.8.1",
+        "clause_id": "201.57(c)(9)(i)",
+        "impacted": true,
+        "owed": "follow-rld",
+        "escalate": false
+      },
+      "text": null
+    },
+    "scripted": false
+  },
+  {
+    "id": "g-002",
+    "question": "An earlier version of 21 CFR 201.57(c)(9)(i) required a pregnancy category letter (A, B, C, D or X) in section 8.1. Does our metoprolol tartrate tablet label need a category letter, and what do we owe?",
+    "answer": {
+      "table_row": "metoprolol-tartrate.8.1",
+      "clause_id": "201.57(c)(9)(i)",
+      "answer_fields": {
+        "impacted": false,
+        "owed": "none",
+        "escalate": false
+      }
+    },
+    "row": {
+      "table_row": "metoprolol-tartrate.8.1",
+      "holder": "Ardentia Generics",
+      "holder_fictional": true,
+      "ingredient": "metoprolol tartrate",
+      "dosage_form": "tablet",
+      "strengths": "25 mg; 50 mg; 100 mg",
+      "anda": "ANDA202871",
+      "rld_nda": "NDA018704",
+      "dailymed_set_id": "24837d82-0f3f-4482-9af0-31e5f675c30f",
+      "label_revised": "2024-08",
+      "label_read_on": "2026-10-09",
+      "format": "201.56(d)",
+      "section": "8.1",
+      "section_title": "Pregnancy",
+      "section_terms": "Risk Summary; Clinical consideration; Data",
+      "section_terms_read_on": "2026-10-10",
+      "requirement": "201.57(c)(9)(i)"
+    },
+    "clause": {
+      "id": "201.57(c)(9)(i)",
+      "citation": "21 CFR 201.57(c)(9)(i)",
+      "text": "(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:",
+      "source_note": "[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]",
+      "ecfr_url": "https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)",
+      "ecfr_as_of": "2026-10-07",
+      "effective_date": "2016-11-29",
+      "text_copied_on": "2026-10-10",
+      "existence_checked_by_hand_on": "2026-10-09",
+      "note": "Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only."
+    },
+    "agent": {
+      "name": "label-impact",
+      "repository": "agentkeel-studio/label-impact",
+      "commit": "bd89989",
+      "platform": "agentkeel m10"
+    },
+    "call": {
+      "subject": "pharmadelta",
+      "issuer": "self",
+      "door_host": "sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139",
+      "request_id": "G1YMzhR4PHcEMZA=",
+      "called_at": "2026-11-14T14:17:40+00:00",
+      "agent": "label-impact",
+      "agent_commit": "bd89989",
+      "run_url": "https://github.com/andaro74/pharmadelta/actions/runs/43604067436"
+    },
+    "door": {
+      "status": 200,
+      "request_id_header": "apigw-requestid",
+      "stop_reason": "end_turn",
+      "parsed": {
+        "table_row": "metoprolol-tartrate.8.1",
+        "clause_id": "201.57(c)(9)(i)",
+        "impacted": false,
+        "owed": "none",
+        "escalate": false
+      },
+      "text": null
+    },
+    "scripted": false
+  }
+]
+</script>
+<pre>[
+  {
+    &quot;id&quot;: &quot;g-001&quot;,
+    &quot;question&quot;: &quot;FDA has published a revision to 21 CFR 201.57(c)(9)(i), the content rule for section 8.1 Pregnancy. Does it touch our lisinopril tablet label, and what do we owe?&quot;,
+    &quot;answer&quot;: {
+      &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
+      &quot;clause_id&quot;: &quot;201.57(c)(9)(i)&quot;,
+      &quot;answer_fields&quot;: {
+        &quot;impacted&quot;: true,
+        &quot;owed&quot;: &quot;follow-rld&quot;,
+        &quot;escalate&quot;: false
+      }
+    },
+    &quot;row&quot;: {
+      &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
+      &quot;holder&quot;: &quot;Ardentia Generics&quot;,
+      &quot;holder_fictional&quot;: true,
+      &quot;ingredient&quot;: &quot;lisinopril&quot;,
+      &quot;dosage_form&quot;: &quot;tablet&quot;,
+      &quot;strengths&quot;: &quot;2.5 mg; 5 mg; 10 mg; 20 mg; 30 mg; 40 mg&quot;,
+      &quot;anda&quot;: &quot;ANDA075743&quot;,
+      &quot;rld_nda&quot;: &quot;NDA019777&quot;,
+      &quot;dailymed_set_id&quot;: &quot;f8d16c85-50e2-4d99-afae-6fb902734e42&quot;,
+      &quot;label_revised&quot;: &quot;2022-06&quot;,
+      &quot;label_read_on&quot;: &quot;2026-10-09&quot;,
+      &quot;format&quot;: &quot;201.56(d)&quot;,
+      &quot;section&quot;: &quot;8.1&quot;,
+      &quot;section_title&quot;: &quot;Pregnancy&quot;,
+      &quot;section_terms&quot;: &quot;Risk Summary; Clinical Considerations&quot;,
+      &quot;section_terms_read_on&quot;: &quot;2026-10-10&quot;,
+      &quot;requirement&quot;: &quot;201.57(c)(9)(i)&quot;
+    },
+    &quot;clause&quot;: {
+      &quot;id&quot;: &quot;201.57(c)(9)(i)&quot;,
+      &quot;citation&quot;: &quot;21 CFR 201.57(c)(9)(i)&quot;,
+      &quot;text&quot;: &quot;(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:&quot;,
+      &quot;source_note&quot;: &quot;[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]&quot;,
+      &quot;ecfr_url&quot;: &quot;https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)&quot;,
+      &quot;ecfr_as_of&quot;: &quot;2026-10-07&quot;,
+      &quot;effective_date&quot;: &quot;2016-11-29&quot;,
+      &quot;text_copied_on&quot;: &quot;2026-10-10&quot;,
+      &quot;existence_checked_by_hand_on&quot;: &quot;2026-10-09&quot;,
+      &quot;note&quot;: &quot;Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.&quot;
+    },
+    &quot;agent&quot;: {
+      &quot;name&quot;: &quot;label-impact&quot;,
+      &quot;repository&quot;: &quot;agentkeel-studio/label-impact&quot;,
+      &quot;commit&quot;: &quot;bd89989&quot;,
+      &quot;platform&quot;: &quot;agentkeel m10&quot;
+    },
+    &quot;call&quot;: {
+      &quot;subject&quot;: &quot;pharmadelta&quot;,
+      &quot;issuer&quot;: &quot;self&quot;,
+      &quot;door_host&quot;: &quot;sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139&quot;,
+      &quot;request_id&quot;: &quot;G1YLLg6xvHcEMYA=&quot;,
+      &quot;called_at&quot;: &quot;2026-11-14T14:17:30+00:00&quot;,
+      &quot;agent&quot;: &quot;label-impact&quot;,
+      &quot;agent_commit&quot;: &quot;bd89989&quot;,
+      &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/43604067436&quot;
+    },
+    &quot;door&quot;: {
+      &quot;status&quot;: 200,
+      &quot;request_id_header&quot;: &quot;apigw-requestid&quot;,
+      &quot;stop_reason&quot;: &quot;end_turn&quot;,
+      &quot;parsed&quot;: {
+        &quot;table_row&quot;: &quot;lisinopril.8.1&quot;,
+        &quot;clause_id&quot;: &quot;201.57(c)(9)(i)&quot;,
+        &quot;impacted&quot;: true,
+        &quot;owed&quot;: &quot;follow-rld&quot;,
+        &quot;escalate&quot;: false
+      },
+      &quot;text&quot;: null
+    },
+    &quot;scripted&quot;: false
+  },
+  {
+    &quot;id&quot;: &quot;g-002&quot;,
+    &quot;question&quot;: &quot;An earlier version of 21 CFR 201.57(c)(9)(i) required a pregnancy category letter (A, B, C, D or X) in section 8.1. Does our metoprolol tartrate tablet label need a category letter, and what do we owe?&quot;,
+    &quot;answer&quot;: {
+      &quot;table_row&quot;: &quot;metoprolol-tartrate.8.1&quot;,
+      &quot;clause_id&quot;: &quot;201.57(c)(9)(i)&quot;,
+      &quot;answer_fields&quot;: {
+        &quot;impacted&quot;: false,
+        &quot;owed&quot;: &quot;none&quot;,
+        &quot;escalate&quot;: false
+      }
+    },
+    &quot;row&quot;: {
+      &quot;table_row&quot;: &quot;metoprolol-tartrate.8.1&quot;,
+      &quot;holder&quot;: &quot;Ardentia Generics&quot;,
+      &quot;holder_fictional&quot;: true,
+      &quot;ingredient&quot;: &quot;metoprolol tartrate&quot;,
+      &quot;dosage_form&quot;: &quot;tablet&quot;,
+      &quot;strengths&quot;: &quot;25 mg; 50 mg; 100 mg&quot;,
+      &quot;anda&quot;: &quot;ANDA202871&quot;,
+      &quot;rld_nda&quot;: &quot;NDA018704&quot;,
+      &quot;dailymed_set_id&quot;: &quot;24837d82-0f3f-4482-9af0-31e5f675c30f&quot;,
+      &quot;label_revised&quot;: &quot;2024-08&quot;,
+      &quot;label_read_on&quot;: &quot;2026-10-09&quot;,
+      &quot;format&quot;: &quot;201.56(d)&quot;,
+      &quot;section&quot;: &quot;8.1&quot;,
+      &quot;section_title&quot;: &quot;Pregnancy&quot;,
+      &quot;section_terms&quot;: &quot;Risk Summary; Clinical consideration; Data&quot;,
+      &quot;section_terms_read_on&quot;: &quot;2026-10-10&quot;,
+      &quot;requirement&quot;: &quot;201.57(c)(9)(i)&quot;
+    },
+    &quot;clause&quot;: {
+      &quot;id&quot;: &quot;201.57(c)(9)(i)&quot;,
+      &quot;citation&quot;: &quot;21 CFR 201.57(c)(9)(i)&quot;,
+      &quot;text&quot;: &quot;(i) 8.1 Pregnancy. This subsection of the labeling must contain the following information in the following order under the subheadings “Pregnancy Exposure Registry,” “Risk Summary,” “Clinical Considerations,” and “Data”:&quot;,
+      &quot;source_note&quot;: &quot;[71 FR 3988, Jan. 24, 2006, as amended at 79 FR 72101, Dec. 4, 2014]&quot;,
+      &quot;ecfr_url&quot;: &quot;https://www.ecfr.gov/current/title-21/section-201.57#p-201.57(c)(9)(i)&quot;,
+      &quot;ecfr_as_of&quot;: &quot;2026-10-07&quot;,
+      &quot;effective_date&quot;: &quot;2016-11-29&quot;,
+      &quot;text_copied_on&quot;: &quot;2026-10-10&quot;,
+      &quot;existence_checked_by_hand_on&quot;: &quot;2026-10-09&quot;,
+      &quot;note&quot;: &quot;Content rule for 8.1 Pregnancy in a label of the 201.56(d) format. Sub-paragraphs (A) to (D) are not copied; the text is the (i) paragraph only.&quot;
+    },
+    &quot;agent&quot;: {
+      &quot;name&quot;: &quot;label-impact&quot;,
+      &quot;repository&quot;: &quot;agentkeel-studio/label-impact&quot;,
+      &quot;commit&quot;: &quot;bd89989&quot;,
+      &quot;platform&quot;: &quot;agentkeel m10&quot;
+    },
+    &quot;call&quot;: {
+      &quot;subject&quot;: &quot;pharmadelta&quot;,
+      &quot;issuer&quot;: &quot;self&quot;,
+      &quot;door_host&quot;: &quot;sha256:21585a9a763a1a2955d4a442ae1a4cf178b610559e8453722afd439e04d68139&quot;,
+      &quot;request_id&quot;: &quot;G1YMzhR4PHcEMZA=&quot;,
+      &quot;called_at&quot;: &quot;2026-11-14T14:17:40+00:00&quot;,
+      &quot;agent&quot;: &quot;label-impact&quot;,
+      &quot;agent_commit&quot;: &quot;bd89989&quot;,
+      &quot;run_url&quot;: &quot;https://github.com/andaro74/pharmadelta/actions/runs/43604067436&quot;
+    },
+    &quot;door&quot;: {
+      &quot;status&quot;: 200,
+      &quot;request_id_header&quot;: &quot;apigw-requestid&quot;,
+      &quot;stop_reason&quot;: &quot;end_turn&quot;,
+      &quot;parsed&quot;: {
+        &quot;table_row&quot;: &quot;metoprolol-tartrate.8.1&quot;,
+        &quot;clause_id&quot;: &quot;201.57(c)(9)(i)&quot;,
+        &quot;impacted&quot;: false,
+        &quot;owed&quot;: &quot;none&quot;,
+        &quot;escalate&quot;: false
+      },
+      &quot;text&quot;: null
+    },
+    &quot;scripted&quot;: false
+  }
+]</pre>
 </section>
 <footer>
   <p>This demo produces the evidence a validation would need. It is not medical information: the agent assesses

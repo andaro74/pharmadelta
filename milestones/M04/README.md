@@ -1087,3 +1087,146 @@ Each needs a seat's ruling. None blocks the plant.
 | 7 | Whether the gate checks `src/baseline/` equals its state at `m00` and names `baseline_changed` (P5). Proposed: yes; "runs the baseline" means the control, and the check is one `git diff`. **Ruled at PR 2** (`rulings/pr2.md` 2): yes; `git diff m00 --quiet -- src/baseline/` in the checkout, `baseline_changed` true on exit 1, with the tag's commit recorded. | Threshold Owner, Engineering |
 | 8 | The ruling file names this PR as #23, the next number on this repository. **Ruled at PR 2** (`rulings/pr2.md` 5): PR 1 was #23. | Product |
 | 9 | The side-by-side page is written by hand at PR 1 and will be rebuilt by a writer at the lift, as M03's pages are by `src/m03/lift.py`. Whether the writer is M04's own module (`src/m04/`) or an extension of M03's. Proposed: M04's own, decided at the lift PR. **Carried at PR 2** (`rulings/pr2.md` 11): M04's own module, decided at the lift PR, as proposed. **Ruled at PR 4** (`rulings/pr4.md` 10): M04's own, `src/m04/lift.py`. | Engineering |
+
+## A second question: the trap g-002 (outside the cap, 2026-11-14)
+
+PR #40, `milestones/adoption/rulings/trap-question.md`. Outside any cap
+(U9). The milestone is closed at 4 / 4 and tagged `m04` on `3905c10`;
+this PR carries no claim, plants nothing, measures nothing and changes
+no verdict. Rows 4 and 5 of the ledger are not touched. It answers M03's
+Unsure 35: after the M03 re-lift (#39) both columns of the side-by-side
+page read the same on `g-001`, an `ordinary` golden. The page now also
+serves `g-002`, a `trap`, on both sides, each from a CI record. M07 does
+not open here.
+
+### Which trap, and when it was chosen
+
+`g-002`: "An earlier version of 21 CFR 201.57(c)(9)(i) required a
+pregnancy category letter … Does our metoprolol tartrate tablet label
+need a category letter, and what do we owe?" (SPEC/00 §7, scenario 2, a
+superseded rule). Chosen before any call to the agent, by one rule: it
+is the trap row 0's measurement names (`traps_matched` `["g-002"]` on
+the plant). The frozen baseline's observations of all three traps were
+read first, from the artifact of run 41250971500; it answers each of
+`g-002`, `g-003` and `g-004` with `impacted` true. The agent's answer
+was not known when the id was fixed, and whatever it answered was to be
+served.
+
+### The two records
+
+| | The ordinary assistant | The deployed agent |
+|---|---|---|
+| record | [run 41250971500](https://github.com/andaro74/pharmadelta/actions/runs/41250971500), artifact `m04-gate-36c453aa306377137a324e9a1f340af1fb3c7e09`, the run `pages/api/baseline.json` already named; `started_at` `2026-10-31T23:04:49+00:00` | [run 43604067436](https://github.com/andaro74/pharmadelta/actions/runs/43604067436), `workflow_dispatch` of `m03-lift.yml` on `trap-question` at `4bfa4d8` with `also` `g-002`, artifact `m03-lift-4bfa4d884a4b43299e59169fe0c1532b9dd922a8`; `ok` true, `written_by_ci` true, `dirty` false, sign-in 200 as `pharmadelta`, `agent_commit` `bd89989` |
+| `g-001` | `lisinopril.8.1`, `201.57(c)(9)(i)`, `impacted` true, `owed` `follow-rld`, `escalate` false | the same five values; request id `G1YLLg6xvHcEMYA=`, `end_turn`, one tool call, success |
+| `g-002` | `metoprolol-tartrate.8.1`, `201.57(c)(9)(i)`, `impacted` **true**, `owed` **`follow-rld`**, `escalate` false | `metoprolol-tartrate.8.1`, `201.57(c)(9)(i)`, `impacted` **false**, `owed` **`none`**, `escalate` false; request id `G1YMzhR4PHcEMZA=`, called `2026-11-14T14:17:40+00:00`, `end_turn`, `guardrail_topics` `[]`, one `find_label_row` call (`metoprolol-tartrate`, `"8.1"`), success; `usage` 4265 / 386 / 4651 |
+
+Both sides cite the same row and the same clause on `g-002` and differ
+on two answer fields. The agent's answer equals `goldens/g-002.yaml`'s
+`expected` on every field, read by hand on 2026-11-14; no code here
+compares them, and the page does not say which column the golden
+expects (Unsure 33). It is one call on `g-002`.
+
+The push of `4bfa4d8` edited `m03-lift.yml`, so the workflow also ran
+once on the push,
+[run 43604067705](https://github.com/andaro74/pharmadelta/actions/runs/43604067705):
+`g-001` only, the same answer, request id `G1YKKjYXvHcESeg=`. Its
+artifact has the same name as the dispatch's (one sha, two runs). It is
+served nowhere.
+
+### The agent's text, kept off the pages
+
+On `g-002` the door's `text` held the JSON object and then five
+sentences of prose. The prose says the label "is already compliant", a
+word SPEC/00 §11 bans on a page (here about a label, not a control),
+and cites 21 CFR 201.56(e), a paragraph that is in neither
+`data/clauses.json` nor SPEC/00 §10 and was not checked against the
+source (P7). `src/m03/lift.py` now serves an entry's `door.text` only
+where no answer is shown with its row and its clause, the case M03
+Unsure 26 kept it for; beside a shown answer it is null. The text stays
+in the run's artifact, which each page names as holding the door's full
+reading, as the guardrail's message does at M05 (Unsure 22). By the
+same rule `g-001`'s `door.text`, the JSON object alone, is null. That
+the agent writes prose after its object is label-impact's to read
+(Unsure 34); nothing of it is designed here.
+
+### The code
+
+- `src/m03/lift.py`: `call --also <ids>` asks each id the served file
+  does not hold with the question of `goldens/<id>.yaml`; `call.json`
+  records `also`. The `door.text` rule above. `write` otherwise
+  unchanged.
+- `.github/workflows/m03-lift.yml`: a `workflow_dispatch` input `also`,
+  passed as the environment value `M03_LIFT_ALSO`, never as script text.
+- `src/m04/lift.py`: `write --also <ids>` appends ids the baseline file
+  does not serve yet.
+- A new served answer starts from a CI record on both sides. No
+  hand-written entry was committed at any commit of this PR (P1, P8).
+- No gate changed: `src/m03/gate.py` and `src/m04/gate.py` already read
+  every served entry. `src/baseline/` (P5), `goldens/` and `data/`
+  unchanged.
+
+### The pages, as written
+
+- `pages/api/answers.json`, `pages/detail.html`: two entries. The
+  detail page's title is "LabelKeel: the answers the API serves".
+- `pages/api/baseline.json`, `pages/side-by-side.html`: two entries,
+  `g-002` under `g-001`, each with both columns.
+- `index.html`: the two table cells say two questions, one a trap about
+  a rule no longer in force.
+- The six words of SPEC/00 §11: 0 on every page and served file. No
+  door host, pool id or client id in a file (grep `execute-api`,
+  `us-west-2_`, `amazonaws.com/`: no host, no id).
+
+### What this PR does not hold
+
+- No change to any row cell of `milestones/README.md`.
+- No change to `pages/api/sign-off.json`, `pages/sign-off.html`, the
+  evidence zip, `pages/api/break-it.json` or `pages/break-it.html`. The
+  commit that last changed the served sign-off stays `37352ef`. The
+  package keeps the entries as at its build (M03 Unsure 36).
+- No statement on a page that the baseline is wrong or the agent right.
+  The page shows two records.
+- No treatment answer: `g-002` asks what a label owes under a rule.
+- No tag.
+
+### What a reader can falsify
+
+- `git diff e26b030..<head> --stat` touches `.github/workflows/m03-lift.yml`,
+  `src/m03/lift.py`, `src/m04/lift.py`, `index.html`,
+  `pages/api/answers.json`, `pages/api/baseline.json`,
+  `pages/detail.html`, `pages/side-by-side.html`,
+  `milestones/README.md`, `milestones/M04/README.md` and
+  `milestones/adoption/rulings/trap-question.md` only.
+- Rows 0 to 8 of `milestones/README.md` are byte-for-byte as at
+  `e26b030`.
+- `gh run download 43604067436` and a `src.m03.lift write` from it,
+  then `gh run download 41250971500` and a `src.m04.lift write` from
+  it, leave `git status --short` empty on the head.
+- The artifact of run 43604067436 holds the prose under
+  `calls[1].door.text`; `grep -c "201.56(e)" pages/*.html pages/api/*.json`
+  reads 0 on each.
+- `git log -1 --format=%h -- pages/api/sign-off.json` reads `37352ef`.
+
+### After this PR
+
+The gates' readings on the PR, and on `main` after the merge, go in
+comments on #40, not in a commit. The M03 gate now makes two calls as
+`pharmadelta` per run and the M04 gate compares two served answers.
+Expected: `M03 gate` GREEN when the door answers both questions as on
+the lift call, RED on `answers_differing` naming the one it does not;
+`M04 gate` GREEN, `agent_disagreed` `[]`. Either reading is after rows
+4 and 5's measurements and reopens nothing. No tag.
+
+### Unsure (trap question)
+
+Numbering continues from PR 4's. Each needs a seat's ruling. None
+changes row 4 or row 5.
+
+| # | Item | Seat |
+|---|---|---|
+| 32 | Which trap is served. `g-002` by the rule above. `g-003` (the baseline answers `cbe-0` under 314.70(c)(6)(iii)(A) on another row) and `g-004` (a pasted note with a reportable event) differ more visibly and are not served. Whether one of them joins is Product's, each by the same path: `also` on the lift, `--also` on the M04 writer. | Product |
+| 33 | The page shows two differing answers on `g-002` and does not say which one the golden expects. An executive reader has to know that an earlier version of a rule owes nothing. Whether the page states the golden's `expected` beside the columns, with the golden linked, is Product's and Data Owner's: P6 says a test never supplies the answer to the thing tested, and the page is not the test. Proposed: yes, in its own PR, labelled as the Data Owner's expected answer. | Product, Data Owner |
+| 34 | The agent wrote prose after its JSON object on `g-002`, with an unchecked citation and a banned word. label-impact #9's prompt asks for the five fields; whether it should ask for the object alone is label-impact's. Flagged, not designed. | Rule Owner, Tool Owner (label-impact) |
+| 35 | `door.text` null beside a shown answer changes `g-001`'s entry too and makes "verbatim" on the page mean the parsed object, not the text. The full text is in the artifact the page names. Whether the page should say in words that the agent's free text is not shown. Proposed: one sentence, with Unsure 33's PR. | Product, Security |
+| 36 | The M03 gate's calls per run doubled, under the agent's `daily_usd` 10 and `rps_per_edge` 1 (M03 Unsure 9). The spend is the agent's. | Threshold Owner |
+| 37 | The ruling file names this PR as #40, the next number on this repository after #39. | Product |
