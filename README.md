@@ -29,12 +29,12 @@ The company, Ardentia Generics, is fictional. Its portfolio and every "our label
 
 | Page | What it shows |
 |---|---|
-| [Detail](https://andaro74.github.io/pharmadelta/pages/detail.html) | Two questions sent to the deployed agent. Each answer with its row, its clause and the record of the call. |
-| [Side by side](https://andaro74.github.io/pharmadelta/pages/side-by-side.html) | The same two questions answered by an ordinary assistant (a keyword baseline) and by the agent, with the answer the test expects. On the trap, the baseline differs and the agent does not. |
+| [Detail](https://andaro74.github.io/pharmadelta/pages/detail.html) | Four questions sent to the deployed agent: an ordinary one and three traps. Each answer with its row, its clause and the record of the call. |
+| [Side by side](https://andaro74.github.io/pharmadelta/pages/side-by-side.html) | The same four questions answered by an ordinary assistant (a keyword baseline) and by the agent, with the answer the test expects. On each of the three traps the baseline differs from it and the agent equals it. |
 | [Try to break it](https://andaro74.github.io/pharmadelta/pages/break-it.html) | A request for dosing advice and an instruction hidden in a pasted document. What the platform's guardrail did on each, and the rule it named. |
 | [Sign-off](https://andaro74.github.io/pharmadelta/pages/sign-off.html) | A seat holder's signature over a downloadable evidence package. |
 
-The trap on the side-by-side page: an earlier version of a rule, no longer in force. The ordinary assistant says the label is impacted. The agent says it is not, which is what the test expects.
+One of the three traps on the side-by-side page: an earlier version of a rule, no longer in force. The ordinary assistant says the label is impacted. The agent says it is not, which is what the test expects.
 
 ![The side-by-side page on the trap question. The expected answer: row metoprolol-tartrate.8.1, clause 201.57(c)(9)(i), impacted false, owed none, escalate false. The ordinary assistant's impacted and owed read "differs from expected"; all five of the deployed agent's values read "equals expected".](docs/assets/side-by-side-trap.png)
 
@@ -54,7 +54,7 @@ A picture of the page as saved on 2026-11-14. The page itself holds the records 
 
 ## Why an agent on a platform, and not one app with the rules inside it
 
-A single app with the rules written into its prompt would answer the two questions on the detail page the same way. The difference is in what each can show to someone who has to rely on the answer.
+A single app with the rules written into its prompt could answer the four questions on the detail page the same way. The difference is in what each can show to someone who has to rely on the answer.
 
 | The question an auditor asks | One app with the rules inside | Here | Where it was measured |
 |---|---|---|---|
@@ -63,7 +63,7 @@ A single app with the rules written into its prompt would answer the two questio
 | Who is allowed to ask? | Anyone who can reach the app. | Only a caller the agent's manifest names. | Row P, measured in agentkeel |
 | Is what runs what was reviewed? | Whatever was deployed last. | The platform signs each bundle and its deploy checks the signature. | agentkeel's own ledger, not this one |
 | Is the data what the regulation says? | Typed in once. | Rebuilt from the eCFR and DailyMed in CI and compared. The row closed RED: the build found two errors in the hand-typed seed. | Row 2 |
-| Better than what? | No control. | A frozen keyword baseline runs beside the agent. It fails the trap. | Rows 0 and 5 |
+| Better than what? | No control. | A frozen keyword baseline runs beside the agent. It fails the traps. | Rows 0 and 5 |
 | Can I check it myself? | Read the code. | A signed evidence package to download, each file with its hash and the CI run that wrote it. | Row 7 |
 | What does the next agent cost? | Build it all again. | A second agent starts from the same template and gets the same controls. | Row 8, **not yet measured** (M07) |
 
@@ -120,7 +120,7 @@ The AWS side is agentkeel's, read from its code at `3962809`. This repository ho
 Shortcomings a reader should know:
 
 - One person holds all seven seats, so the reviewer reviews their own work. The pages say so.
-- The detail and side-by-side pages serve two questions. The agent's own tests hold more.
+- The detail and side-by-side pages serve four questions, one call each on the page. Four answers are not a rate.
 - Row 2 of the ledger closed RED, with its finding.
 - The time to create a second agent (M07) is not measured yet.
 

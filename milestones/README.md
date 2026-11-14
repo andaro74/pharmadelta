@@ -117,3 +117,19 @@ the same row and clause, `impacted` true, `owed` `follow-rld`,
 the golden expects. The agent's free text beside a shown answer is in
 the run's artifact and on no page (M04 README, "A second question").
 Rows 4 and 5 are not touched.
+
+On 2026-11-14 one PR outside any cap
+(`milestones/adoption/rulings/three-traps.md`) added the other two
+`trap` goldens, `g-003` and `g-004`, to the same two pages, by the same
+path. The agent's four entries are from
+[run 43621291917](https://github.com/andaro74/pharmadelta/actions/runs/43621291917),
+artifact `m03-lift-7437113d400586ec7dc19bb21a3732ea9c77b46b`: on `g-003`,
+`metformin.5.1`, `314.150(b)(10)`, `impacted` false, `owed`
+`follow-rld`, `escalate` false; on `g-004`, `metformin.6`,
+`314.80(c)(1)(i)`, `impacted` false, `owed` `alert-report`, `escalate`
+true. The frozen baseline's observations in run 41250971500: on
+`g-003`, `metformin.bw`, `314.70(c)(6)(iii)(A)`, `impacted` true, `owed`
+`cbe-0`; on `g-004`, `metformin.bw`, `314.94(a)(8)(iv)`, `impacted`
+true, `owed` `follow-rld`, `escalate` false. The pages now serve four
+questions: one ordinary and every trap in `goldens/`. Rows 4 and 5 are
+not touched.
