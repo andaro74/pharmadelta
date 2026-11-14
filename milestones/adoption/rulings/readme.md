@@ -1,0 +1,138 @@
+---
+ruling: readme
+seat:
+  - Product
+  - Security
+  - Engineering
+authorises:
+  # Product: what the README says the demo is, how it works and why a platform (rulings 1, 2, 5)
+  - README.md
+  # Engineering, Security: the services named, read from agentkeel's code (rulings 3, 4)
+  - README.md
+  # Product, Security: the three images and the hero's source (rulings 7, 8)
+  - docs/assets/readme-header.html
+  - docs/assets/readme-header.png
+  - docs/assets/architecture.svg
+  - docs/assets/side-by-side-trap.png
+  - milestones/adoption/rulings/readme.md
+evidence:
+  - SPEC/00-overview.md
+  - docs/adr/ADR-0001-spec00-adopted.md
+  - milestones/README.md
+  - pages/api/answers.json
+  - pages/api/baseline.json
+  - pages/api/break-it.json
+  - pages/api/sign-off.json
+  - https://github.com/andaro74/agentkeel/tree/3962809/infra
+  - https://github.com/andaro74/agentkeel/blob/3962809/infra/construct/governed_agent.py
+  - https://github.com/andaro74/agentkeel/blob/3962809/infra/construct/door.py
+  - https://github.com/andaro74/agentkeel/blob/3962809/infra/bootstrap/app.py
+  - https://github.com/andaro74/agentkeel/blob/3962809/infra/audit/README.md
+  - https://github.com/andaro74/agentkeel/blob/3962809/infra/security/README.md
+  - https://github.com/andaro74/agentkeel/blob/3962809/infra/grafana/README.md
+  - https://github.com/andaro74/agentkeel/blob/3962809/.github/workflows/deploy.yml
+  - https://github.com/agentkeel-studio/label-impact/blob/bd89989/manifest.yaml
+  - https://github.com/andaro74/regdelta/blob/main/docs/assets/readme-header.html
+  - https://github.com/andaro74/regdelta/blob/main/docs/assets/architecture.svg
+  - pages/side-by-side.html
+pr: https://github.com/andaro74/pharmadelta/pull/43
+---
+
+# Ruling: the README
+
+One person holds all seven seats on this project (agentkeel ruling R1,
+ADR-0001). This file records which seat rules on which edit.
+
+This PR is outside any milestone's cap (U9). It carries no claim,
+plants nothing and measures nothing. It changes `README.md`, adds four
+files under `docs/assets/` and adds this file. No ledger row, served file, page, gate or workflow is
+touched, and no call to the agent was made. The owner asked on
+2026-11-14 for a README that says what problem the demo solves, how it
+works, what a platform gives that one app with the rules inside does
+not, and the main AWS services and technologies.
+
+## Rulings in this PR
+
+1. **Product (what stays word for word).** The tagline, SPEC/00 §1's
+   one sentence and §2's "not affiliated" sentence are unchanged, as
+   are the lines naming SPEC/00, the ledger and the pages' URL.
+2. **Product (the comparison).** The section "Why an agent on a
+   platform" is a table of questions. Each "Here" cell names a ledger
+   row, or says the measurement is agentkeel's, or says "not yet
+   measured" (row 8, M07). It states no number. It says what one app
+   with the rules inside would do in plain words and makes no measured
+   claim about such an app: none was built. It names what the platform
+   costs and the case where an app is less work.
+3. **Engineering (the services).** Every AWS service the README names
+   was read in `andaro74/agentkeel` at `3962809` on 2026-11-14: the CDK
+   modules `infra/` imports (`aws_bedrock`, `aws_bedrockagentcore`,
+   `aws_dynamodb`, `aws_apigatewayv2`, `aws_lambda`, `aws_cognito`,
+   `aws_kms`, `aws_ecr`, `aws_ec2`, `aws_logs`, `aws_cloudtrail`,
+   `aws_s3`, `aws_ssm`, `aws_budgets`, `aws_athena`, `aws_iam`), the
+   construct's and the door's docstrings, the four stack READMEs, and
+   `deploy.yml` for cosign and the two OIDC uses. A service agentkeel
+   imports and the README does not name (Kinesis Data Firehose, Glue,
+   SAM) was left out as not one of the main ones. What each service
+   does is one line taken from that code's own description. This
+   repository holds no AWS resource and no AWS credential.
+4. **Security (nothing of the door or the accounts).** The README
+   names services, never an account id, a host, a pool id, a client id
+   or an ARN. Grep for `execute-api`, `us-west-2_`, `amazonaws` and a
+   twelve-digit number: no match.
+5. **Product (SPEC/00 §2 and §11).** None of the six words appears in
+   the README. "Not a validation. It produces the evidence a validation
+   would need." is §2's wording without the word §2 bans. The README
+   says the company is fictional, that the demo is not medical
+   information, that the pages take no question, that one person holds
+   all seven seats, and that row 2 closed RED.
+6. **Product.** This PR is #43, the next number on this repository.
+7. **Product (the images).** Asked for by the owner on 2026-11-14,
+   with `andaro74/regdelta`'s README images as the reference: a hero
+   image, a colour diagram and a page screenshot.
+   `docs/assets/readme-header.png` is rendered from
+   `docs/assets/readme-header.html` by headless Chrome (1200 by 630 at
+   scale 2), the command in the file's comment, so it can be
+   reproduced. `docs/assets/architecture.svg` replaces the Mermaid
+   block: five numbered steps, one hue per step, each box with a plain
+   sentence and the service's name. `docs/assets/side-by-side-trap.png`
+   is a crop of `pages/side-by-side.html` at `ac366d2`, light theme,
+   rendered by headless Chrome: the trap question, the expected answer
+   and the two answer tables. It is a picture of a page, not a record;
+   the README says so and links the page. The hero's wordmark reads
+   "PharmaDelta", as regdelta's reads "RegDelta"; the name in prose
+   stays `pharmadelta`.
+8. **Product, Security (the rules on images).** SPEC/00 §2 and §11
+   apply to an image as to a page. None of the six words is in the
+   hero's source or the diagram. Neither states a number that is a
+   measured result. Both say the demo's company is fictional and that
+   it is not medical information (P8). The hero says the pages are
+   saved records, not live. The diagram draws the CI gate and the
+   pages outside the platform's boundary, where they are. Each image
+   has alt text that says what it shows. No host, account id or
+   identifier is in any image. The hero carries the owner's site
+   name, as regdelta's does.
+
+## What a reader can falsify
+
+- `git diff ac366d2..<head> --stat` touches `README.md`, the four files
+  under `docs/assets/` and this file only.
+- Rendering `docs/assets/readme-header.html` with the command in its
+  comment gives the committed PNG's picture.
+- Each ledger row the comparison table names says what the cell says.
+- `grep -i -w -E "validated|compliant|governed|secure|proven" README.md`
+  prints nothing.
+- Each service in the tables is imported or named under `infra/` or in
+  `.github/workflows/deploy.yml` of `andaro74/agentkeel` at `3962809`.
+- The four page links answer 200.
+
+## What this ruling does not settle
+
+- The README's AWS section goes stale when agentkeel changes. Nothing
+  here reads agentkeel in CI. The owner re-reads it when the platform's
+  tag moves.
+- Row 8's cell in the comparison table changes from "not yet measured"
+  when M07 closes, in M07's close PR or one after it.
+- The Mermaid block is gone; the diagram is an SVG file, read as a
+  picture before it was committed.
+- The screenshot goes stale when the side-by-side page changes. It is
+  re-cut by hand then.

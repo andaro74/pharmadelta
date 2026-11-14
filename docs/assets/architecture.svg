@@ -1,0 +1,129 @@
+<svg width="980" height="836" viewBox="0 0 980 836" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace">
+  <!--
+    The README's "how it works" diagram. Same palette family as
+    docs/assets/readme-header.html; one hue per step so the flow reads at a
+    glance: cyan = the question and the record, blue = the door, rose = the
+    guardrail, amber = the agent and its answer, green = the data, violet =
+    the seats, slate = the control. Each box carries a plain sentence for a
+    reader who does not build software and the service name for one who does.
+    SPEC/00 section 11 applies: none of the six words, no number that is a
+    measured result. Every service named is in agentkeel's infra/
+    (milestones/adoption/rulings/readme.md 3).
+  -->
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5b7091"/>
+    </marker>
+  </defs>
+
+  <!-- card background -->
+  <rect x="1" y="1" width="978" height="834" rx="16" fill="#0d1a2e" stroke="#2c3d5c" stroke-width="1.5"/>
+
+  <!-- the question (cyan) -->
+  <rect x="90" y="34" width="470" height="92" rx="10" fill="#0f2a3a" stroke="#22d3ee" stroke-width="2"/>
+  <text x="325" y="62" text-anchor="middle" fill="#a5f3fc" font-size="15" font-weight="bold" letter-spacing="1">THE QUESTION</text>
+  <text x="325" y="86" text-anchor="middle" fill="#dbe4f0" font-size="12.5">A labeling rule changed. Which label does it</text>
+  <text x="325" y="105" text-anchor="middle" fill="#dbe4f0" font-size="12.5">touch, and what do we owe?</text>
+
+  <!-- who asks, top right -->
+  <text x="610" y="64" fill="#8b9bb4" font-size="11.5">asked by this repository's CI,</text>
+  <text x="610" y="82" fill="#8b9bb4" font-size="11.5">signed in as the named caller</text>
+  <text x="610" y="100" fill="#8b9bb4" font-size="11.5">"pharmadelta"</text>
+
+  <line x1="325" y1="126" x2="325" y2="206" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+  <circle cx="325" cy="146" r="3.5" fill="#f0a43a"/>
+
+  <!-- the platform boundary -->
+  <rect x="50" y="176" width="880" height="436" rx="14" fill="rgba(19,33,58,0.35)" stroke="#3f5578" stroke-width="1.5" stroke-dasharray="7 7"/>
+  <rect x="600" y="165" width="306" height="22" rx="3" fill="#0a1526"/>
+  <text x="612" y="181" fill="#cbd6e6" font-size="12" letter-spacing="3">AGENTKEEL PLATFORM &#183; ON AWS</text>
+
+  <!-- 1 the door (blue) -->
+  <rect x="90" y="212" width="470" height="78" rx="10" fill="#12253f" stroke="#4da3ff" stroke-width="2"/>
+  <circle cx="122" cy="251" r="14" fill="#4da3ff"/>
+  <text x="122" y="256" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">1</text>
+  <text x="152" y="238" fill="#bfdcff" font-size="15" font-weight="bold" letter-spacing="1">THE DOOR</text>
+  <text x="152" y="259" fill="#dbe4f0" font-size="12.5">Only a caller the agent names gets in.</text>
+  <text x="152" y="277" fill="#8b9bb4" font-size="11">Amazon API Gateway &#183; Amazon Cognito</text>
+
+  <line x1="325" y1="290" x2="325" y2="310" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- 2 the guardrail (rose) -->
+  <rect x="90" y="314" width="470" height="78" rx="10" fill="#2a1a30" stroke="#f472b6" stroke-width="2"/>
+  <circle cx="122" cy="353" r="14" fill="#f472b6"/>
+  <text x="122" y="358" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">2</text>
+  <text x="152" y="340" fill="#fcd0e4" font-size="15" font-weight="bold" letter-spacing="1">THE GUARDRAIL</text>
+  <text x="152" y="361" fill="#dbe4f0" font-size="12.5">Stops treatment questions and hidden instructions.</text>
+  <text x="152" y="379" fill="#8b9bb4" font-size="11">Amazon Bedrock Guardrails &#183; rules sit outside the agent</text>
+
+  <line x1="325" y1="392" x2="325" y2="412" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- 3 the agent (amber) -->
+  <rect x="90" y="416" width="470" height="84" rx="12" fill="#182a47" stroke="#f0a43a" stroke-width="2.5"/>
+  <circle cx="122" cy="458" r="14" fill="#f0a43a"/>
+  <text x="122" y="463" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">3</text>
+  <text x="152" y="444" fill="#ffe1ad" font-size="15" font-weight="bold" letter-spacing="1">THE AGENT &#183; label-impact</text>
+  <text x="152" y="466" fill="#dbe4f0" font-size="12.5">Looks up one row of the label table and decides.</text>
+  <text x="152" y="485" fill="#8b9bb4" font-size="11">Bedrock AgentCore Runtime &#183; a model on Amazon Bedrock</text>
+
+  <line x1="325" y1="500" x2="325" y2="520" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- 4 the answer (amber outline) -->
+  <rect x="90" y="524" width="470" height="66" rx="10" fill="#0a1526" stroke="#f0a43a" stroke-width="1.5"/>
+  <circle cx="122" cy="557" r="14" fill="none" stroke="#f0a43a" stroke-width="2"/>
+  <text x="122" y="562" text-anchor="middle" fill="#f0c37a" font-size="14" font-weight="bold">4</text>
+  <text x="152" y="551" fill="#f0c37a" font-size="15" font-weight="bold" letter-spacing="1">THE ANSWER</text>
+  <text x="152" y="573" fill="#dbe4f0" font-size="12.5">One row &#183; one clause &#183; impacted &#183; owed &#183; escalate</text>
+
+  <!-- right column, inside the platform -->
+  <!-- seven seats (violet) -->
+  <rect x="610" y="212" width="290" height="180" rx="10" fill="#182342" stroke="#a78bfa" stroke-width="2"/>
+  <text x="630" y="242" fill="#ddd2fe" font-size="15" font-weight="bold" letter-spacing="1">SEVEN SEATS</text>
+  <text x="630" y="268" fill="#dbe4f0" font-size="12.5">Every rule, test and threshold</text>
+  <text x="630" y="287" fill="#dbe4f0" font-size="12.5">has a named owner.</text>
+  <text x="630" y="314" fill="#dbe4f0" font-size="12.5">The platform refuses an agent</text>
+  <text x="630" y="333" fill="#dbe4f0" font-size="12.5">while a seat is empty.</text>
+  <text x="630" y="366" fill="#8b9bb4" font-size="11">a GitHub App check on every change</text>
+
+  <!-- label table and clauses (green) -->
+  <line x1="560" y1="458" x2="606" y2="458" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+  <circle cx="582" cy="458" r="3.5" fill="#f0a43a"/>
+  <rect x="610" y="416" width="290" height="84" rx="10" fill="#12283b" stroke="#34d399" stroke-width="2"/>
+  <text x="630" y="444" fill="#a7f3d0" font-size="15" font-weight="bold" letter-spacing="1">LABEL TABLE + CLAUSES</text>
+  <text x="630" y="466" fill="#dbe4f0" font-size="12.5">Built from eCFR and DailyMed.</text>
+  <text x="630" y="485" fill="#8b9bb4" font-size="11">Amazon DynamoDB</text>
+
+  <!-- signed deploy (slate) -->
+  <rect x="610" y="524" width="290" height="66" rx="10" fill="#151f33" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="630" y="551" fill="#e2e8f0" font-size="15" font-weight="bold" letter-spacing="1">SIGNED DEPLOY</text>
+  <text x="630" y="573" fill="#8b9bb4" font-size="11">only a signed bundle runs &#183; cosign</text>
+
+  <!-- out of the platform: the record -->
+  <line x1="325" y1="590" x2="325" y2="646" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- 5 the record (cyan) -->
+  <rect x="90" y="650" width="470" height="78" rx="10" fill="#0f2a3a" stroke="#22d3ee" stroke-width="2"/>
+  <circle cx="122" cy="689" r="14" fill="#22d3ee"/>
+  <text x="122" y="694" text-anchor="middle" fill="#0d1a2e" font-size="14" font-weight="bold">5</text>
+  <text x="152" y="676" fill="#a5f3fc" font-size="15" font-weight="bold" letter-spacing="1">THE RECORD</text>
+  <text x="152" y="697" fill="#dbe4f0" font-size="12.5">CI saves each call. A gate asks again on every run.</text>
+  <text x="152" y="715" fill="#8b9bb4" font-size="11">GitHub Actions &#183; pharmadelta (this repository)</text>
+
+  <line x1="560" y1="689" x2="606" y2="689" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- the pages (cyan) -->
+  <rect x="610" y="650" width="290" height="78" rx="10" fill="#0f2a3a" stroke="#22d3ee" stroke-width="2"/>
+  <text x="630" y="676" fill="#a5f3fc" font-size="15" font-weight="bold" letter-spacing="1">THE PAGES</text>
+  <text x="630" y="697" fill="#dbe4f0" font-size="12.5">Detail &#183; side by side &#183; break it</text>
+  <text x="630" y="715" fill="#8b9bb4" font-size="11">saved records and signed evidence</text>
+
+  <!-- the frozen baseline (slate), feeding the side-by-side page -->
+  <line x1="755" y1="752" x2="755" y2="732" stroke="#5b7091" stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="610" y="752" width="290" height="60" rx="10" fill="#151f33" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="630" y="777" fill="#e2e8f0" font-size="14" font-weight="bold" letter-spacing="1">FROZEN BASELINE</text>
+  <text x="630" y="797" fill="#8b9bb4" font-size="11">the keyword control, shown beside it</text>
+
+  <!-- footer notes -->
+  <text x="90" y="778" fill="#8b9bb4" font-size="11.5"><tspan fill="#f0a43a">&#9679;</tspan>&#160; an answer without its row and its clause is not shown</text>
+  <text x="90" y="800" fill="#667799" font-size="11.5"><tspan fill="#f0a43a">&#9679;</tspan>&#160; a demo &#183; the company is fictional &#183; not medical information</text>
+</svg>
