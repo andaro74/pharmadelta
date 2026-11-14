@@ -1230,3 +1230,79 @@ changes row 4 or row 5.
 | 35 | `door.text` null beside a shown answer changes `g-001`'s entry too and makes "verbatim" on the page mean the parsed object, not the text. The full text is in the artifact the page names. Whether the page should say in words that the agent's free text is not shown. Proposed: one sentence, with Unsure 33's PR. | Product, Security |
 | 36 | The M03 gate's calls per run doubled, under the agent's `daily_usd` 10 and `rps_per_edge` 1 (M03 Unsure 9). The spend is the agent's. | Threshold Owner |
 | 37 | The ruling file names this PR as #40, the next number on this repository after #39. | Product |
+
+## The expected answer on the page (outside the cap, 2026-11-14)
+
+PR #41, `milestones/adoption/rulings/expected-answer.md`. Outside any
+cap (U9). No claim, no plant, no measurement; rows 4 and 5 are not
+touched and no served file changes. It rules Unsure 33 and 35 of the
+section above, asked for by the owner on 2026-11-14 after #40 merged at
+`d5b7957`.
+
+### What the pages now show
+
+- A block "The expected answer" for each question that has a golden:
+  the `expected` of `goldens/<id>.yaml`, named as the Data Owner
+  seat's, with the golden linked at the commit that last changed it
+  (`g-001` at `df860b7`, `g-002` at `3b014f1`) and its kind. On the
+  side-by-side page it sits between the question and the two columns;
+  on the detail page, above the answer.
+- Beside each of the five values of each shown answer, one of two
+  phrases: "equals expected" or "differs from expected".
+- One sentence under the agent's record: text the agent wrote beside
+  its answer is in the run's artifact and is not shown (Unsure 35).
+
+| | `g-001` | `g-002` |
+|---|---|---|
+| the ordinary assistant | five equal | `impacted` and `owed` differ; three equal |
+| the deployed agent | five equal | five equal |
+
+### What it is, and what it is not
+
+- A copy of the test's answer and a comparison of two values printed on
+  the page. The block says so in words, and says no run wrote it.
+- Not a measured result. The baseline's score against the goldens is
+  row 0's, on another run. The agent's score against its goldens is
+  agentkeel's, in label-impact. No gate reads the block or the marks.
+- Not "right" or "wrong". The page uses neither word.
+- No reason is given for the expected answer. A sentence such as "the
+  earlier version is not in force" is a statement about the CFR and
+  would be checked against the source first (P7). The clause's
+  effective date, already on the page, is checked.
+- P6 is not touched: the golden still does not state the fact its row
+  holds, and the page is not the test.
+
+### The code and the pages
+
+- `src/m03/lift.py`: `expected_answer`, `expected_mark`,
+  `render_expected`; the detail writer's block, line and column;
+  `write --goldens`.
+- `src/m04/lift.py`: the block and a third cell on the answer rows of
+  both columns.
+- `pages/detail.html`, `pages/side-by-side.html`: rebuilt from the
+  artifacts of runs 43604067436 and 41250971500. The three JSON blocks
+  are byte-equal to `d5b7957`. Nothing under `pages/api/` changes. No
+  call to the agent was made.
+- A rebuild now also reads `goldens/` and its git history, as it reads
+  `data/`.
+
+### What a reader can falsify
+
+- `git diff d5b7957..<head> --stat` touches `src/m03/lift.py`,
+  `src/m04/lift.py`, `pages/detail.html`, `pages/side-by-side.html`,
+  `milestones/M04/README.md` and
+  `milestones/adoption/rulings/expected-answer.md` only.
+- Each value in a block equals the `expected` of its golden file.
+- `gh run download 43604067436` and a `src.m03.lift write` from it,
+  then `gh run download 41250971500` and a `src.m04.lift write` from
+  it, leave `git status --short` empty on the head.
+- `grep -c "differs from expected</span>" pages/side-by-side.html`
+  reads 2; on `pages/detail.html`, 0.
+
+### Unsure (expected answer)
+
+| # | Item | Seat |
+|---|---|---|
+| 38 | The marks are written by the page writer, run by hand, from two values on the page. If a later lift serves an answer that differs, the mark changes with the rebuild and no gate says so. Whether a gate should read the marks against the golden in CI is a change to a gate, outside this PR. Proposed: no; the marks restate what the page prints. | Engineering, Product |
+| 39 | The evidence package signed at `37352ef` holds the two pages as at its build. It is not re-built (M03 Unsure 36). | Product |
+| 40 | The ruling file names this PR as #41, the next number on this repository after #40. | Product |
