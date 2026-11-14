@@ -99,3 +99,21 @@ its row, its clause and the call record of that run, where they served
 "no answer" (M03 Unsure 23, 26; M06 Unsure 42). Row 4's "Measured" cell
 and state are the measurement, taken at `0b8d2ec`, and stand; the
 re-lift is a reading after it (M03 README, "Re-lift").
+
+After that re-lift both columns of the side-by-side page read the same
+on `g-001`, an `ordinary` golden. On 2026-11-14 one PR outside any cap
+(`milestones/adoption/rulings/trap-question.md`) added a second
+question to the detail page and the side-by-side page: `g-002`, a
+`trap` about an earlier version of a rule, the trap row 0's measurement
+names, fixed before any call to the agent. The agent's entry is from
+[run 43604067436](https://github.com/andaro74/pharmadelta/actions/runs/43604067436),
+artifact `m03-lift-4bfa4d884a4b43299e59169fe0c1532b9dd922a8`:
+`metoprolol-tartrate.8.1`, `201.57(c)(9)(i)`, `impacted` false, `owed`
+`none`, `escalate` false. The ordinary assistant's entry is the frozen
+baseline's observation in
+[run 41250971500](https://github.com/andaro74/pharmadelta/actions/runs/41250971500):
+the same row and clause, `impacted` true, `owed` `follow-rld`,
+`escalate` false. The page shows the two records and does not say which
+the golden expects. The agent's free text beside a shown answer is in
+the run's artifact and on no page (M04 README, "A second question").
+Rows 4 and 5 are not touched.
