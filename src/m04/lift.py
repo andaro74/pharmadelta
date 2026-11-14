@@ -453,6 +453,8 @@ def write(args: argparse.Namespace) -> int:
         observations, result = read_artifact(args.from_dir)
         old = json.loads(args.api.read_text(encoding="utf-8")) if args.api.exists() else {}
         ids = [a["id"] for a in old.get("answers") or [] if isinstance(a, dict) and isinstance(a.get("id"), str)]
+        # `--also`: ids the file does not serve yet, appended; the artifact must hold the baseline's observation of each.
+        ids += [i for i in args.also.replace(",", " ").split() if i and i not in ids]
         if not ids:
             raise Refused(f"{args.api} serves no answer; there is no id to rebuild")
         entries = build_entries(ids, observations, result, args.goldens)
@@ -481,6 +483,7 @@ def main() -> int:
     p_write.add_argument("--agent-api", type=Path, default=ROOT / "pages" / "api" / "answers.json")
     p_write.add_argument("--page", type=Path, default=ROOT / "pages" / "side-by-side.html")
     p_write.add_argument("--goldens", type=Path, default=ROOT / "goldens")
+    p_write.add_argument("--also", default="", help="golden ids the file does not serve yet, separated by commas or spaces; appended after the served ids")
     args = parser.parse_args()
     return write(args)
 
