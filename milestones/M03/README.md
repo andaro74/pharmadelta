@@ -1271,6 +1271,6 @@ changes row 4.
 | # | Item | Seat |
 |---|---|---|
 | 34 | Whether the door's answer to `g-001` is stable now. One lift call and the gate runs on this PR are too few to say; Unsure 26 recorded five shapes in eight calls before the fix. A RED on `answers_differing` on a later run is recorded as what the agent said that day, not repaired here. | Product, Tool Owner (label-impact) |
-| 35 | Both columns of the side-by-side page now read the same on `g-001`. Whether the page should serve a second question, a trap the baseline fails, so that an executive sees a difference (SPEC/00 §1). That is a new served answer on two pages and two gates' inputs, not a re-lift; proposed: its own PR outside any cap, ruled by Product. | Product |
+| 35 | Both columns of the side-by-side page now read the same on `g-001`. Whether the page should serve a second question, a trap the baseline fails, so that an executive sees a difference (SPEC/00 §1). That is a new served answer on two pages and two gates' inputs, not a re-lift; proposed: its own PR outside any cap, ruled by Product. **Ruled** (`milestones/adoption/rulings/trap-question.md` 1, 2; #40): `g-002` is served on both pages, each side from a CI record. | Product |
 | 36 | The evidence package signed at `37352ef` holds the entry with `answer` null. Whether it is re-built and re-signed to hold the new entry. Proposed: no; the package is the record of the day of the signature (M06 Unsure 34, 36, 41). | Product |
 | 37 | The ruling file names this PR as #39, the next number on this repository after #38. | Product |
