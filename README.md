@@ -1,6 +1,8 @@
 # pharmadelta
 What changed in FDA drug labeling, and which of our labels it touches. Built on agentkeel.
 
+![PharmaDelta: an agent for FDA drug labeling changes. A question passes a door that admits named callers only and a guardrail that holds the rules outside the agent; the agent cites one row of the label table and one clause of 21 CFR; a CI gate asks again; the answer is a row, a clause and what we owe. A demo: the company is fictional, and it is not medical information.](docs/assets/readme-header.png)
+
 pharmadelta shows what changed in FDA drug labeling and which labels it touches, with a citation on every claim, from an agent whose rules, tests and thresholds each have a named owner.
 
 pharmadelta is an independent open-source demo and is not affiliated with any pharmaceutical company.
@@ -32,6 +34,12 @@ The company, Ardentia Generics, is fictional. Its portfolio and every "our label
 | [Try to break it](https://andaro74.github.io/pharmadelta/pages/break-it.html) | A request for dosing advice and an instruction hidden in a pasted document. What the platform's guardrail did on each, and the rule it named. |
 | [Sign-off](https://andaro74.github.io/pharmadelta/pages/sign-off.html) | A seat holder's signature over a downloadable evidence package. |
 
+The trap on the side-by-side page: an earlier version of a rule, no longer in force. The ordinary assistant says the label is impacted. The agent says it is not, which is what the test expects.
+
+![The side-by-side page on the trap question. The expected answer: row metoprolol-tartrate.8.1, clause 201.57(c)(9)(i), impacted false, owed none, escalate false. The ordinary assistant's impacted and owed read "differs from expected"; all five of the deployed agent's values read "equals expected".](docs/assets/side-by-side-trap.png)
+
+A picture of the page as saved on 2026-11-14. The page itself holds the records and the CI runs behind them.
+
 ## How it works
 
 1. **The data is built from the sources.** Code in this repository reads the eCFR and DailyMed and builds the label table and the clauses. CI compares the build with the committed data.
@@ -42,22 +50,7 @@ The company, Ardentia Generics, is fictional. Its portfolio and every "our label
 6. **The agent answers with a row, a clause and three fields:** whether the label is impacted, what is owed, and whether to escalate.
 7. **CI saves the record and a gate re-checks it.** The pages are rebuilt from the saved record. On every run a gate asks the agent again and compares.
 
-```mermaid
-flowchart LR
-    subgraph P["pharmadelta (this repository)"]
-        SRC["eCFR and DailyMed"] --> BUILD["Build the label table<br/>and the clauses"]
-        CI["CI: lift and gates"] --> PAGES["Pages: saved records"]
-        BASE["Frozen baseline<br/>(the control)"] --> CI
-    end
-    subgraph A["agentkeel on AWS"]
-        DOOR["Door<br/>API Gateway, Cognito"] --> GR["Guardrail<br/>Bedrock Guardrails"]
-        GR --> AG["Agent label-impact<br/>AgentCore Runtime, a model on Bedrock"]
-        AG --> TBL[("Label table<br/>DynamoDB")]
-    end
-    BUILD -. "data, copied into the agent's repository" .-> TBL
-    CI -- "question, as the caller pharmadelta" --> DOOR
-    AG -- "row, clause, answer fields" --> CI
-```
+![How a question is answered, in five steps. The question is asked by this repository's CI as the named caller pharmadelta. Inside the agentkeel platform on AWS: 1, the door (API Gateway, Cognito) admits only a caller the agent names; 2, the guardrail (Bedrock Guardrails) stops treatment questions and hidden instructions; 3, the agent label-impact (AgentCore Runtime, a model on Bedrock) looks up one row of the label table in DynamoDB; 4, the answer is one row, one clause and three fields. Beside them: seven seats with named owners, and a signed deploy. Outside the platform: 5, CI saves the record and a gate asks again on every run; the pages show the saved records, with the frozen baseline as the control.](docs/assets/architecture.svg)
 
 ## Why an agent on a platform, and not one app with the rules inside it
 
