@@ -80,3 +80,22 @@ M06 as the owner's setting. No Measured cell depended on it: "public"
 meant readable in the repository at every measurement. The pages show
 saved CI records and take no question; a live path is a platform item
 (M03 `rulings/pr4.md` 7).
+
+The tool was fixed. `agentkeel-studio/label-impact` #8 (merged
+2026-11-11, `d899d68`) made `find_label_row` read the section as text,
+and #9 (merged 2026-11-11, `main` at `bd89989`) changed the prompt;
+agentkeel
+[run 42967373936](https://github.com/andaro74/agentkeel/actions/runs/42967373936)
+deployed it. On 2026-11-14 one PR outside any cap
+(`milestones/adoption/rulings/m03-relift.md`) re-ran `m03-lift.yml` by
+hand on `m03-relift` at `4e5d5ba`:
+[run 43602104535](https://github.com/andaro74/pharmadelta/actions/runs/43602104535),
+artifact `m03-lift-4e5d5ba5a52977248d8554c65eeedd2b6c3d9851`. The door
+answered `g-001` at `end_turn` after one tool call that succeeded:
+`table_row` `lisinopril.8.1`, `clause_id` `201.57(c)(9)(i)`, `impacted`
+true, `owed` `follow-rld`, `escalate` false, `agent_commit` `bd89989`.
+The detail page and the side-by-side page now serve that answer with
+its row, its clause and the call record of that run, where they served
+"no answer" (M03 Unsure 23, 26; M06 Unsure 42). Row 4's "Measured" cell
+and state are the measurement, taken at `0b8d2ec`, and stand; the
+re-lift is a reading after it (M03 README, "Re-lift").

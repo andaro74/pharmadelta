@@ -1126,3 +1126,151 @@ Each needs a seat's ruling. None blocks the plant.
 | 8 | The ruling file names this PR as #19, the next number on this repository. **Ruled at PR 2** (`rulings/pr2.md` 5): PR 1 was #19. | Product |
 | 9 | Cost and ceilings: one call per served answer per gate run on every pull request and push to `main`, under the agent's `concurrency` 2, `rps_per_edge` 1 and `daily_usd` 10; the spend is the agent's, not this repository's. Whether the gate runs on every pull request or on `main` and by hand only. **Ruled at PR 2** (`rulings/pr2.md` 6): the gate runs on every pull request, every push to `main` and by hand, one call per served answer per run, called or not (Unsure 11), under the agent's ceilings; the spend is the agent's. Narrowing the triggers is a one-line change for PR 3 if the Threshold Owner asks. | Threshold Owner, Security |
 | 10 | The call record's fields on a served answer and which the gate can verify from here: `run_url` is a run of this repository's workflow, readable through GitHub's API; the `request_id` can be matched to the door's access log only in the security account, which agentkeel's observer reads, not this repository. **Ruled at PR 2** (`rulings/pr2.md` 7): the fields are fixed as `subject`, `issuer`, `door_host`, `request_id`, `called_at`, `agent`, `agent_commit`, `run_url`; the gate names an answer uncalled when any is missing or empty or `subject` is not `pharmadelta`. From here `run_url` is readable through GitHub's API and `request_id` is not; `door_host` is Unsure 12. | Engineering, Security |
+
+## Re-lift (outside the cap, 2026-11-14)
+
+PR #39, `milestones/adoption/rulings/m03-relift.md`. Outside any cap
+(U9), as #1, #13 to #18, #31, #32, #37 and #38 were. The milestone is
+closed at 4 / 4 and tagged `m03` on `9932776`; this PR carries no claim,
+plants nothing, measures nothing and changes no verdict. It does what
+M06's Unsure 42 said one PR would do when label-impact fixed its tool:
+re-run `m03-lift.yml` by hand, rebuild the detail page from its
+artifact, rebuild the side-by-side page that copies the same entry, and
+let the gates read. Row 4's "Measured" cell and state are not touched.
+M07 does not open here.
+
+### Why: Unsure 23 and 26, answered in label-impact
+
+At the close the lift served `g-001` as "no answer" with its call
+record: the tool refused the model's `section` as the number `8.1`
+(Unsure 23) and the door's answer took five shapes in eight CI calls
+(Unsure 26). After M06 the M03 gate read GREEN or RED on
+`answers_differing` by the call (M06 Unsure 42). Read from
+`agentkeel-studio/label-impact` with `gh api` on 2026-11-14, none of it
+designed or built here:
+
+| What | Where | Read |
+|---|---|---|
+| The tool | #8, merged 2026-11-11 03:50 UTC, `d899d68` | "find_label_row: section is text, and the model's number is read as the table's text" |
+| The prompt | #9, merged 2026-11-11 05:23 UTC, `main` at `bd89989` | "prompt: which clause to cite, when impacted is true, and all five fields every time" |
+| The deploy | agentkeel [run 42967373936](https://github.com/andaro74/agentkeel/actions/runs/42967373936), 2026-11-11 05:41 UTC | `sign-agent` and `deploy-agent` for `agentkeel-studio/label-impact` at `bd899896…`, both success |
+| The data | `data/table.json`, `data/clauses.json` at `bd89989` | git blob hashes `21718ee…` and `c1e826f…`, equal to this repository's `data/` at `595dd68` |
+| The manifest | `manifest.yaml` at `bd89989` | seven seats `andaro74`, one caller `pharmadelta` issuer `self`, guardrail `4q5ebd7qov82` version `"1"`, `platform_version: m10` |
+
+### The call
+
+One `workflow_dispatch` of `m03-lift.yml` on `m03-relift`,
+[run 43602104535](https://github.com/andaro74/pharmadelta/actions/runs/43602104535).
+The artifact was downloaded with `gh run download` into a fresh empty
+directory and read with `python -I`.
+
+| Field | Read |
+|---|---|
+| head | `4e5d5ba`, one commit over `main` at `cd2c462` |
+| artifact | `m03-lift-4e5d5ba5a52977248d8554c65eeedd2b6c3d9851` |
+| `ci` | `event` `workflow_dispatch`, `ref` `refs/heads/m03-relift`, `run_attempt` `1`, `workflow` and `job` `m03-lift` |
+| `ok`, `written_by_ci`, `dirty` | true, true, false |
+| `env_set` | all four true |
+| `sign_in` | `signed_in` true, 200, `token_use` `access`, `token_username` `pharmadelta`, `expires_in` 3600, `pool_id_prefix` `us-west-2` |
+| `agent_commit` | `bd89989` |
+| `call.request_id`, `called_at` | `G1U1Sjc1PHcEMoQ=`, `2026-11-14T13:54:41+00:00` |
+| `door` | 200, `apigw-requestid`, `stop_reason` `end_turn`, `guardrail_topics` `[]`, `refused` null, `error` null, `source` `dynamodb`, `usage` 4248 / 151 / 4399, `latency_ms` 2947, 6713 ms wall |
+| `door.tool_calls` | one: `find_label_row`, `label` `lisinopril`, `section` the string `"8.1"`, `status` `success`, `found` true |
+| `door.parsed` | `table_row` `lisinopril.8.1`, `clause_id` `201.57(c)(9)(i)`, `impacted` true, `owed` `follow-rld`, `escalate` false |
+
+It is one call. It does not show that the door's answer no longer
+varies; the gate asks again on every run and says so by the run.
+
+### The pages, as written
+
+- `pages/api/answers.json` and `pages/detail.html`: `uv run python -m
+  src.m03.lift write --from <artifact>`. The `g-001` entry serves the
+  call's answer verbatim, with row `lisinopril.8.1` and clause
+  `201.57(c)(9)(i)` copied from `data/` at `595dd68`; `agent.commit`
+  and `call.agent_commit` `bd89989`; `scripted` false. Before: `answer`,
+  `row` and `clause` null from run 41222218526 at `8cf0563`. The detail
+  page shows an answer with its row and its clause for the first time.
+- `pages/side-by-side.html`: `uv run python -m src.m04.lift write
+  --from <artifact of run 41250971500>`. Its right column copies the
+  new entry. Its left column, the frozen baseline's run, is unchanged
+  and `pages/api/baseline.json` is byte-equal after the rebuild.
+- The two columns now show the same row, clause and three fields on
+  `g-001`. That is what an `ordinary` golden is: row 0 measured the
+  baseline failing a trap, `g-002`, not this question. The page shows
+  one question; it makes no comparison beyond it (Unsure 35).
+- The answer equals `goldens/g-001.yaml`'s `expected` on every field,
+  read by hand on 2026-11-14. No code here compares them; scoring the
+  agent against its goldens is agentkeel's, in label-impact.
+
+### The code
+
+- `src/m03/lift.py`: `AGENT_COMMIT` from `956cd87` to `bd89989`, read
+  by hand from the deploy run above (M05 Unsure 41 stands: a constant,
+  not a registry read).
+- `src/m05/lift.py`: the entry's `agent.commit` is the call record's
+  `agent_commit`, not the constant, as `src/m03/lift.py` has read it
+  since `df5a56f`. Without it a rebuild of the break page would write
+  `bd89989` over a call made at `956cd87`. Construction (P4): a rebuild
+  from the artifact of run 42410336643 leaves `pages/api/break-it.json`
+  and `pages/break-it.html` unchanged.
+- No gate, no workflow, `src/baseline/` (P5), `goldens/` and `data/`
+  unchanged.
+
+### What this PR does not hold
+
+- No change to row 4, or to any row cell, of `milestones/README.md`.
+- No change to `pages/api/sign-off.json`, `pages/sign-off.html` or the
+  evidence zip: the commit that last changed the served sign-off stays
+  `37352ef`, and the package still holds `pages/api/answers.json` as at
+  its build commit, the entry with `answer` null. The M06 gate reads
+  each package entry at the commit the package names, so the live
+  detail page now differs from the package's copy, as the live pages
+  have since #38. No re-build of the package is made; one would need a
+  new signature (M06 Unsure 36).
+- No door host, pool id, client id, door text beyond the answer, or
+  token in a file, page or commit message: the three served files
+  grepped for `execute-api`, `us-west-2_` and `amazonaws.com/`, no
+  match; the artifact, the same.
+- No word of SPEC/00 §11's six on either page (count 0).
+- No treatment answer: the answer is a regulatory one, a row and a
+  clause.
+- No tag.
+
+### What a reader can falsify
+
+- `git diff cd2c462..<head> --stat` touches `src/m03/lift.py`,
+  `src/m05/lift.py`, `pages/api/answers.json`, `pages/detail.html`,
+  `pages/side-by-side.html`, `milestones/README.md`,
+  `milestones/M03/README.md` and
+  `milestones/adoption/rulings/m03-relift.md` only.
+- Row 4 of `milestones/README.md` is byte-for-byte as at `cd2c462`.
+- `gh run download 43602104535` and a `src.m03.lift write` from it,
+  then `gh run download 41250971500` and a `src.m04.lift write` from
+  it, leave `git status --short` empty on the head.
+- `gh run download 42410336643` and a `src.m05.lift write` from it
+  leave `git status --short` empty on the head.
+- `gh api repos/agentkeel-studio/label-impact/commits/main` reads
+  `bd89989`.
+- `git log -1 --format=%h -- pages/api/sign-off.json` reads `37352ef`.
+
+### After this PR
+
+The gates' readings on the PR, and on `main` after the merge, go in
+comments on #39, not in a commit. Expected: `M03 gate` GREEN when the
+door answers `g-001` as it did on the lift call, RED on
+`answers_differing` when it does not; either is a reading after row 4's
+measurement and reopens nothing (`rulings/pr4.md` 6, 22). `M04 gate`
+GREEN with `agent_disagreed` `[]`. `M05 gate` and `M06 gate` as on
+`main`. No tag is placed. M07 opens in its own session at its PR 1.
+
+### Unsure (re-lift)
+
+Numbering continues from PR 4's. Each needs a seat's ruling. None
+changes row 4.
+
+| # | Item | Seat |
+|---|---|---|
+| 34 | Whether the door's answer to `g-001` is stable now. One lift call and the gate runs on this PR are too few to say; Unsure 26 recorded five shapes in eight calls before the fix. A RED on `answers_differing` on a later run is recorded as what the agent said that day, not repaired here. | Product, Tool Owner (label-impact) |
+| 35 | Both columns of the side-by-side page now read the same on `g-001`. Whether the page should serve a second question, a trap the baseline fails, so that an executive sees a difference (SPEC/00 §1). That is a new served answer on two pages and two gates' inputs, not a re-lift; proposed: its own PR outside any cap, ruled by Product. | Product |
+| 36 | The evidence package signed at `37352ef` holds the entry with `answer` null. Whether it is re-built and re-signed to hold the new entry. Proposed: no; the package is the record of the day of the signature (M06 Unsure 34, 36, 41). | Product |
+| 37 | The ruling file names this PR as #39, the next number on this repository after #38. | Product |
