@@ -633,6 +633,36 @@ As row 8 says, and as the `main` run read: RED, `times_unrecorded`
 `M07 gate` job fails (exit 1). The Measured source stays run
 43770733652; this run is a reading after it.
 
+### Observed (CI run, 2026-11-15 UTC)
+
+The first run on this PR,
+[43774347102](https://github.com/andaro74/pharmadelta/actions/runs/43774347102),
+wrote the artifact `m07-gate-4e5542203a3f63d23b11b8ccc2c738e70b293a7f`
+(the sha is the pull request's merge ref; the branch head was
+`b14b74a`). Its `result.json`, read with `gh run download` into a fresh
+directory and `python -I`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F7.1 holds: times a-002 are served with no clock record" |
+| `times_unrecorded` | `["a-002"]` |
+| `times_disagreed` | `[]`: six pages read, no block on any |
+| `times_differing` | `[]`: `read_back` null, `not_read_back` "no clock record" |
+| `unreadable` | `[]`; `api_reads` `[]` |
+| `written_by_ci` | `true`; `commit` `4e55422`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/49/merge`; `run_at` `2026-11-15T23:21:23+00:00`; `env_set` `{"token": true}`, no token prefix in the file; the job failed at the gate step, the grep step and the upload succeeded |
+
+Equals the expected result on every field the ledger row names. The
+repaired gate reads the plant as the gate on `main` did. The repaired
+paths (a difference message, a cut job name) did not run: the plant
+makes no read-back. Their first CI exercise is the lift's (Unsure 36).
+
+On the same head `M00 gate`, `M02 gate`, `M03 gate`, `M04 gate`,
+`M05 gate` and `M06 gate` passed (runs 43774347057, 43774347052,
+43774347024, 43774347030, 43774347043, 43774347020); `m01.yml` did not
+run. Those are readings after their measurements and reopen no row. The
+push that adds this section runs every gate again; that second `M07
+gate` run is read into a comment on #49.
+
 ### What a reader can falsify
 
 - `git diff main --stat` on this PR touches `src/m07/gate.py`,
