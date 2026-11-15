@@ -23,7 +23,7 @@ this is the same row with the open detail.
 | Seeded commit | `c07fbe5` on `m07-pr1`: `pages/api/second-agent.json`, the time pharmadelta serves for its second agent, one entry `a-002`: name `record-keep-desk`, its job, repository `agentkeel-studio/record-keep-desk` with `repository_exists` false (GitHub answered 404 on 2026-11-15 UTC), `elapsed_seconds` `3600` typed by hand, `clock` null (no `created_at`, no deploy job, no run), `scripted` true, a `PLANT` key beside them. No page shows the number. No second repository exists, nothing was created or deployed, and nothing in this repository reads a clock. |
 | Expected gate output | PR 2's gate, in CI, reads every time the served file serves and names each that carries no clock record (`times_unrecorded`), and each time a page shows for the second agent that the file does not serve or serves differently (`times_disagreed`); then, for each time with a clock record, reads from GitHub's API the repository the record names (its `created_at` and its template), its first pull request's merge commit, and the `deploy-agent` job the record names by run and job id, and names each whose record differs from what GitHub answers or whose `elapsed_seconds` is not the stop less the start (`times_differing`). It writes a `result.json` that is RED when any time is unrecorded, disagreed or differing, naming each; GREEN only when every served time carries a clock record that equals GitHub's records, is shown as served, and the job concluded `success`; UNSCORABLE when nothing is RED and the served file, a page or GitHub's API could not be read. On `c07fbe5`: RED, `times_unrecorded` `["a-002"]`, `times_disagreed` `[]`, `times_differing` `[]`. The Measured cell cites the `main` run after PR 2 merges (M01 Unsure 23, ruled at M02 PR 1). |
 | Measured | |
-| PRs used / cap | 1 / 4 |
+| PRs used / cap | 2 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -259,6 +259,304 @@ The run links go in the PR body once read. A local run is not evidence
   `repository_id`, `template`, `created_at`, `pull_request`,
   `merge_commit`, `deploy_run`, `deploy_job`, `completed_at`,
   `conclusion`, and the run and artifact of the lift that read them.
+
+## Open detail (PR 2, 2026-11-15 UTC)
+
+PR 2 is the measure. It adds the gate that reads the plant and nothing
+that lifts it. `pages/api/second-agent.json` serves one time, `3600`
+seconds typed by hand, with `clock` null at the head this PR measures.
+M07 is measured here.
+
+### The owner's rulings on PR 1's Unsure, as given
+
+The start prompt for this PR listed Unsure 1, 2, 3, 5, 6 and 7 for
+Product and left all six blank. Each stands at its PR 1 proposal and
+stays open. PR 2 builds on two of them:
+
+| # | Proposal used | Built on here |
+|---|---|---|
+| 1 | a served JSON file is not a page | no; the served file is not edited |
+| 2 | nothing is drafted before `created_at` | no; before the run |
+| 3 | the check and the deploy may be started by hand, each recorded | no; before the run |
+| 5 | the gate reads public records only, with `GITHUB_TOKEN`, no secret | yes |
+| 6 | the one line goes on `index.html` | yes; the gate reads `index.html` and every `pages/*.html`, so a ruling for another page changes no code |
+| 7 | the first attempt stays the measurement | no; before the run |
+
+If 5 is ruled the other way, the gate gains a seat read and the
+workflow a secret, in PR 3. Items 2, 3 and 7 must still be ruled before
+the stopwatch run.
+
+### What this PR holds
+
+- `src/m07/gate.py`, the gate. Python 3.14, the standard library only;
+  `pyproject.toml` and `uv.lock` are unchanged. Nothing is imported from
+  `src/m01/` to `src/m06/`. In order:
+  1. Reads `pages/api/second-agent.json` (the `agents` list) and the
+     JSON in each `<script type="application/json"
+     id="second-agent-<id>">` block of `index.html` and every
+     `pages/*.html`.
+  2. `times_unrecorded`: every served entry that serves a time
+     (`elapsed_seconds` is not null) whose `clock` is null, is not an
+     object, lacks a field of the clock record (below), holds it empty,
+     or holds it in the wrong form. A read of the served file; no
+     network.
+  3. `times_disagreed`: every page block whose `id` the file does not
+     serve, whose block is not named `second-agent-<its id>`, or that is
+     not equal to the file's entry of that `id` as parsed JSON in
+     canonical form. A page with no block shows no time.
+  4. For each time that carries a clock record, and for no other, the
+     read-back from GitHub's API ("The read-back, as built").
+  5. `times_differing`: every such time with a difference. A read that
+     could not be made is `unreadable` and decides nothing.
+  6. Writes `result.json` and exits 0 GREEN, 1 RED, 2 UNSCORABLE.
+- `.github/workflows/m07.yml`: on every pull request, every push to
+  `main` and by hand. A default checkout (the gate asks git nothing but
+  its own head), `uv sync --locked`, the artifact directory, the gate
+  with `GITHUB_TOKEN` in its `env` and nothing else; a step that greps
+  the result directory for a token's prefix and fails on a match; then
+  the artifact `m07-gate-<sha>` holding `result.json`, 90 days, uploaded
+  only when the grep step passed. `permissions` is `contents: read`. The
+  job fails on anything but GREEN. The other ten workflows are
+  unchanged.
+- `result.json` records `verdict`, `times_unrecorded`,
+  `times_disagreed`, `times_differing`, `unreadable`, `commit`, `dirty`,
+  `written_by_ci`, `ci`, the API base, the clock record's fields, how
+  the clock is read (`clock_reading`, with `seats_read` false and
+  `registry_read` false), whether the environment held the token
+  (`env_set`, a boolean), per served entry its record check, page
+  equality and read-back (`served`), each page read and its blocks
+  (`pages`) and every API read by path and status (`api_reads`). No
+  token.
+- `rulings/pr2.md`, and "PRs used / cap" set to 2 / 4 here and in the
+  ledger.
+
+### The clock record's fields (fixed here; the lift writes them)
+
+A field present and empty is missing.
+
+| Field | Form the gate requires | Read back against |
+|---|---|---|
+| `repository` | `owner/name` | the entry's `repository`; `full_name` of `GET /repos/<repository>` |
+| `repository_id` | a positive whole number | the repository's `id`; the second value in the job's name |
+| `template` | `owner/name` | `agentkeel-studio/agent-template`, and the repository's `template_repository.full_name` |
+| `created_at` | a time with an offset | the repository's `created_at`, as an instant |
+| `pull_request` | a positive whole number | the `number` of the repository's first pull request by creation time |
+| `merge_commit` | 40 hex digits | that pull request's `merge_commit_sha`, when it is merged; the third value in the job's name |
+| `deploy_run` | a positive whole number | the job's `run_id`; the run's `path`, which must be `.github/workflows/deploy.yml` |
+| `deploy_job` | a positive whole number | `GET /repos/andaro74/agentkeel/actions/jobs/<deploy_job>` |
+| `completed_at` | a time with an offset | the job's `completed_at`, as an instant |
+| `conclusion` | a word | `success`, and the job's `conclusion` |
+| `read_by` | `run_url`, a run of this repository on github.com; `artifact`, a name | nothing; form only (Unsure 22) |
+
+`elapsed_seconds`, on the entry, must be a whole number equal to
+`completed_at` less `created_at`, both in the record and as GitHub
+answers.
+
+### The read-back, as built
+
+Nothing here runs on the plant. Four GETs per time.
+
+| Read | Decides |
+|---|---|
+| `GET /repos/<clock.repository>` | differing when GitHub answers 404 (the repository does not exist, or is not public: Unsure 19), names it otherwise, holds another id, was created from another template or none, or its `created_at` is not the record's; unreadable on any other status |
+| `GET /repos/<clock.repository>/pulls?state=all&sort=created&direction=asc&per_page=1` | differing when there is no pull request, the first is not the record's number, is not merged, or its merge commit is not the record's (Unsure 23); not asked of a repository that answered 404 |
+| `GET /repos/andaro74/agentkeel/actions/jobs/<clock.deploy_job>` | differing when the job does not exist, belongs to another run, is not a `deploy-agent` job, its name does not carry the repository, its id and the merge commit, it did not conclude `success`, or its `completed_at` is not the record's |
+| `GET /repos/andaro74/agentkeel/actions/runs/<clock.deploy_run>` | differing when the run does not exist or is not a run of `deploy.yml` |
+
+The gate follows no redirect, so the token goes to the API host alone;
+a 301 reads `unreadable`.
+
+**The job's name is cut (found here).** `deploy-agent` is a matrix job,
+so GitHub names each leg from the matrix row: `deploy-agent
+(<repository>, <repository_id>, <commit>, <name>, <rollout>)`. GitHub
+cuts the name at 97 characters and adds `...`. On label-impact's deploy
+job 114389865133 the name ends right after the 40-digit commit; the
+agent's bare name, the fourth value, is not in it. `agentkeel-studio/record-keep-desk`
+is four characters longer, so with a ten-digit repository id its job
+name will hold 36 of the commit's 40 digits. The gate reads the three
+leading values by position: the repository and its id whole; the commit
+whole when 40 digits are there, else as a prefix of the record's merge
+commit, at least 20 digits, and only when the cut ended the name inside
+it. It records which (`name_read.commit_whole`). F7.1's "names the
+agent" is read as: names the agent's repository and its id (Unsure 20).
+
+**Unsure 10, as built.** The record names the job by id. A job id is
+one attempt's: a re-run makes a new job with a new id under the same
+run id. So the record names one attempt and that attempt's
+`completed_at`. This is GitHub's documented behaviour; it has not been
+exercised here (Unsure 21).
+
+### The verdict
+
+- **RED** when `times_unrecorded`, `times_disagreed` or
+  `times_differing` is non-empty. The first two are reads of the served
+  file and the pages and come before any network, so the plant reads RED
+  whatever GitHub's API says that day (M03 Unsure 4's rule).
+- **GREEN** only when every served time carries a clock record, every
+  read-back equals it, the job concluded `success`, every page block is
+  the file's entry, and nothing was unread.
+- **UNSCORABLE** when nothing is RED and: the served file could not be
+  read or parsed, it serves no entry or one id twice, a page could not
+  be read or holds a block that is not JSON, or a read-back could not be
+  made. Never RED, never GREEN.
+- A read-back that cannot be made on a time that also differs leaves
+  the RED standing, with `unreadable` beside it (M05 PR 3's rule, built
+  in).
+- An entry that serves no time (`elapsed_seconds` null or absent) is
+  named by no list (Unsure 18). A served time that no page shows is
+  named by no list (Unsure 17).
+
+### What this PR does not hold
+
+- No lift. `git diff c07fbe5 -- pages/` and `git diff main -- pages/
+  index.html` are empty.
+- No second repository and no step that starts the clock. The session
+  asked GitHub whether `agentkeel-studio/record-keep-desk` exists (a
+  GET; 404) and created nothing.
+- No edit under `src/m01/` to `src/m06/`, `src/baseline/` (P5),
+  `src/gate/`, `src/ingest/`, `goldens/`, `data/`, `pyproject.toml`,
+  `uv.lock`, the other workflows, SPEC/00, CLAUDE.md, the README or any
+  other milestone's files.
+- No secret and no variable. Grep `secrets.` in
+  `.github/workflows/m07.yml`: one match, `secrets.GITHUB_TOKEN`. Grep
+  `vars.`: none. Grep `https://` under `src/m07/`: the API base and the
+  run URL pattern on github.com, nothing else.
+- No seat read and no registry read (Unsure 5; M01 Unsure 12).
+- No "Measured" cell and no tag. Those are PR 4's.
+- No number on a page: no page changes. The step summary shows no time.
+  No word of SPEC/00 §11's six. No design of anything the platform owns.
+
+### Construction run (not evidence, P4)
+
+Run on 2026-11-15 UTC from the working tree before the first push, so
+`written_by_ci` is false and the tree was dirty.
+
+| Reading | What was read |
+|---|---|
+| the gate on the real files with no token | `RED`, `times_unrecorded` `["a-002"]` (`clock is null`), `times_disagreed` `[]`, `times_differing` `[]`, `unreadable` `[]`; six pages read, no block on any; `read_back` null; `api_reads` `[]`; exit 1. `result.json` grepped for `ghs_`, `ghp_`, `github_pat_`, `execute-api` and `amazonaws`: no match |
+| eighty-four made-up pairs of files in the session's scratch directory, every API read stubbed, not committed | the plant: `RED`, unrecorded, no API read. A lifted entry with every read equal: `GREEN`, with no page block and with a block equal to the entry. Fifteen malformed clock records (a string, a field missing or empty, a repository not `owner/name`, an id a string or `true` or zero, a time with no offset or a word, a short commit, `read_by` malformed, off github.com or another repository's run): each `RED`, unrecorded, no API read. Fourteen differences on the record's side (the entry's repository, the template, the conclusion, `elapsed_seconds` off by one, a float, a word or `true`, the start, the stop, a stop before the start, the id, the pull request, the merge commit, the run) and twenty-three on GitHub's side (the repository 404, renamed, with no template or another, another `created_at`; no pull request, the first not merged, not the record's number, another merge commit; the job 404, of another run, a `sign-agent` job, naming another repository, id or commit, with no values, cut below twenty digits, a short commit in an uncut name, `failure`, not completed, another `completed_at`; the run 404 or of `platform-check.yml`): each `RED`, differing. An uncut name with the whole commit: `GREEN`. Eight unread answers (403, 301, 500, 502, a body that is not an object, a `created_at` that is not a time, the API raising): each `UNSCORABLE`, exit 2. An unread answer beside a difference: `RED`, with `unreadable`. A page showing another time, an id the file lacks, a misnamed block, one wrong page of two: `RED`, disagreed. A page missing beside the plant: `RED`, unrecorded, `unreadable` names the page; beside a lifted entry, a page missing, not UTF-8, or with a block that is not JSON or not an object: `UNSCORABLE`. An entry with no time, alone: `GREEN`; beside the plant: unrecorded `["a-002"]` only. Zero served, not JSON, `agents` not a list, one id twice, an entry with no id: `UNSCORABLE` by the refusal path |
+| the gate's own transport on real records: label-impact written as if it were a lifted entry (its repository, id, `created_at`, pull request #1, merge commit `5e370ca`, agentkeel run 38112132210, job 114389865133), once with the owner's `gh auth token` in one process's environment, typed and printed nowhere, and once with no token | `GREEN` both times; four GETs, each 200; the job's name read with the commit whole. With a later deploy job of label-impact (130347979449, commit `bd89989`): `RED`, differing, "the job's name carries the commit bd899896ff7f…, not the merge commit". With the repository named `agentkeel-studio/record-keep-desk`: `RED`, differing, "the repository the record names does not exist". No time read here is written anywhere: label-impact was not timed (M01) |
+
+No defect was found by the eighty-nine readings. The script and its
+files live in the session's scratch directory and are not committed (M01
+Unsure 21's reading: no test file).
+
+### Expected CI result on this PR
+
+The ledger row says: RED, `times_unrecorded` `["a-002"]`,
+`times_disagreed` `[]`, `times_differing` `[]`. The CI run on this PR is
+expected to write that, with `unreadable` `[]`, `written_by_ci` true,
+`env_set` true, `api_reads` `[]`, no read-back made, and to fail the
+`M07 gate` job (exit 1). The other gates that run on a pull request
+read their own files, none of which this PR changes. The CI run is the
+measurement; the construction run decides nothing.
+
+### Observed (CI run, 2026-11-15 UTC)
+
+The first run on this PR,
+[43769375822](https://github.com/andaro74/pharmadelta/actions/runs/43769375822),
+wrote the artifact `m07-gate-c708fc2413185f005f66dcf86b402f3ee0609070`
+(the sha is the pull request's merge ref; the branch head was
+`8ca4f15`). It holds `result.json`, read with `gh run download` into a
+fresh directory and `python -I` in this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F7.1 holds: times a-002 are served with no clock record" |
+| `times_unrecorded` | `["a-002"]`: `clock is null` |
+| `times_disagreed` | `[]`: six pages read (`index.html` and the five under `pages/`), no `second-agent-` block on any |
+| `times_differing` | `[]`: nothing read back, `read_back` null, `not_read_back` "no clock record" |
+| `unreadable` | `[]` |
+| `api_reads` | `[]`: GitHub's API was asked nothing for the plant |
+| `env_set` | `{"token": true}`; no value of it in the file. The workflow's grep step passed before the upload; the downloaded file grepped again here for `ghs_`, `ghp_`, `github_pat_`, `execute-api` and `amazonaws`: no match |
+| `written_by_ci` | `true`; `commit` `c708fc2`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/48/merge`; `run_at` `2026-11-15T22:27:26+00:00`; exit 1; the `M07 gate` job failed at the gate step, the grep step and the upload step succeeded. `result.json` is 4345 bytes, the artifact 1689 bytes, `expires_at` 2027-02-13 |
+
+Equals the expected result on every field the ledger row names. The
+plant is named as row 8 expects: the RED is the missing clock record,
+nothing else. No network read was made, so what GitHub's API would have
+said that day decided nothing.
+
+On the same head `M00 gate`
+([43769375770](https://github.com/andaro74/pharmadelta/actions/runs/43769375770)),
+`M02 gate`
+([43769375838](https://github.com/andaro74/pharmadelta/actions/runs/43769375838)),
+`M03 gate`
+([43769375763](https://github.com/andaro74/pharmadelta/actions/runs/43769375763)),
+`M04 gate`
+([43769375812](https://github.com/andaro74/pharmadelta/actions/runs/43769375812)),
+`M05 gate`
+([43769375885](https://github.com/andaro74/pharmadelta/actions/runs/43769375885))
+and `M06 gate`
+([43769375856](https://github.com/andaro74/pharmadelta/actions/runs/43769375856))
+passed; `m01.yml` did not run (its paths did not change). Those six are
+readings after their measurements and reopen no row. The push that adds
+this section runs every gate again; the second `M07 gate` run is read
+into a comment on #48.
+
+### What a reader can falsify
+
+- The artifact `m07-gate-<sha>` on this PR's run holds `result.json`
+  with `verdict: RED`, `times_unrecorded: ["a-002"]`, `times_disagreed:
+  []`, `times_differing: []`, `unreadable: []` and `written_by_ci:
+  true`. Download it and read it.
+- In that file `served[0].read_back` is null and `api_reads` is `[]`:
+  GitHub's API was asked nothing for the plant.
+- `git diff main --stat` on this PR touches `src/m07/`,
+  `.github/workflows/m07.yml`, `milestones/README.md`,
+  `milestones/M07/README.md` and `milestones/M07/rulings/pr2.md` only.
+- `agentkeel-studio/record-keep-desk` still answers 404: open the URL.
+- The job name's cut: `GET
+  /repos/andaro74/agentkeel/actions/jobs/114389865133`, `name`, 100
+  characters ending `...`.
+- Grep `from src.m0` in `src/m07/gate.py`: no match. Grep `secrets.` in
+  the workflow: one match.
+
+### After this PR goes RED
+
+The plant is lifted as "The false state" says: the stopwatch run, then a
+workflow of this repository that reads the four records above from
+GitHub's API and writes the entry with its `clock`, `scripted` false and
+no `PLANT` key, and the one line on the site with its block. Which PR
+carries the lift is ruled on reading this PR's CI run, as M03's to
+M06's were. Proposed: PR 4, by M03's path (b), a lift workflow run by
+hand whose artifact is committed. PR 3, if the cold review of this PR
+finds anything, repairs and does not lift; if it finds nothing, PR 3 is
+skipped.
+
+**Ruled at PR 2, on reading run 43769375822 (Product).** The owner's
+words: "PR 4 carries the lift". The lift is carried by PR 4, as M03's
+to M06's were, by M03's path (b): after the stopwatch run, a workflow
+of this repository, started by hand, reads the four records from
+GitHub's API and writes the entry with its `clock` as an artifact; the
+artifact's entry is committed to `pages/api/second-agent.json` with
+`scripted` false and no `PLANT` key, and the one line with its block is
+written on the site. PR 3, if the cold review of #48 finds anything,
+repairs and does not lift; if it finds nothing, PR 3 is skipped. The
+Measured cell takes the `main` run after #48 merges (M01 Unsure 23,
+ruled at M02 PR 1), which is expected to read as run 43769375822 did on
+the three lists: the plant makes no network read (`rulings/pr2.md` 13).
+
+## Unsure (PR 2)
+
+Numbering continues from PR 1's. Each needs a seat's ruling. None blocks
+the measurement. Items 19 and 23 bear on the stopwatch run's checklist.
+
+| # | Item | Seat |
+|---|---|---|
+| 15 | The ruling file names this PR as #48, the next number on this repository after #47. | Product |
+| 16 | **How a page shows a time.** By a `<script type="application/json" id="second-agent-<id>">` block holding the file's entry, on `index.html` or any `pages/*.html`. A time typed into a page's prose with no block is not seen by the gate, the same limit as the M03 to M06 gates. The lift writes the line and its block together. | Product, Engineering |
+| 17 | **One direction.** The row says GREEN needs every served time "shown as served". Read here as: what a page shows equals what the file serves. A served time that no page shows is named by no list. Whether GREEN must require the line to exist is Product's; the lift places it either way. | Product |
+| 18 | An entry whose `elapsed_seconds` is null or absent serves no time and is named by no list, whatever its `clock` (M06 Unsure 24's reading). | Product |
+| 19 | **The second repository must be public.** The gate reads with this repository's `GITHUB_TOKEN`, which sees public repositories only. A private repository answers 404, and the gate names its time differing, "does not exist, or is not public". One line for the stopwatch run's checklist: choose Public when creating from the template. | Security, Product |
+| 20 | **The job's name is cut at 97 characters.** For `record-keep-desk` the name will hold about 36 of the commit's 40 digits, fewer if the repository id is longer. The gate accepts a cut prefix of at least 20 digits. The name never holds the agent's bare name; "names the agent" is read as the repository's full name and id. GitHub's API gives the matrix values nowhere else on the job's record. | Engineering, Product |
+| 21 | Unsure 10 as built: the record names one attempt by its job id. That a re-run makes a new job id is GitHub's documented behaviour, not exercised here. If the deploy job is re-run during the stopwatch run, the lift writes the first attempt that concluded `success`. Proposed. | Engineering |
+| 22 | `read_by`, the lift's run and artifact, is checked for form and not read back: the gate reads GitHub's four records itself. Whether it should also download the lift's artifact and compare. Proposed: no. | Engineering |
+| 23 | **"First pull request"** is the earliest by creation time, whatever its number. If it is closed unmerged and a second one is merged and deployed, the time reads differing, as F7.1's words say. For the checklist: the agent's files go in one pull request and that one is merged. | Product |
+| 24 | The gate does not read `scripted` or `PLANT`. A lifted entry that still said `scripted` true would read GREEN if its records were equal. The lift removes both. | Product |
+| 25 | The template is read from `template_repository.full_name`. If the template repository is later renamed or deleted, GitHub's answer changes and the time would read differing. Recorded. | Engineering |
+| 26 | The read-back has run in CI on no run: the plant makes no network read. Its first CI exercise is the lift's. That this repository's `GITHUB_TOKEN` can read a job of `andaro74/agentkeel` rests on M01's reader, which read that repository's runs and jobs with it, and on the construction reading with no token. | Engineering |
+| 27 | `result.json` records the plant's `elapsed_seconds` as read, in `served[].elapsed_seconds`. A CI artifact is not a page, and the step summary shows no time. Follows Unsure 1. | Product |
+| 28 | PR 1's Unsure 1, 2, 3, 5, 6 and 7 were left blank in this PR's start prompt and stand at their proposals, open. 2, 3 and 7 before the stopwatch run. The order of PR 3 and the run in the attention plan is still Product's to change. | Product |
 
 ## Unsure (PR 1)
 

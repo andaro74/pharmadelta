@@ -1,0 +1,86 @@
+# The M07 gate (milestones/README.md row 8, F7.1).
+#
+# Reads the times pharmadelta serves for its second agent
+# (pages/api/second-agent.json) and the times a page shows (the
+# id="second-agent-<id>" blocks of index.html and pages/*.html), names
+# every served time that carries no clock record and every page time the
+# file does not serve; then, for each time with a clock record, reads back
+# from GitHub's API the repository the record names (its created_at and
+# its template), its first pull request's merge commit, and the
+# deploy-agent job of agentkeel's deploy.yml the record names by run and
+# job id, and compares. Writes the result as the artifact m07-gate-<sha>.
+# The job fails when the verdict is not GREEN. Only what this workflow
+# writes is evidence (SPEC/00 P4); a local run of the same command is not.
+#
+# What it reads, and with what: GitHub's API with the workflow's own
+# GITHUB_TOKEN, public records only (the agent's repository and
+# andaro74/agentkeel are public). No secret and no variable: no door, no
+# pool, no sign-in, no seat read (M07 Unsure 5). The gate follows no
+# redirect, so the token goes to the API host alone. The token is read
+# from the environment and written nowhere; before upload the result is
+# grepped for a token's prefix and the job fails on a match, so a result
+# that holds it is never written as an artifact. The other workflows are
+# unchanged.
+
+name: m07
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  m07-gate:
+    name: M07 gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Install (locked, Python 3.14 from .python-version)
+        run: uv sync --locked
+
+      # The artifact directory exists before anything can crash, so the
+      # upload below always has a directory to read (M00 PR 3, Q3 b).
+      - name: Create the artifact directory
+        run: mkdir -p "$RUNNER_TEMP/m07-gate"
+
+      # The gate writes result.json whenever its `main` runs: UNSCORABLE with
+      # the error when the served file could not be read and nothing is RED.
+      # A failure before `main` (an import error) exits 1 with no file, and
+      # the upload below then fails on if-no-files-found.
+      - name: Read the served times and the pages; read the repository, its first pull request and the deploy job back; judge row 8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          uv run python -m src.m07.gate
+          --out-dir "$RUNNER_TEMP/m07-gate"
+          --summary "$GITHUB_STEP_SUMMARY"
+
+      # The result must hold no token. An Actions token begins `ghs_`; hex
+      # digests cannot contain it. Runs whether the gate passed or failed; a
+      # match fails the job and the upload below does not run, so the file
+      # is never an artifact.
+      - name: Check the result holds no token
+        id: redact
+        if: always()
+        run: |
+          if grep -rqE 'ghs_[A-Za-z0-9]|ghp_[A-Za-z0-9]|github_pat_' "$RUNNER_TEMP/m07-gate"; then
+            echo "::error::the result holds a token; not uploaded"
+            exit 1
+          fi
+          echo "no match"
+
+      - name: Write the result as a CI artifact
+        if: ${{ !cancelled() && steps.redact.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: m07-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/m07-gate/
+          if-no-files-found: error
+          retention-days: 90
