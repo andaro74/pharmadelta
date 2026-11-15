@@ -451,6 +451,48 @@ expected to write that, with `unreadable` `[]`, `written_by_ci` true,
 read their own files, none of which this PR changes. The CI run is the
 measurement; the construction run decides nothing.
 
+### Observed (CI run, 2026-11-15 UTC)
+
+The first run on this PR,
+[43769375822](https://github.com/andaro74/pharmadelta/actions/runs/43769375822),
+wrote the artifact `m07-gate-c708fc2413185f005f66dcf86b402f3ee0609070`
+(the sha is the pull request's merge ref; the branch head was
+`8ca4f15`). It holds `result.json`, read with `gh run download` into a
+fresh directory and `python -I` in this session:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F7.1 holds: times a-002 are served with no clock record" |
+| `times_unrecorded` | `["a-002"]`: `clock is null` |
+| `times_disagreed` | `[]`: six pages read (`index.html` and the five under `pages/`), no `second-agent-` block on any |
+| `times_differing` | `[]`: nothing read back, `read_back` null, `not_read_back` "no clock record" |
+| `unreadable` | `[]` |
+| `api_reads` | `[]`: GitHub's API was asked nothing for the plant |
+| `env_set` | `{"token": true}`; no value of it in the file. The workflow's grep step passed before the upload; the downloaded file grepped again here for `ghs_`, `ghp_`, `github_pat_`, `execute-api` and `amazonaws`: no match |
+| `written_by_ci` | `true`; `commit` `c708fc2`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/48/merge`; `run_at` `2026-11-15T22:27:26+00:00`; exit 1; the `M07 gate` job failed at the gate step, the grep step and the upload step succeeded. `result.json` is 4345 bytes, the artifact 1689 bytes, `expires_at` 2027-02-13 |
+
+Equals the expected result on every field the ledger row names. The
+plant is named as row 8 expects: the RED is the missing clock record,
+nothing else. No network read was made, so what GitHub's API would have
+said that day decided nothing.
+
+On the same head `M00 gate`
+([43769375770](https://github.com/andaro74/pharmadelta/actions/runs/43769375770)),
+`M02 gate`
+([43769375838](https://github.com/andaro74/pharmadelta/actions/runs/43769375838)),
+`M03 gate`
+([43769375763](https://github.com/andaro74/pharmadelta/actions/runs/43769375763)),
+`M04 gate`
+([43769375812](https://github.com/andaro74/pharmadelta/actions/runs/43769375812)),
+`M05 gate`
+([43769375885](https://github.com/andaro74/pharmadelta/actions/runs/43769375885))
+and `M06 gate`
+([43769375856](https://github.com/andaro74/pharmadelta/actions/runs/43769375856))
+passed; `m01.yml` did not run (its paths did not change). Those six are
+readings after their measurements and reopen no row. The push that adds
+this section runs every gate again; the second `M07 gate` run is read
+into a comment on #48.
+
 ### What a reader can falsify
 
 - The artifact `m07-gate-<sha>` on this PR's run holds `result.json`
