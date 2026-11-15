@@ -475,13 +475,21 @@ def read_run(api: Api, run_id: int) -> dict:
 
 
 def parse_job_name(name: Any) -> dict:
-    """The job and the matrix values GitHub put in its name, by position; `cut` when GitHub ended the name with `...`."""
+    """The job and the matrix values GitHub put in its name, by position; `cut` when GitHub ended the name with `...`.
+
+    GitHub cuts at 97 characters and trims nothing, so the cut can land between a value's comma and the space
+    after it. The last value of a cut name then ends with that comma, which is the separator's and not the
+    value's: it is dropped (M07 PR 3, D2).
+    """
     if not isinstance(name, str) or " (" not in name:
         return {"job": name if isinstance(name, str) else None, "values": [], "cut": False}
     job, _, rest = name.partition(" (")
     cut = rest.endswith("...")
     rest = rest[:-3] if cut else rest.removesuffix(")")
-    return {"job": job, "values": [v.strip() for v in rest.split(", ")], "cut": cut}
+    values = [v.strip() for v in rest.split(", ")]
+    if cut:
+        values[-1] = values[-1].removesuffix(",")
+    return {"job": job, "values": values, "cut": cut}
 
 
 def job_name_check(name: Any, repository: str, repository_id: int, merge_commit: str) -> dict:
@@ -503,10 +511,10 @@ def job_name_check(name: Any, repository: str, repository_id: int, merge_commit:
     prefix_allowed = parsed["cut"] and len(values) == 3
     if whole:
         if commit != merge_commit:
-            differences.append(f"the job's name carries the commit {commit[:12]}…, not the merge commit {merge_commit[:12]}…")
+            differences.append(f"the job's name carries the commit {commit[:12]}..., not the merge commit {merge_commit[:12]}...")
     elif prefix_allowed and HEX.match(commit) and len(commit) >= MIN_COMMIT_PREFIX:
         if not merge_commit.startswith(commit):
-            differences.append(f"the job's name carries a commit beginning {commit[:12]}…, not the merge commit {merge_commit[:12]}…")
+            differences.append(f"the job's name carries a commit beginning {commit[:12]}..., not the merge commit {merge_commit[:12]}...")
     else:
         differences.append(f"the job's name carries {commit!r} where the commit is, not 40 hex digits or a cut prefix of at least {MIN_COMMIT_PREFIX}")
     return {**parsed, "commit_in_name": commit, "commit_whole": whole, "differences": differences}
@@ -589,7 +597,7 @@ def _read_back(entry: dict, api: Api, out: dict[str, Any], differences: list[str
             if not pull["merged_at"]:
                 differences.append(f"the first pull request #{pull['number']} is not merged (state {pull['state']!r})")
             elif pull["merge_commit"] != merge_commit:
-                differences.append(f"the first pull request's merge commit is {str(pull['merge_commit'])[:12]}…, not the record's {merge_commit[:12]}…")
+                differences.append(f"the first pull request's merge commit is {str(pull['merge_commit'])[:12]}..., not the record's {merge_commit[:12]}...")
 
     # The stop: the deploy job, by id.
     job = read_job(api, clock["deploy_job"])
@@ -700,9 +708,23 @@ def write_json(path: Path, obj: Any) -> None:
 
 
 def write_result(args: argparse.Namespace, result: dict) -> None:
+    """Write `result.json`, then the summary. Nothing after the result is written may raise.
+
+    The verdict is the file's. A summary that cannot be rendered or printed (a stdout that cannot encode a
+    character) must not reach `main`, which would write UNSCORABLE over a verdict already written (M07 PR 3, D1).
+    """
     write_json(args.out_dir / "result.json", result)
-    text = summary_markdown(result)
-    print(text)
+    try:
+        text = summary_markdown(result)
+    except Exception as exc:  # noqa: BLE001  the result is written; the summary changes nothing
+        text = f"## M07 gate: {result.get('verdict')}\n\nThe summary could not be rendered ({type(exc).__name__}). The verdict is in result.json.\n"
+    try:
+        print(text)
+    except Exception as exc:  # noqa: BLE001  the same: a print that fails is not a verdict
+        try:
+            print(f"the summary could not be printed: {type(exc).__name__}", file=sys.stderr)
+        except Exception:  # noqa: BLE001, S110
+            pass
     if args.summary:
         try:
             args.summary.parent.mkdir(parents=True, exist_ok=True)
