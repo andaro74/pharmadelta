@@ -23,7 +23,7 @@ this is the same row with the open detail.
 | Seeded commit | `c07fbe5` on `m07-pr1`: `pages/api/second-agent.json`, the time pharmadelta serves for its second agent, one entry `a-002`: name `record-keep-desk`, its job, repository `agentkeel-studio/record-keep-desk` with `repository_exists` false (GitHub answered 404 on 2026-11-15 UTC), `elapsed_seconds` `3600` typed by hand, `clock` null (no `created_at`, no deploy job, no run), `scripted` true, a `PLANT` key beside them. No page shows the number. No second repository exists, nothing was created or deployed, and nothing in this repository reads a clock. |
 | Expected gate output | PR 2's gate, in CI, reads every time the served file serves and names each that carries no clock record (`times_unrecorded`), and each time a page shows for the second agent that the file does not serve or serves differently (`times_disagreed`); then, for each time with a clock record, reads from GitHub's API the repository the record names (its `created_at` and its template), its first pull request's merge commit, and the `deploy-agent` job the record names by run and job id, and names each whose record differs from what GitHub answers or whose `elapsed_seconds` is not the stop less the start (`times_differing`). It writes a `result.json` that is RED when any time is unrecorded, disagreed or differing, naming each; GREEN only when every served time carries a clock record that equals GitHub's records, is shown as served, and the job concluded `success`; UNSCORABLE when nothing is RED and the served file, a page or GitHub's API could not be read. On `c07fbe5`: RED, `times_unrecorded` `["a-002"]`, `times_disagreed` `[]`, `times_differing` `[]`. The Measured cell cites the `main` run after PR 2 merges (M01 Unsure 23, ruled at M02 PR 1). |
 | Measured | |
-| PRs used / cap | 2 / 4 |
+| PRs used / cap | 3 / 4 |
 | State | OPEN |
 
 ## The false state (P1, P2)
@@ -535,6 +535,164 @@ repairs and does not lift; if it finds nothing, PR 3 is skipped. The
 Measured cell takes the `main` run after #48 merges (M01 Unsure 23,
 ruled at M02 PR 1), which is expected to read as run 43769375822 did on
 the three lists: the plant makes no network read (`rulings/pr2.md` 13).
+
+### The `main` run after #48 merged (read 2026-11-15 UTC)
+
+#48 merged at `3292219`. The push ran the gate on `main`:
+[run 43770733652](https://github.com/andaro74/pharmadelta/actions/runs/43770733652),
+artifact `m07-gate-329221941fb3b9eb2c1e21b1b92e8c23ea1541dc`. Its
+`result.json` was read with `gh run download` into a fresh directory and
+`python -I`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F7.1 holds: times a-002 are served with no clock record" |
+| `times_unrecorded` | `["a-002"]`: `clock is null` |
+| `times_disagreed` | `[]`: six pages read, no `second-agent-` block on any |
+| `times_differing` | `[]`: `read_back` null, `not_read_back` "no clock record" |
+| `unreadable` | `[]` |
+| `api_reads` | `[]` |
+| `env_set` | `{"token": true}`; the file grepped for `ghs_`, `ghp_`, `github_pat_`, `execute-api` and `amazonaws`: no match |
+| `written_by_ci` | `true`; `commit` `3292219`, `dirty` false; `event` `push`, `ref` `refs/heads/main`; `run_at` `2026-11-15T22:42:06+00:00`; the `M07 gate` job failed at the gate step, the grep step and the upload step succeeded. `result.json` is 4334 bytes, the artifact 1690 bytes, `expires_at` 2027-02-13 |
+
+Equals row 8's expected output on every field the row names, and reads
+as run 43769375822 did. This run is the Measured cell's source. The cell
+is filled at PR 4, not here.
+
+## Open detail (PR 3, 2026-11-15 UTC)
+
+PR 3 is the repair. A session that did not write the gate read
+`src/m07/gate.py` and `.github/workflows/m07.yml` at `3292219` cold,
+against row 8's words, and found two defects. This PR repairs both and
+nothing else. It does not lift: `pages/api/second-agent.json` and every
+page are unchanged, and the gate still reads the plant RED.
+
+### What the review found
+
+Construction readings only (P4): stubs in the session's scratch
+directory, and public records of the platform. None is committed.
+
+**Defects, repaired here.**
+
+| # | Where (at `3292219`) | The input that showed it | What it would have cost |
+|---|---|---|---|
+| D1 | `write_result`, `main` | `result.json` was written, then the summary rendered and printed. A print that raised reached `main`, which wrote UNSCORABLE over the verdict already written. Shown: a lifted entry with a wrong merge commit and a stdout that encodes ASCII only read exit 2, UNSCORABLE, `UnicodeEncodeError`; the same entry with a UTF-8 stdout read RED. The character was `…`, in three difference messages, none of which has printed in CI. | A real difference at the lift could have read UNSCORABLE where it is RED, in PR 4, with no PR left. CI's stdout is expected to be UTF-8; that was not read in CI, so the defect was latent |
+| D2 | `parse_job_name` | GitHub cuts a job's name at 97 characters and trims nothing (`sign-agent`'s name on run 42967373936 ends `, ...`). When the cut lands between the commit's comma and the space after it, the third value read as 40 hex digits and a comma, and the gate named a true time differing. That is a full repository name of 28 characters with a ten-digit id. | Nothing for `record-keep-desk` (33 characters; 36 digits of the commit kept). A second try under an 11-character name (Unsure 7) would have read RED for a reason that is not F7.1's |
+
+**The repair.**
+
+- D1: `write_result` writes `result.json` first; rendering and printing
+  the summary are each guarded and cannot raise. The three messages use
+  `...` in place of `…`.
+- D2: the last value of a cut name loses a trailing comma, which is the
+  separator's.
+
+**Limits, recorded and not repaired** (Unsure 30 to 38).
+
+**Nothing found** on: a token or a redirect URL reaching `result.json`
+(no path writes either; a redirect is recorded as its status alone); a
+clause of F7.1 the gate does not read; a clause read more strictly than
+the words; the workflow.
+
+### The cut name, read on real records
+
+| Job | Name | Read |
+|---|---|---|
+| label-impact, 114389865133 | 100 characters, ends right after the 40-digit commit | the commit whole |
+| festival-desk, 115060689514 | 100 characters, 39 digits of the commit, then `...` | a prefix of 39 digits |
+| `record-keep-desk`, made up, ten-digit id | 36 digits | a prefix of 36 digits |
+| the same, eleven-digit id | 35 digits | a prefix of 35 digits |
+| a 28-character full name, made up | 40 digits, a comma, `...` | differing before this PR; the commit whole after |
+
+### Construction run on the repaired gate (not evidence, P4)
+
+| Reading | Before | After |
+|---|---|---|
+| the gate on the real files, no token | RED, unrecorded `["a-002"]` | the same; other lists `[]`, `api_reads` `[]`, exit 1 |
+| a wrong merge commit, stdout ASCII only | UNSCORABLE, exit 2 | RED, differing `["a-002"]`, exit 1 |
+| a wrong merge commit, stdout UTF-8 | RED, differing | the same |
+| the cut after the comma | differing | no difference |
+| label-impact's real records in the lifted shape, no token | GREEN | GREEN |
+
+### What this PR does not hold
+
+- No lift. `git diff main -- pages/ index.html` is empty.
+- No second repository and no step that starts the clock.
+  `agentkeel-studio/record-keep-desk` answered 404 to a GET in this
+  session.
+- No change to the workflow, to any other gate, to `src/baseline/`
+  (P5), `goldens/`, `data/`, `pyproject.toml` or `uv.lock`.
+- No "Measured" cell and no tag. No number on a page.
+- No repair of a limit. No design of anything the platform owns.
+
+### Expected CI result on this PR
+
+As row 8 says, and as the `main` run read: RED, `times_unrecorded`
+`["a-002"]`, `times_disagreed` `[]`, `times_differing` `[]`, with
+`unreadable` `[]`, `written_by_ci` true and `api_reads` `[]`. The
+`M07 gate` job fails (exit 1). The Measured source stays run
+43770733652; this run is a reading after it.
+
+### Observed (CI run, 2026-11-15 UTC)
+
+The first run on this PR,
+[43774347102](https://github.com/andaro74/pharmadelta/actions/runs/43774347102),
+wrote the artifact `m07-gate-4e5542203a3f63d23b11b8ccc2c738e70b293a7f`
+(the sha is the pull request's merge ref; the branch head was
+`b14b74a`). Its `result.json`, read with `gh run download` into a fresh
+directory and `python -I`:
+
+| Field | Value |
+|---|---|
+| `verdict` | `RED`; `reason` "F7.1 holds: times a-002 are served with no clock record" |
+| `times_unrecorded` | `["a-002"]` |
+| `times_disagreed` | `[]`: six pages read, no block on any |
+| `times_differing` | `[]`: `read_back` null, `not_read_back` "no clock record" |
+| `unreadable` | `[]`; `api_reads` `[]` |
+| `written_by_ci` | `true`; `commit` `4e55422`, `dirty` false; `event` `pull_request`, `ref` `refs/pull/49/merge`; `run_at` `2026-11-15T23:21:23+00:00`; `env_set` `{"token": true}`, no token prefix in the file; the job failed at the gate step, the grep step and the upload succeeded |
+
+Equals the expected result on every field the ledger row names. The
+repaired gate reads the plant as the gate on `main` did. The repaired
+paths (a difference message, a cut job name) did not run: the plant
+makes no read-back. Their first CI exercise is the lift's (Unsure 36).
+
+On the same head `M00 gate`, `M02 gate`, `M03 gate`, `M04 gate`,
+`M05 gate` and `M06 gate` passed (runs 43774347057, 43774347052,
+43774347024, 43774347030, 43774347043, 43774347020); `m01.yml` did not
+run. Those are readings after their measurements and reopen no row. The
+push that adds this section runs every gate again; that second `M07
+gate` run is read into a comment on #49.
+
+### What a reader can falsify
+
+- `git diff main --stat` on this PR touches `src/m07/gate.py`,
+  `milestones/README.md`, `milestones/M07/README.md` and
+  `milestones/M07/rulings/pr3.md` only.
+- Grep `…` in `src/m07/gate.py`: no match.
+- The artifact of this PR's `m07` run holds `result.json` with
+  `verdict: RED` and `times_unrecorded: ["a-002"]`.
+- festival-desk's job name: `GET
+  /repos/andaro74/agentkeel/actions/jobs/115060689514`, `name`.
+
+## Unsure (PR 3)
+
+Numbering continues from PR 2's. Each needs a seat's ruling. None blocks
+the repair. Item 38 bears on the stopwatch run's checklist.
+
+| # | Item | Seat |
+|---|---|---|
+| 29 | The ruling file names this PR as #49, the next number on this repository after #48. | Product |
+| 30 | **The agent is not bound to the entry (extends 20).** The gate never reads the entry's `name`. label-impact's real records, served as `a-002` with the name `record-keep-desk`, read GREEN: any repository made from the template and deployed passes as "the second agent". The lift writes the repository the owner creates; the gate cannot tell it from the first. | Product, Engineering |
+| 31 | **The run's branch is not read.** A run of `deploy.yml` from a branch of agentkeel other than `main` would count as "agentkeel's `deploy.yml`". Only a login with write access there can make one. label-impact's run reads `head_branch` `main`. | Security, Engineering |
+| 32 | **Which successful job (extends 21).** The gate accepts any `deploy-agent` job that names the repository and the commit and concluded `success`, as F7.1's "a job" says. It does not read whether that job deployed or skipped at "Already deployed". The platform drops a deployed commit in `find-agents` and queues runs in one group, so a second successful job for one commit needs a re-run. The lift writes the job that deployed. | Engineering |
+| 33 | **How a page block is found (extends 16).** Only `type` before `id`, both in double quotes. A block written the other way round is not seen, and a page's prose is not compared with its block; both read GREEN. The lift writes the block in the form the gate reads. | Product, Engineering |
+| 34 | **A time under another key (extends 18).** An entry with `elapsed_seconds` null and the time under another name reads GREEN. | Product |
+| 35 | The plant beside an entry with no `id`, or beside one id served twice, reads UNSCORABLE, not RED: the gate refuses the file before it reads any entry. | Engineering |
+| 36 | **A 404 on the job or the run is a difference (extends 26).** If this repository's `GITHUB_TOKEN` could not see a job of `andaro74/agentkeel`, a true time would read RED. M01's reader read agentkeel's runs and job lists in CI under the same `permissions`; `GET .../actions/jobs/<id>` has run in CI on no run. A dry run by hand on a branch that is never merged would settle it before the stopwatch run; proposed, not ruled, not done. | Security, Engineering |
+| 37 | The step summary ends "No time is shown here". It shows the repository's `created_at` and the job's `completed_at`, and a difference message can name `elapsed_seconds`. Wording; a CI summary is not a page (follows 27). | Product |
+| 38 | **A first deploy that fails.** festival-desk's `deploy-agent` job failed on every scheduled run from at least `21:47Z` to `23:57Z` on 2026-10-12. If `record-keep-desk`'s first deploy fails and the fix is a second pull request, the deployed commit is not the first pull request's merge commit and the time reads differing, as F7.1's words say. For the checklist, with 7, 13 and 23. | Product, Security |
+| 39 | Unsure 2, 3, 7, 17, 19, 20 and 23 were left blank in this PR's start prompt and stand at their proposals, open. 2, 3 and 7 before the stopwatch run. | Product |
+| 40 | D2 as repaired covers a cut after the commit's comma. A cut inside the repository's name or its id (a full name of more than 70 characters) still reads differing. Not reachable by a name the owner would choose. | Engineering |
 
 ## Unsure (PR 2)
 
