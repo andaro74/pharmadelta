@@ -523,6 +523,19 @@ hand whose artifact is committed. PR 3, if the cold review of this PR
 finds anything, repairs and does not lift; if it finds nothing, PR 3 is
 skipped.
 
+**Ruled at PR 2, on reading run 43769375822 (Product).** The owner's
+words: "PR 4 carries the lift". The lift is carried by PR 4, as M03's
+to M06's were, by M03's path (b): after the stopwatch run, a workflow
+of this repository, started by hand, reads the four records from
+GitHub's API and writes the entry with its `clock` as an artifact; the
+artifact's entry is committed to `pages/api/second-agent.json` with
+`scripted` false and no `PLANT` key, and the one line with its block is
+written on the site. PR 3, if the cold review of #48 finds anything,
+repairs and does not lift; if it finds nothing, PR 3 is skipped. The
+Measured cell takes the `main` run after #48 merges (M01 Unsure 23,
+ruled at M02 PR 1), which is expected to read as run 43769375822 did on
+the three lists: the plant makes no network read (`rulings/pr2.md` 13).
+
 ## Unsure (PR 2)
 
 Numbering continues from PR 1's. Each needs a seat's ruling. None blocks

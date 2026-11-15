@@ -125,6 +125,20 @@ nothing under `pages/` changes, and no repository is created.
     about `agentkeel-studio/record-keep-desk` was a GET that answered
     404.
 
+13. **Product, on reading run 43769375822.** The run wrote RED,
+    `times_unrecorded` `["a-002"]`, `times_disagreed` `[]`,
+    `times_differing` `[]`, `unreadable` `[]`, `written_by_ci` true, on
+    the merge ref `c708fc2`; the plant is named as the row expects.
+    `api_reads` is `[]` and `read_back` is null: the gate asked
+    GitHub's API nothing for the plant. The grep step passed and the
+    artifact was written. The second run, 43769500271 on merge ref
+    `bc9687d`, read the same. The owner ruled: "PR 4 carries the lift".
+    It does so by M03's path (b): a lift workflow started by hand after
+    the stopwatch run, its artifact's entry committed (README, "After
+    this PR goes RED"). PR 3, if the cold review of #48 finds anything,
+    repairs and does not lift; if it finds nothing, PR 3 is skipped.
+    The Measured cell takes the `main` run after #48 merges.
+
 ## What a reader can falsify
 
 Listed in `milestones/M07/README.md`, "What a reader can falsify" under
