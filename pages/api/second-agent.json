@@ -1,0 +1,19 @@
+{
+  "what": "The time pharmadelta serves for its second agent: one entry per agent created on a stopwatch, each with the record of the clock that timed it (milestones/M07/README.md). The clock starts at the agent repository's `created_at` and stops at the `completed_at` of the `deploy-agent` job of agentkeel's deploy workflow for the agent's merge commit, both GitHub's records, never a person's. A time in this file is a measured result only when `clock` holds those records and the CI run that read them.",
+  "first_agent": "label-impact, agentkeel-studio/label-impact, created 2026-10-10 at M01 and not timed (milestones/M01/README.md)",
+  "company": "The second agent belongs to a fictional bank with no name. It is not the fictional generics company of the other pages, it is not a real bank, and its table and its policy clauses are invented (SPEC/00 §2, P8). It says what the bank's own retention policy requires; it gives no legal or financial advice.",
+  "lift": null,
+  "agents": [
+    {
+      "id": "a-002",
+      "name": "record-keep-desk",
+      "job": "A document type is due for disposal; may it be destroyed yet, and who signs? Every answer cites one row of the bank's retention table and one clause of the bank's own retention policy.",
+      "repository": "agentkeel-studio/record-keep-desk",
+      "repository_exists": false,
+      "elapsed_seconds": 3600,
+      "clock": null,
+      "scripted": true,
+      "PLANT": "M07 PR 1 (milestones/M07/README.md): `elapsed_seconds` is 3600, typed by hand. No repository named agentkeel-studio/record-keep-desk exists (GitHub answered 404 on 2026-11-15 UTC), nothing was created, nothing was deployed and no clock was read (`clock` null). The claim of ledger row 8 is false in this state; PR 2's gate must name a-002 under times_unrecorded."
+    }
+  ]
+}
